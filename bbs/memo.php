@@ -15,11 +15,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $posted = isset($_POST['settings']) && is_array($_POST['settings']) ? $_POST['settings'] : array();
     $save_settings = array();
-    $save_settings['all'] = in_array('all', $posted, true) ? 1 : 0;
+    $enabled_count = 0;
 
     foreach ($definitions as $key => $definition) {
         $save_settings[$key] = in_array($key, $posted, true) ? 1 : 0;
+        if ($save_settings[$key]) {
+            $enabled_count++;
+        }
     }
+    $save_settings['all'] = $enabled_count > 0 ? 1 : 0;
 
     willow_notification_save_settings($member['mb_id'], $save_settings);
     goto_url(G5_BBS_URL.'/memo.php?saved=1');
@@ -27,6 +31,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $g5['title'] = '알림센터';
 $settings = willow_notification_settings($member['mb_id']);
+if (empty($settings['all'])) {
+    foreach ($definitions as $setting_key => $definition) {
+        $settings[$setting_key] = 0;
+    }
+}
+$enabled_setting_count = 0;
+foreach ($definitions as $setting_key => $definition) {
+    if (!empty($settings[$setting_key])) {
+        $enabled_setting_count++;
+    }
+}
+$setting_total_count = count($definitions);
+$is_all_enabled = $setting_total_count > 0 && $enabled_setting_count === $setting_total_count;
+$is_all_disabled = $enabled_setting_count === 0;
 $token = get_token();
 $is_saved = isset($_GET['saved']) && $_GET['saved'] === '1';
 
@@ -48,12 +66,12 @@ include_once('./_head.php');
             <h2>알림설정변경</h2>
 
             <div class="willow_notification_segment" role="group" aria-label="알림 전체 수신 설정">
-                <label class="<?php echo !empty($settings['all']) ? 'is_active' : ''; ?>">
-                    <input type="radio" name="settings[]" value="all" <?php echo !empty($settings['all']) ? 'checked' : ''; ?>>
-                    <span>수신함</span>
+                <label class="<?php echo $is_all_enabled ? 'is_active' : ''; ?>">
+                    <input type="radio" name="willow_receive_mode" value="all_on" <?php echo $is_all_enabled ? 'checked' : ''; ?>>
+                    <span>모두수신</span>
                 </label>
-                <label class="<?php echo empty($settings['all']) ? 'is_active' : ''; ?>">
-                    <input type="radio" name="willow_all_off" value="1" <?php echo empty($settings['all']) ? 'checked' : ''; ?>>
+                <label class="<?php echo $is_all_disabled ? 'is_active' : ''; ?>">
+                    <input type="radio" name="willow_receive_mode" value="all_off" <?php echo $is_all_disabled ? 'checked' : ''; ?>>
                     <span>수신안함</span>
                 </label>
             </div>
@@ -108,8 +126,8 @@ include_once('./_head.php');
     if (!form) return;
 
     var segmentLabels = form.querySelectorAll('.willow_notification_segment label');
-    var allOn = form.querySelector('input[value="all"]');
-    var allOff = form.querySelector('input[name="willow_all_off"]');
+    var allOn = form.querySelector('input[name="willow_receive_mode"][value="all_on"]');
+    var allOff = form.querySelector('input[name="willow_receive_mode"][value="all_off"]');
     var itemChecks = form.querySelectorAll('.willow_notification_setting_item input[type="checkbox"]');
 
     function refreshSegment() {
@@ -117,6 +135,17 @@ include_once('./_head.php');
             var input = segmentLabels[i].querySelector('input');
             segmentLabels[i].classList.toggle('is_active', !!input.checked);
         }
+    }
+
+    function syncSegmentWithItems() {
+        if (!allOn || !allOff) return;
+        var checkedCount = 0;
+        for (var i = 0; i < itemChecks.length; i++) {
+            if (itemChecks[i].checked) checkedCount++;
+        }
+        allOn.checked = itemChecks.length > 0 && checkedCount === itemChecks.length;
+        allOff.checked = checkedCount === 0;
+        refreshSegment();
     }
 
     if (allOn && allOff) {
@@ -135,14 +164,7 @@ include_once('./_head.php');
 
     for (var i = 0; i < itemChecks.length; i++) {
         itemChecks[i].addEventListener('change', function () {
-            if (!allOn || !allOff) return;
-            var hasEnabled = false;
-            for (var j = 0; j < itemChecks.length; j++) {
-                if (itemChecks[j].checked) hasEnabled = true;
-            }
-            allOn.checked = hasEnabled;
-            allOff.checked = !hasEnabled;
-            refreshSegment();
+            syncSegmentWithItems();
         });
     }
 
