@@ -14,11 +14,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     check_token();
 
     $posted = isset($_POST['settings']) && is_array($_POST['settings']) ? $_POST['settings'] : array();
+    $has_consent = isset($_POST['willow_notification_consent']) && $_POST['willow_notification_consent'] === '1';
     $save_settings = array();
     $enabled_count = 0;
 
     foreach ($definitions as $key => $definition) {
-        $save_settings[$key] = in_array($key, $posted, true) ? 1 : 0;
+        $save_settings[$key] = $has_consent && in_array($key, $posted, true) ? 1 : 0;
         if ($save_settings[$key]) {
             $enabled_count++;
         }
@@ -45,6 +46,7 @@ foreach ($definitions as $setting_key => $definition) {
 $setting_total_count = count($definitions);
 $is_all_enabled = $setting_total_count > 0 && $enabled_setting_count === $setting_total_count;
 $is_all_disabled = $enabled_setting_count === 0;
+$has_notification_consent = $enabled_setting_count > 0;
 $token = get_token();
 $is_saved = isset($_GET['saved']) && $_GET['saved'] === '1';
 
@@ -97,7 +99,14 @@ include_once('./_head.php');
             <?php } ?>
         </section>
 
-        <button type="button" class="willow_notification_consent_open">알림 수신동의 <span>보기</span></button>
+        <div class="willow_notification_consent_row">
+            <label>
+                <input type="checkbox" name="willow_notification_consent" value="1" <?php echo $has_notification_consent ? 'checked' : ''; ?>>
+                <i aria-hidden="true"></i>
+                <span>알림 수신동의</span>
+            </label>
+            <button type="button" class="willow_notification_consent_open">보기</button>
+        </div>
         <button type="submit" class="willow_notification_setting_submit">저장하기</button>
     </form>
 </main>
@@ -129,6 +138,7 @@ include_once('./_head.php');
     var allOn = form.querySelector('input[name="willow_receive_mode"][value="all_on"]');
     var allOff = form.querySelector('input[name="willow_receive_mode"][value="all_off"]');
     var itemChecks = form.querySelectorAll('.willow_notification_setting_item input[type="checkbox"]');
+    var consentCheck = form.querySelector('input[name="willow_notification_consent"]');
 
     function refreshSegment() {
         for (var i = 0; i < segmentLabels.length; i++) {
@@ -145,6 +155,7 @@ include_once('./_head.php');
         }
         allOn.checked = itemChecks.length > 0 && checkedCount === itemChecks.length;
         allOff.checked = checkedCount === 0;
+        if (consentCheck) consentCheck.checked = checkedCount > 0;
         refreshSegment();
     }
 
@@ -152,12 +163,23 @@ include_once('./_head.php');
         allOn.addEventListener('change', function () {
             if (!allOn.checked) return;
             for (var i = 0; i < itemChecks.length; i++) itemChecks[i].checked = true;
+            if (consentCheck) consentCheck.checked = true;
             refreshSegment();
         });
         allOff.addEventListener('change', function () {
             if (!allOff.checked) return;
             allOn.checked = false;
             for (var i = 0; i < itemChecks.length; i++) itemChecks[i].checked = false;
+            if (consentCheck) consentCheck.checked = false;
+            refreshSegment();
+        });
+    }
+
+    if (consentCheck) {
+        consentCheck.addEventListener('change', function () {
+            for (var i = 0; i < itemChecks.length; i++) itemChecks[i].checked = consentCheck.checked;
+            if (allOn) allOn.checked = consentCheck.checked;
+            if (allOff) allOff.checked = !consentCheck.checked;
             refreshSegment();
         });
     }

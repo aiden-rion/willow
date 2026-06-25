@@ -1343,40 +1343,73 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
   transform: translateX(20px);
 }
 
-.willow_notification_consent_open {
+.willow_notification_consent_row {
   display: flex;
   min-height: 54px;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
-  border: 0;
+  gap: 16px;
   border-bottom: 1px solid #e3e6ea;
-  background: transparent;
+}
+
+.willow_notification_consent_row label {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
   color: #777777;
   font-size: 14px;
   font-weight: 800;
 }
 
-.willow_notification_consent_open::before {
+.willow_notification_consent_row input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.willow_notification_consent_row i {
+  position: relative;
   display: inline-grid;
   width: 25px;
   height: 25px;
-  margin-right: 10px;
+  flex: 0 0 auto;
   place-items: center;
   border-radius: 50%;
   background: #e1e4e8;
-  color: #ffffff;
-  content: "✓";
 }
 
-.willow_notification_consent_open span {
-  margin-left: auto;
+.willow_notification_consent_row i::before {
+  color: #ffffff;
+  content: "✓";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.willow_notification_consent_row input:checked + i {
+  background: #ff3d46;
+}
+
+.willow_notification_consent_row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.willow_notification_consent_open {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: #666666;
   font-size: 13px;
   font-weight: 700;
 }
 
-.willow_notification_consent_open span::after {
+.willow_notification_consent_open::after {
   display: inline-block;
   width: 8px;
   height: 8px;
