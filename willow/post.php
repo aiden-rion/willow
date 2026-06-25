@@ -388,7 +388,9 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <?php } ?>
     </article>
 
+    <?php if (!$article_requires_subscription) { ?>
     <?php willow_render_banner_area('post_bottom', 'willow_article_bottom_banner', '게시글상세 하단 배너'); ?>
+    <?php } ?>
 
     <div class="willow_image_viewer" aria-hidden="true">
         <button type="button" class="willow_image_viewer_close" aria-label="닫기"></button>
