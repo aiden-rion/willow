@@ -24,9 +24,7 @@ $write_href = $has_visible_topic ? willow_topic_write_url($willow_topic) : '#';
 
 $chips = willow_get_categories(true);
 
-$featured_posts = willow_get_popular_board_posts(2);
-
-$recommended = willow_get_recommended_posts(3);
+$featured_posts = willow_get_personalized_feed(0, 3);
 $recommended_authors = willow_get_recommended_authors();
 ?>
 
@@ -61,74 +59,9 @@ $recommended_authors = willow_get_recommended_authors();
         <?php } ?>
     </nav>
 
-    <section class="willow_feed" aria-label="커뮤니티 피드">
+    <section class="willow_feed willow_home_initial_feed" aria-label="맞춤 글">
         <?php foreach ($featured_posts as $post) { ?>
-        <?php $is_post_owner = !empty($member['mb_id']) && !empty($post['mb_id']) && $member['mb_id'] === $post['mb_id']; ?>
-        <article class="willow_post_card">
-            <div class="willow_post_head">
-                <img src="<?php echo $post['avatar']; ?>" alt="">
-                <div>
-                    <strong><?php echo $post['author']; ?><?php if (!empty($post['verified'])) { ?><img class="willow_author_cert_mark" src="<?php echo G5_IMG_URL; ?>/img_cert_mark.png" alt="탈북이주민 인증"><?php } ?></strong>
-                    <span><?php echo $post['date']; ?></span>
-                </div>
-                <div class="willow_more">
-                    <button class="willow_more_button" type="button" aria-label="더보기" aria-expanded="false">
-                        <span aria-hidden="true"></span>
-                    </button>
-                    <div class="willow_more_menu" role="menu">
-                        <?php if ($is_post_owner) { ?>
-                        <button type="button" role="menuitem">수정하기</button>
-                        <button type="button" role="menuitem">삭제하기</button>
-                        <?php } else { ?>
-                        <button type="button" role="menuitem" class="willow_report_button" data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
-                        <?php } ?>
-                    </div>
-                </div>
-            </div>
-            <a href="<?php echo $post['href']; ?>">
-                <?php if (!empty($post['title'])) { ?>
-                <h3><?php echo $post['title']; ?></h3>
-                <?php } ?>
-                <p><?php echo $post['body']; ?></p>
-                <?php if (!empty($post['image'])) { ?>
-                <img class="willow_post_image" src="<?php echo $post['image']; ?>" alt="">
-                <?php } ?>
-            </a>
-            <div class="willow_post_meta">
-                <button type="button" class="willow_like_button <?php echo !empty($post['liked']) ? 'is_liked' : ''; ?>" data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>" aria-pressed="<?php echo !empty($post['liked']) ? 'true' : 'false'; ?>">
-                    <img class="willow_meta_icon" src="<?php echo G5_IMG_URL; ?>/ico_heart<?php echo !empty($post['liked']) ? '_active' : ''; ?>.png" alt="" data-icon-heart data-icon-default="<?php echo G5_IMG_URL; ?>/ico_heart.png" data-icon-active="<?php echo G5_IMG_URL; ?>/ico_heart_active.png"><span data-like-count><?php echo (int) str_replace(',', '', $post['likes']) > 0 ? $post['likes'] : ''; ?></span>
-                </button>
-                <a class="willow_comment_link" href="<?php echo $post['href']; ?>#willow_comments">
-                    <img class="willow_meta_icon" src="<?php echo G5_IMG_URL; ?>/ico_rep.png" alt=""><span data-comment-count><?php echo (int) str_replace(',', '', $post['comments']) > 0 ? $post['comments'] : ''; ?></span>
-                </a>
-                <div class="willow_post_badges">
-                    <?php if (!empty($post['access']) && $post['access'] !== 'free') { ?>
-                    <span class="willow_post_badge is_subscribe">구독</span>
-                    <?php } ?>
-                    <?php if (!empty($post['category'])) { ?>
-                    <span class="willow_post_badge"><?php echo get_text($post['category']); ?></span>
-                    <?php } ?>
-                </div>
-            </div>
-        </article>
-        <?php } ?>
-    </section>
-
-    <section class="willow_recommend">
-        <h3>추천작가 글</h3>
-        <?php foreach ($recommended as $item) { ?>
-        <article class="<?php echo !empty($item['image']) ? 'has_thumb' : 'no_thumb'; ?>">
-            <div>
-                <a href="<?php echo $item['href']; ?>">
-                    <h4><?php echo $item['title']; ?></h4>
-                    <p><?php echo $item['excerpt']; ?></p>
-                    <span><b><?php echo $item['author']; ?> 작가</b> · <?php echo $item['date']; ?></span>
-                </a>
-            </div>
-            <?php if (!empty($item['image'])) { ?>
-            <img src="<?php echo $item['image']; ?>" alt="">
-            <?php } ?>
-        </article>
+        <?php echo willow_render_post_card($post); ?>
         <?php } ?>
     </section>
 
@@ -154,10 +87,78 @@ $recommended_authors = willow_get_recommended_authors();
     </section>
     <?php } ?>
 
+    <section id="willow_home_feed_more" class="willow_feed willow_home_more_feed" aria-label="더 많은 맞춤 글"></section>
+    <div class="willow_feed_state" data-feed-state>
+        <span data-feed-loading hidden>글을 불러오는 중입니다.</span>
+        <span data-feed-end hidden>모든 글을 확인했습니다.</span>
+    </div>
+
     <?php willow_render_banner_area('home', 'willow_home_main_banner', '메인 배너'); ?>
 
     <script>
     (function() {
+        var feedOffset = <?php echo count($featured_posts); ?>;
+        var feedLimit = 6;
+        var feedLoading = false;
+        var feedEnded = false;
+        var feedMore = document.getElementById('willow_home_feed_more');
+        var loadingText = document.querySelector('[data-feed-loading]');
+        var endText = document.querySelector('[data-feed-end]');
+
+        function setFeedState() {
+            if (loadingText) loadingText.hidden = !feedLoading;
+            if (endText) endText.hidden = !feedEnded;
+        }
+
+        function loadMoreFeed() {
+            if (!feedMore || feedLoading || feedEnded) return;
+            feedLoading = true;
+            setFeedState();
+            fetch('<?php echo G5_URL; ?>/willow/home_feed.php?offset=' + encodeURIComponent(feedOffset) + '&limit=' + encodeURIComponent(feedLimit), {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            }).then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                if (!data.success) {
+                    feedEnded = true;
+                    return;
+                }
+                if (data.html) {
+                    feedMore.insertAdjacentHTML('beforeend', data.html);
+                }
+                feedOffset += parseInt(data.count || 0, 10);
+                feedEnded = !data.has_more || parseInt(data.count || 0, 10) < feedLimit;
+            }).catch(function() {
+                feedEnded = true;
+            }).finally(function() {
+                feedLoading = false;
+                setFeedState();
+            });
+        }
+
+        if ('IntersectionObserver' in window && feedMore) {
+            var sentinel = document.createElement('div');
+            sentinel.className = 'willow_feed_sentinel';
+            feedMore.after(sentinel);
+            var observer = new IntersectionObserver(function(entries) {
+                if (entries.some(function(entry) { return entry.isIntersecting; })) {
+                    loadMoreFeed();
+                }
+            }, { rootMargin: '420px 0px' });
+            observer.observe(sentinel);
+        } else {
+            window.addEventListener('scroll', function() {
+                if (feedEnded || feedLoading) return;
+                if (window.innerHeight + window.scrollY > document.documentElement.scrollHeight - 520) {
+                    loadMoreFeed();
+                }
+            }, { passive: true });
+        }
+
         document.addEventListener('click', function(event) {
             var likeButton = event.target.closest('.willow_like_button');
             if (likeButton) {
