@@ -1,0 +1,34 @@
+<svg width="746" height="278" viewBox="0 0 746 278" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="746" height="278" fill="#F5EBDD"/>
+  <text x="52" y="84" fill="#1E1E1E" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="32" font-weight="700">윌로우 에서</text>
+  <text x="52" y="128" fill="#1E1E1E" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="32" font-weight="700">작가로 활동하세요!</text>
+  <text x="52" y="186" fill="#666666" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="23" font-weight="400">함께하실 작가분들을</text>
+  <text x="52" y="226" fill="#666666" font-family="-apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif" font-size="23" font-weight="400">언제나 모집합니다.</text>
+  <ellipse cx="524" cy="224" rx="150" ry="9" fill="#E7D9C7"/>
+  <path d="M405 219H451L443 156H413L405 219Z" fill="#BFA98E"/>
+  <path d="M412 156H443L447 145H416L412 156Z" fill="#9A856A"/>
+  <path d="M435 148C453 130 487 132 503 153C521 176 497 214 460 215C436 216 421 202 423 180C424 166 426 156 435 148Z" fill="#F1E1CB"/>
+  <path d="M488 136C504 138 514 150 514 166C511 162 506 162 500 166C491 173 487 187 475 194C457 204 432 194 428 176C424 157 453 132 488 136Z" fill="#3E3A32"/>
+  <path d="M426 178C417 182 410 191 406 203C423 201 438 199 451 196C445 184 437 178 426 178Z" fill="#E7D3B8"/>
+  <path d="M469 196C500 208 533 214 570 216L569 228C526 228 487 224 454 216L469 196Z" fill="#E7D3B8"/>
+  <path d="M454 216C485 224 524 228 569 228" stroke="#C5B08F" stroke-width="2"/>
+  <path d="M476 210L535 203L541 230L482 237L476 210Z" fill="#D6C4A5"/>
+  <path d="M483 218L532 212" stroke="#A99574" stroke-width="2"/>
+  <path d="M495 228L530 224" stroke="#A99574" stroke-width="2"/>
+  <path d="M538 207L558 193" stroke="#333333" stroke-width="3" stroke-linecap="round"/>
+  <path d="M389 196H407V227H389V196Z" fill="#E9DDCB" stroke="#C9BBA8"/>
+  <path d="M384 196H412" stroke="#C9BBA8"/>
+  <path d="M377 140H433V183H377V140Z" fill="#EFE2D0" stroke="#D7C6B3"/>
+  <path d="M399 134C407 144 416 151 428 156" stroke="#B5B58C" stroke-width="2" stroke-linecap="round"/>
+  <path d="M410 145C412 138 416 133 423 130" stroke="#B5B58C" stroke-width="2" stroke-linecap="round"/>
+  <path d="M411 146C406 142 400 139 394 138" stroke="#B5B58C" stroke-width="2" stroke-linecap="round"/>
+  <path d="M640 118C617 145 604 176 596 216" stroke="#9CA071" stroke-width="3" stroke-linecap="round"/>
+  <path d="M605 173C627 161 643 147 656 128" stroke="#9CA071" stroke-width="3" stroke-linecap="round"/>
+  <path d="M612 154C598 142 592 127 595 111" stroke="#9CA071" stroke-width="3" stroke-linecap="round"/>
+  <path d="M623 143C634 135 643 125 651 113" stroke="#9CA071" stroke-width="3" stroke-linecap="round"/>
+  <path d="M596 190C578 179 569 163 568 145" stroke="#9CA071" stroke-width="3" stroke-linecap="round"/>
+  <path d="M589 214H651L641 236H599L589 214Z" fill="#C8B58F"/>
+  <path d="M561 229H671V244H561V229Z" fill="#D7C6A7"/>
+  <path d="M575 214H646V229H575V214Z" fill="#E4D8C2"/>
+  <path d="M338 216H386L379 229H330L338 216Z" fill="#938D6A"/>
+</svg>

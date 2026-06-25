@@ -1,0 +1,143 @@
+@charset "utf-8";
+
+.willow_notification_page {
+  padding: 18px 16px 98px;
+}
+
+.willow_notification_head {
+  margin-bottom: 14px;
+}
+
+.willow_notification_head h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.willow_notification_head p {
+  margin: 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.willow_notification_policy {
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid #ececec;
+  background: #fff;
+}
+
+.willow_notification_policy h3 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.willow_notification_policy ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.willow_notification_policy li {
+  position: relative;
+  padding-left: 10px;
+  color: #666;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.willow_notification_policy li::before {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #111;
+  content: "";
+}
+
+.willow_notification_list {
+  display: grid;
+  gap: 10px;
+}
+
+.willow_notification_item {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 12px;
+  padding: 15px 14px;
+  border: 1px solid #eeeeee;
+  background: #ffffff;
+}
+
+.willow_notification_badge {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f8f8f8;
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.willow_notification_item strong {
+  display: block;
+  margin: 1px 0 5px;
+  color: #111;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.willow_notification_item p {
+  margin: 0;
+  color: #555;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.willow_notification_item time {
+  display: block;
+  margin-top: 8px;
+  color: #999;
+  font-size: 12px;
+}
+
+.willow_notification_empty {
+  display: grid;
+  justify-items: center;
+  padding: 46px 18px;
+  border: 1px solid #eeeeee;
+  background: #ffffff;
+  text-align: center;
+}
+
+.willow_notification_empty strong {
+  font-size: 17px;
+}
+
+.willow_notification_empty p {
+  margin: 8px 0 0;
+  color: #777;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.willow_notification_empty a {
+  display: grid;
+  min-width: 132px;
+  height: 42px;
+  margin-top: 18px;
+  place-items: center;
+  border-radius: 999px;
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
