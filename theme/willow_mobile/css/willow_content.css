@@ -58,9 +58,14 @@ button {
 }
 
 .willow_detail_header h1 {
+  overflow: hidden;
+  max-width: calc(100% - 152px);
   margin: 0;
   font-size: 18px;
   font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .willow_back {
@@ -68,6 +73,8 @@ button {
   left: 21px;
   width: 32px;
   height: 32px;
+  padding: 0;
+  cursor: pointer;
 }
 
 .willow_back::before {
@@ -80,6 +87,28 @@ button {
   border-left: 2px solid #111111;
   content: "";
   transform: rotate(45deg);
+}
+
+.willow_detail_actions {
+  position: absolute;
+  right: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.willow_detail_actions a {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+}
+
+.willow_detail_actions img {
+  display: block;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
 }
 
 .willow_today_page {

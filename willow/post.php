@@ -245,7 +245,16 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
 <main class="willow_content_app willow_article_page">
     <header class="willow_detail_header">
-        <a class="willow_back" href="<?php echo G5_URL; ?>/willow/today.php" aria-label="뒤로가기"></a>
+        <button type="button" class="willow_back" data-history-back data-fallback-url="<?php echo G5_URL; ?>/willow/today.php" aria-label="뒤로가기"></button>
+        <h1>글 상세</h1>
+        <div class="willow_detail_actions">
+            <a href="<?php echo G5_BBS_URL; ?>/new.php" aria-label="알림">
+                <img src="<?php echo G5_IMG_URL; ?>/ico_alert.png" alt="">
+            </a>
+            <a href="<?php echo G5_URL; ?>/willow/menu.php" aria-label="메뉴">
+                <img src="<?php echo G5_IMG_URL; ?>/ico_menu.png" alt="">
+            </a>
+        </div>
     </header>
 
     <article class="willow_article_inner">
@@ -426,6 +435,18 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                 setTimeout(resetArticleScroll, 0);
             }
         });
+
+        var historyBack = document.querySelector('[data-history-back]');
+        if (historyBack) {
+            historyBack.addEventListener('click', function() {
+                if (window.history.length > 1) {
+                    window.history.back();
+                    return;
+                }
+
+                window.location.href = historyBack.getAttribute('data-fallback-url') || '<?php echo G5_URL; ?>/willow/today.php';
+            });
+        }
 
         var galleryLinks = Array.prototype.slice.call(document.querySelectorAll('.willow_article_images [data-gallery-index]'));
         var viewer = document.querySelector('.willow_image_viewer');
