@@ -929,7 +929,7 @@ button {
 }
 
 .willow_article_page {
-  padding-bottom: 112px;
+  padding-bottom: 56px;
   background: #ffffff;
 }
 
@@ -938,7 +938,7 @@ button {
   left: 50%;
   width: 100vw;
   min-height: 145px;
-  margin: 24px 0 96px -50vw;
+  margin: 24px 0 44px -50vw;
   overflow: hidden;
   background: #f5ebdd;
 }
