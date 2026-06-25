@@ -60,6 +60,7 @@ $draft_access = !empty($draft['wd_access']) && $draft['wd_access'] === 'subscrib
     </header>
 
     <form class="willow_topic_write_form" action="<?php echo G5_URL; ?>/willow/write_update.php" method="post" enctype="multipart/form-data" autocomplete="off">
+        <input type="hidden" name="MAX_FILE_SIZE" value="5242880">
         <input type="hidden" name="wt_id" value="<?php echo (int) $topic['wt_id']; ?>">
         <input type="hidden" id="wd_id" name="wd_id" value="<?php echo (int) $draft_id; ?>">
         <input type="hidden" id="wp_tags" name="wp_tags" value="<?php echo get_text(!empty($draft['wd_tags']) ? $draft['wd_tags'] : ''); ?>">
@@ -138,6 +139,7 @@ $draft_access = !empty($draft['wd_access']) && $draft['wd_access'] === 'subscrib
 (function() {
     var topicTitle = <?php echo json_encode($willow_topic_title); ?>;
     var topicDescription = <?php echo json_encode($willow_topic_description); ?>;
+    var maxImageSize = 5 * 1024 * 1024;
     var topicMode = <?php echo json_encode($draft_topic_mode); ?>;
     var form = document.querySelector('.willow_topic_write_form');
     var content = document.getElementById('wp_content');
@@ -216,6 +218,15 @@ $draft_access = !empty($draft['wd_access']) && $draft['wd_access'] === 'subscrib
             var item = input.closest('.willow_attach_item');
             var file = input.files && input.files[0];
             if (!file) {
+                item.classList.remove('has_preview');
+                item.querySelector('.willow_attach_preview').src = '';
+                syncAttachVisibility();
+                return;
+            }
+
+            if (file.size > maxImageSize) {
+                alert('이미지는 5MB 이하 파일만 첨부할 수 있습니다.');
+                input.value = '';
                 item.classList.remove('has_preview');
                 item.querySelector('.willow_attach_preview').src = '';
                 syncAttachVisibility();

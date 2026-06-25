@@ -33,6 +33,7 @@ $tags = isset($_POST['wp_tags']) ? trim(strip_tags($_POST['wp_tags'])) : '';
 $access = isset($_POST['wp_access']) && $_POST['wp_access'] === 'subscriber' ? 'subscriber' : 'public';
 $mb_id = sql_escape_string($member['mb_id']);
 $now = G5_TIME_YMDHIS;
+$image_upload_limit = 5 * 1024 * 1024;
 
 if ($subject === '' && $content === '' && $tags === '' && empty($_FILES['wp_images']['name'])) {
     echo json_encode(array('success' => false, 'message' => '저장할 내용이 없습니다.'));
@@ -59,7 +60,21 @@ if (isset($_FILES['wp_images']['name']) && is_array($_FILES['wp_images']['name']
         if (count($images) >= 4) {
             break;
         }
-        if (!$filename || empty($_FILES['wp_images']['tmp_name'][$idx]) || !is_uploaded_file($_FILES['wp_images']['tmp_name'][$idx])) {
+        if (!$filename) {
+            continue;
+        }
+
+        $upload_error = isset($_FILES['wp_images']['error'][$idx]) ? (int) $_FILES['wp_images']['error'][$idx] : UPLOAD_ERR_OK;
+        $filesize = isset($_FILES['wp_images']['size'][$idx]) ? (int) $_FILES['wp_images']['size'][$idx] : 0;
+        if ($upload_error === UPLOAD_ERR_INI_SIZE || $upload_error === UPLOAD_ERR_FORM_SIZE || $filesize > $image_upload_limit) {
+            echo json_encode(array('success' => false, 'message' => '이미지는 5MB 이하 파일만 첨부할 수 있습니다.'));
+            exit;
+        }
+        if ($upload_error !== UPLOAD_ERR_OK) {
+            echo json_encode(array('success' => false, 'message' => '이미지가 정상적으로 업로드되지 않았습니다. 다시 첨부해 주세요.'));
+            exit;
+        }
+        if (empty($_FILES['wp_images']['tmp_name'][$idx]) || !is_uploaded_file($_FILES['wp_images']['tmp_name'][$idx])) {
             continue;
         }
 

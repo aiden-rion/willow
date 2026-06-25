@@ -24,6 +24,7 @@ if (!willow_topic_is_visible($topic)) {
 $wp_subject = isset($_POST['wp_subject']) ? trim(strip_tags($_POST['wp_subject'])) : '';
 $wp_content = isset($_POST['wp_content']) ? trim(strip_tags($_POST['wp_content'])) : '';
 $wp_images = array();
+$image_upload_limit = 5 * 1024 * 1024;
 
 if (isset($_POST['existing_images']) && is_array($_POST['existing_images'])) {
     foreach ($_POST['existing_images'] as $image_url) {
@@ -61,7 +62,19 @@ if (isset($_FILES['wp_images']['name']) && is_array($_FILES['wp_images']['name']
         if (count($wp_images) >= 4) {
             break;
         }
-        if (!$filename || empty($_FILES['wp_images']['tmp_name'][$idx]) || !is_uploaded_file($_FILES['wp_images']['tmp_name'][$idx])) {
+        if (!$filename) {
+            continue;
+        }
+
+        $upload_error = isset($_FILES['wp_images']['error'][$idx]) ? (int) $_FILES['wp_images']['error'][$idx] : UPLOAD_ERR_OK;
+        $filesize = isset($_FILES['wp_images']['size'][$idx]) ? (int) $_FILES['wp_images']['size'][$idx] : 0;
+        if ($upload_error === UPLOAD_ERR_INI_SIZE || $upload_error === UPLOAD_ERR_FORM_SIZE || $filesize > $image_upload_limit) {
+            alert('이미지는 5MB 이하 파일만 첨부할 수 있습니다.');
+        }
+        if ($upload_error !== UPLOAD_ERR_OK) {
+            alert('이미지가 정상적으로 업로드되지 않았습니다. 다시 첨부해 주세요.');
+        }
+        if (empty($_FILES['wp_images']['tmp_name'][$idx]) || !is_uploaded_file($_FILES['wp_images']['tmp_name'][$idx])) {
             continue;
         }
 
