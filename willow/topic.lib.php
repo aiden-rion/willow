@@ -59,6 +59,7 @@ function willow_topic_install()
         wp_subject varchar(255) not null default '',
         wp_content text not null,
         wp_image text not null,
+        wp_access varchar(20) not null default 'public',
         wp_like int unsigned not null default 0,
         wp_comment int unsigned not null default 0,
         wp_datetime datetime not null,
@@ -70,6 +71,10 @@ function willow_topic_install()
     $post_image_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_image' ", false);
     if (!empty($post_image_column['Type']) && stripos($post_image_column['Type'], 'text') === false) {
         sql_query(" alter table `{$tables['post']}` modify `wp_image` text not null ", false);
+    }
+    $post_access_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_access' ", false);
+    if (empty($post_access_column['Field'])) {
+        sql_query(" alter table `{$tables['post']}` add `wp_access` varchar(20) not null default 'public' after `wp_image` ", false);
     }
 
     sql_query(" create table if not exists `{$tables['draft']}` (
@@ -437,6 +442,8 @@ function willow_topic_post_to_feed($post)
     $author = $post['wp_author'] ? $post['wp_author'] : '윌로우 회원';
     $date = $post['wp_datetime'] ? substr($post['wp_datetime'], 0, 10) : G5_TIME_YMD;
 
+    $access = function_exists('willow_normalize_post_access') ? willow_normalize_post_access(isset($post['wp_access']) ? $post['wp_access'] : '') : (!empty($post['wp_access']) && $post['wp_access'] === 'subscriber' ? 'subscriber' : 'public');
+
     return array(
         'id' => (int) $post['wp_id'],
         'mb_id' => $post['mb_id'],
@@ -454,6 +461,7 @@ function willow_topic_post_to_feed($post)
         'verified' => !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant',
         'href' => willow_topic_post_url($post),
         'title' => get_text($post['wp_subject']),
-        'access' => 'paid',
+        'access' => $access,
+        'access_label' => function_exists('willow_post_access_label') ? willow_post_access_label($access) : ($access === 'subscriber' ? '유료' : '무료'),
     );
 }

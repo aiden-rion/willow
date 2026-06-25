@@ -25,7 +25,7 @@ if ($result) {
             'excerpt' => $post['excerpt'],
             'date' => $post['date'],
             'href' => $post['href'],
-            'type' => $post['access'] === 'free' ? '무료글' : '구독 전용',
+            'type' => willow_is_paid_access($post['access']) ? '유료글' : '무료글',
             'sort_datetime' => $post['sort_datetime'],
         );
     }

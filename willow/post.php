@@ -118,8 +118,8 @@ if ($wr_id) {
     if (empty($board_post['id'])) {
         alert('글을 찾을 수 없습니다.', G5_URL);
     }
-    $is_general = $board_post['access'] === 'free';
-    $article_requires_subscription = !empty($board_post['access']) && $board_post['access'] !== 'free';
+    $is_general = empty($board_post['access']) || !willow_is_paid_access($board_post['access']);
+    $article_requires_subscription = !empty($board_post['access']) && willow_is_paid_access($board_post['access']);
     $article_title = $board_post['title'];
     $article_author = $board_post['author'];
     $article_author_avatar = $board_post['avatar'];
@@ -365,7 +365,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             <?php if (!empty($willow_author_other_posts['items'])) { ?>
             <?php foreach ($willow_author_other_posts['items'] as $item) { ?>
             <?php
-            $item_access_label = !empty($item['access']) && $item['access'] === 'free' ? '무료' : '구독 전용';
+            $item_access_label = !empty($item['access']) ? willow_post_access_label($item['access']) : '무료';
             ?>
             <article class="<?php echo !empty($item['image']) ? 'has_thumb' : 'no_thumb'; ?>">
                 <a class="willow_other_post_link" href="<?php echo !empty($item['href']) ? $item['href'] : '#'; ?>">

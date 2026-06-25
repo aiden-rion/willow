@@ -893,6 +893,12 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
   white-space: nowrap;
 }
 
+.willow_post_badge.is_paid {
+  border-color: #ff3d46 !important;
+  background: #fff2f3;
+  color: #ff3d46 !important;
+}
+
 /*.willow_post_badge.is_subscribe::before {*/
 /*  display: inline-block;*/
 /*  width: 9px;*/

@@ -59,7 +59,7 @@ function willow_author_post_card($post)
 
     $like_count = (int) str_replace(',', '', (string) $post['likes']);
     $comment_count = (int) str_replace(',', '', (string) $post['comments']);
-    $access_label = !empty($post['access']) && $post['access'] === 'free' ? '무료' : '구독';
+    $access_label = !empty($post['access']) ? willow_post_access_label($post['access']) : '무료';
     $is_post_owner = !empty($member['mb_id']) && !empty($post['mb_id']) && $member['mb_id'] === $post['mb_id'];
     ob_start();
     ?>

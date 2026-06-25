@@ -797,6 +797,8 @@ function willow_board_post_to_feed($post)
     $images = !empty($post['wr_5']) ? willow_split_images($post['wr_5']) : array();
     $image = isset($images[0]) ? $images[0] : '';
 
+    $access = willow_normalize_post_access(isset($post['wr_3']) ? $post['wr_3'] : '');
+
     return array(
         'id' => (int) $post['wr_id'],
         'mb_id' => $post['mb_id'],
@@ -815,13 +817,35 @@ function willow_board_post_to_feed($post)
         'comments' => function_exists('willow_comment_count') ? number_format(willow_comment_count('board', (int) $post['wr_id'])) : number_format((int) $post['wr_comment']),
         'views' => (int) $post['wr_hit'],
         'verified' => willow_author_is_escapee($author),
-        'actions' => $post['wr_3'] === 'free',
+        'actions' => !willow_is_paid_access($access),
         'href' => G5_URL.'/willow/post.php?wr_id='.(int) $post['wr_id'],
         'title' => get_text($post['wr_subject']),
         'category' => get_text($post['wr_1']),
         'tags' => array_filter(array_map('trim', explode(',', $post['wr_2']))),
-        'access' => $post['wr_3'],
+        'access' => $access,
+        'access_label' => willow_post_access_label($access),
     );
+}
+
+function willow_normalize_post_access($access)
+{
+    $access = trim((string) $access);
+
+    if ($access === 'subscriber' || $access === 'paid') {
+        return 'subscriber';
+    }
+
+    return 'public';
+}
+
+function willow_is_paid_access($access)
+{
+    return willow_normalize_post_access($access) === 'subscriber';
+}
+
+function willow_post_access_label($access)
+{
+    return willow_is_paid_access($access) ? '유료' : '무료';
 }
 
 function willow_get_board_posts($limit = 10, $keyword = '')
@@ -1269,7 +1293,38 @@ function willow_get_personalized_feed($offset = 0, $limit = 6)
         }
     }
 
-    return array_slice($balanced, $offset, $limit);
+    $slice = array_slice($balanced, $offset, $limit);
+    if ($offset === 0 && $limit >= 3) {
+        $has_paid = false;
+        foreach ($slice as $item) {
+            if (!empty($item['access']) && willow_is_paid_access($item['access'])) {
+                $has_paid = true;
+                break;
+            }
+        }
+
+        if (!$has_paid) {
+            foreach ($balanced as $item) {
+                if (empty($item['access']) || !willow_is_paid_access($item['access'])) {
+                    continue;
+                }
+
+                $exists = false;
+                foreach ($slice as $slice_item) {
+                    if ($slice_item['target_type'].':'.$slice_item['id'] === $item['target_type'].':'.$item['id']) {
+                        $exists = true;
+                        break;
+                    }
+                }
+                if (!$exists) {
+                    $slice[count($slice) - 1] = $item;
+                    break;
+                }
+            }
+        }
+    }
+
+    return $slice;
 }
 
 function willow_render_post_card($post)
@@ -1318,8 +1373,8 @@ function willow_render_post_card($post)
                 <img class="willow_meta_icon" src="<?php echo G5_IMG_URL; ?>/ico_rep.png" alt=""><span data-comment-count><?php echo (int) str_replace(',', '', $post['comments']) > 0 ? $post['comments'] : ''; ?></span>
             </a>
             <div class="willow_post_badges">
-                <?php if (!empty($post['access']) && $post['access'] !== 'free') { ?>
-                <span class="willow_post_badge is_subscribe">구독</span>
+                <?php if (!empty($post['access']) && willow_is_paid_access($post['access'])) { ?>
+                <span class="willow_post_badge is_paid">유료</span>
                 <?php } ?>
                 <?php if (!empty($post['category'])) { ?>
                 <span class="willow_post_badge"><?php echo get_text($post['category']); ?></span>
@@ -1493,9 +1548,9 @@ function willow_get_author_board_posts($mb_id, $author_name = '', $access_group 
     }
 
     if ($access_group === 'free') {
-        $where .= " and wr_3 = 'free' ";
+        $where .= " and (wr_3 = '' or wr_3 = 'free' or wr_3 = 'public') ";
     } else {
-        $where .= " and wr_3 <> 'free' ";
+        $where .= " and wr_3 in ('subscriber', 'paid') ";
     }
 
     if ($exclude_wr_id) {

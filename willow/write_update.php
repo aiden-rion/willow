@@ -23,6 +23,7 @@ if (!willow_topic_is_visible($topic)) {
 
 $wp_subject = isset($_POST['wp_subject']) ? trim(strip_tags($_POST['wp_subject'])) : '';
 $wp_content = isset($_POST['wp_content']) ? trim(strip_tags($_POST['wp_content'])) : '';
+$wp_access = isset($_POST['wp_access']) && $_POST['wp_access'] === 'subscriber' ? 'subscriber' : 'public';
 $wp_images = array();
 $image_upload_limit = 5 * 1024 * 1024;
 
@@ -106,6 +107,7 @@ sql_query(" insert into `{$tables['post']}`
         wp_subject = '".sql_escape_string($wp_subject)."',
         wp_content = '".sql_escape_string($wp_content)."',
         wp_image = '".sql_escape_string($wp_image)."',
+        wp_access = '".sql_escape_string($wp_access)."',
         wp_datetime = '{$now}' ");
 
 sql_query(" update `{$tables['topic']}` set wt_participants = wt_participants + 1 where wt_id = '{$wt_id}' ");
