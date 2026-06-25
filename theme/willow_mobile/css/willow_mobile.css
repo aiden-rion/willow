@@ -996,8 +996,8 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 .willow_author_recommend_grid {
   display: flex;
   gap: 10px;
-  margin: 0 -26px;
-  padding: 0 26px 4px;
+  margin: 0 -26px 0 0;
+  padding: 0 26px 4px 0;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -1588,9 +1588,9 @@ body.willow_modal_open {
 
   .willow_author_recommend_grid {
     margin-right: -18px;
-    margin-left: -18px;
+    margin-left: 0;
     padding-right: 18px;
-    padding-left: 18px;
+    padding-left: 0;
   }
 
   .willow_author_recommend_card {
