@@ -3812,7 +3812,46 @@ button {
 }
 
 .willow_point_header {
+  position: relative;
+  display: flex;
+  min-height: 70px;
+  align-items: center;
+  justify-content: center;
   margin: 0 -18px;
+  padding: 0 52px;
+  background: #ffffff;
+}
+
+.willow_point_header a {
+  position: absolute;
+  left: 8px;
+  display: block;
+  width: 36px;
+  height: 36px;
+}
+
+.willow_point_header a::before {
+  position: absolute;
+  top: 11px;
+  left: 12px;
+  width: 12px;
+  height: 12px;
+  border-bottom: 2px solid #111111;
+  border-left: 2px solid #111111;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.willow_point_header h1 {
+  overflow: hidden;
+  margin: 0;
+  color: #151515;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .willow_point_header a img {
