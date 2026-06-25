@@ -658,7 +658,7 @@ button {
   background: #ffffff;
   color: #1a1a1a;
   font-family: "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.9;
   outline: none;
   padding: 16px 0 0;
@@ -1409,7 +1409,7 @@ button {
   border: 1px solid #dddddd;
   border-radius: 6px;
   color: #111111;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.5;
   resize: vertical;
 }

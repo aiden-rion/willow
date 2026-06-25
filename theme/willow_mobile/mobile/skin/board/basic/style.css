@@ -659,7 +659,7 @@
 .bo_vc_w {display:block;position:relative;padding:0 15px 15px;background:#f8f8f8}
 .bo_vc_w:after {display:block;visibility:hidden;clear:both;content:""}
 .bo_vc_w #char_cnt {display:block;margin:0 0 5px}
-.bo_vc_w textarea {width:100%;height:120px;padding:5px;border:1px solid #d0d3db;background:#fff;color:#000;vertical-align:middle}
+.bo_vc_w textarea {width:100%;height:120px;padding:5px;border:1px solid #d0d3db;background:#fff;color:#000;font-size:16px;vertical-align:middle}
 #wr_secret {}
 
 .bo_vc_w_info {margin:10px 0}

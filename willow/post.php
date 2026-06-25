@@ -400,6 +400,31 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
     <script>
     (function() {
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+
+        function resetArticleScroll() {
+            if (window.location.hash) {
+                return;
+            }
+
+            window.scrollTo(0, 0);
+            document.documentElement.scrollTop = 0;
+            document.body.scrollTop = 0;
+        }
+
+        resetArticleScroll();
+        window.addEventListener('load', function() {
+            setTimeout(resetArticleScroll, 0);
+            setTimeout(resetArticleScroll, 120);
+        });
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                setTimeout(resetArticleScroll, 0);
+            }
+        });
+
         var galleryLinks = Array.prototype.slice.call(document.querySelectorAll('.willow_article_images [data-gallery-index]'));
         var viewer = document.querySelector('.willow_image_viewer');
         var viewerTrack = viewer ? viewer.querySelector('.willow_image_viewer_track') : null;

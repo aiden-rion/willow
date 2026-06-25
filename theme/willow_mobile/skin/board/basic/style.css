@@ -684,7 +684,7 @@ box-shadow:1px 1px 5px 0px hsl(232, 36%, 96%)}
 .bo_vc_w:after {display:block;visibility:hidden;clear:both;content:""}
 .bo_vc_w h2 {position:absolute;font-size:0;line-height:0;overflow:hidden}
 .bo_vc_w #char_cnt {display:block;margin:0 0 5px}
-.bo_vc_w textarea {border:1px solid #ccc;background:#fff;color:#000;vertical-align:middle;border-radius:3px;padding:5px;width:100%;height:120px;
+.bo_vc_w textarea {border:1px solid #ccc;background:#fff;color:#000;font-size:16px;vertical-align:middle;border-radius:3px;padding:5px;width:100%;height:120px;
 -webkit-box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.1);
 -moz-box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.1);
 box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.1)}
