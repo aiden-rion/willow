@@ -37,7 +37,7 @@ header("Pragma: no-cache"); // HTTP/1.0
 <meta charset="utf-8">
 <?php
 if (G5_IS_MOBILE) {
-    echo '<meta name="viewport" id="meta_viewport" content="width=device-width,initial-scale=1.0,minimum-scale=0,maximum-scale=10">'.PHP_EOL;
+    echo '<meta name="viewport" id="meta_viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">'.PHP_EOL;
     echo '<meta name="HandheldFriendly" content="true">'.PHP_EOL;
     echo '<meta name="format-detection" content="telephone=no">'.PHP_EOL;
 } else {
@@ -49,6 +49,19 @@ if($config['cf_add_meta'])
     echo $config['cf_add_meta'].PHP_EOL;
 ?>
 <title><?php echo $g5_head_title; ?></title>
+<?php if (!defined('G5_IS_ADMIN')) { ?>
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
+<meta name="application-name" content="WILLOW">
+<meta name="apple-mobile-web-app-title" content="WILLOW">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileColor" content="#ffffff">
+<link rel="manifest" href="<?php echo G5_URL; ?>/manifest.webmanifest">
+<link rel="apple-touch-icon" href="<?php echo G5_IMG_URL; ?>/willow_app_icon.png">
+<link rel="icon" type="image/svg+xml" href="<?php echo G5_IMG_URL; ?>/willow_app_icon.svg">
+<?php } ?>
 <?php
 $shop_css = '';
 if (defined('_SHOP_')) $shop_css = '_shop';
@@ -89,6 +102,9 @@ if (defined('_SHOP_')) {
 add_javascript('<script src="'.G5_JS_URL.'/common.js?ver='.G5_JS_VER.'"></script>', 0);
 add_javascript('<script src="'.G5_JS_URL.'/wrest.js?ver='.G5_JS_VER.'"></script>', 0);
 add_javascript('<script src="'.G5_JS_URL.'/placeholders.min.js"></script>', 0);
+if(!defined('G5_IS_ADMIN')) {
+    add_javascript('<script src="'.G5_JS_URL.'/willow_app.js?ver='.G5_JS_VER.'"></script>', 15);
+}
 add_javascript('<script>
 document.addEventListener("DOMContentLoaded", function () {
     var header = document.querySelector("#hd.willow_shell_header");

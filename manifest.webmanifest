@@ -1,0 +1,64 @@
+{
+  "name": "WILLOW",
+  "short_name": "WILLOW",
+  "description": "작가와 독자가 글로 만나는 구독형 콘텐츠 앱",
+  "lang": "ko-KR",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "categories": ["books", "lifestyle", "social"],
+  "icons": [
+    {
+      "src": "/img/willow_app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/willow_app_icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/img/willow_splash3.png",
+      "sizes": "780x1689",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/img/willow_splash_1.png",
+      "sizes": "780x1689",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "WILLOW splash"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "오늘의 주제",
+      "short_name": "주제",
+      "url": "/willow/today.php",
+      "description": "오늘 열린 글감을 확인합니다."
+    },
+    {
+      "name": "글쓰기",
+      "short_name": "글쓰기",
+      "url": "/willow/write.php",
+      "description": "새 글을 작성합니다."
+    },
+    {
+      "name": "알림센터",
+      "short_name": "알림",
+      "url": "/bbs/new.php",
+      "description": "새 알림과 활동을 확인합니다."
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="WILLOW">
+  <rect width="512" height="512" rx="112" fill="#ffffff"/>
+  <rect x="1" y="1" width="510" height="510" rx="111" fill="none" stroke="#eeeeee" stroke-width="2"/>
+  <path fill="#111111" d="M128 170h43l24 124 35-124h34l35 124 24-124h43l-43 172h-43l-33-112-33 112h-43L128 170z"/>
+  <circle cx="256" cy="372" r="10" fill="#f0333d"/>
+</svg>

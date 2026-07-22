@@ -5,11 +5,16 @@ html,
 body {
   min-width: 0;
   background: #ffffff;
+  overscroll-behavior-y: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   color: #111111;
   font-family: "SUIT Variable", SUIT, -apple-system, BlinkMacSystemFont, sans-serif;
+  padding-top: env(safe-area-inset-top);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 body,
@@ -23,12 +28,20 @@ textarea {
 a {
   color: inherit;
   text-decoration: none;
+  -webkit-touch-callout: none;
 }
 
 button {
   border: 0;
   background: transparent;
   font: inherit;
+  touch-action: manipulation;
+}
+
+input,
+select,
+textarea {
+  font-size: 16px;
 }
 
 #hd_login_msg,
@@ -46,7 +59,7 @@ button {
 
 #hd.willow_shell_header {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top);
   z-index: 30;
   overflow: visible;
   min-width: 0;
@@ -68,7 +81,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 70px;
+  min-height: 70px;
   padding: 0 23px;
 }
 
@@ -164,7 +177,8 @@ button {
 
 .willow_shell {
   min-height: calc(100vh - 76px);
-  padding-bottom: 78px;
+  min-height: calc(100dvh - 76px);
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
   background: #f1f1f1;
 }
 
@@ -1558,8 +1572,13 @@ body.willow_modal_open {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
-  height: 78px;
-  padding: 8px 10px 10px;
+  min-height: calc(78px + env(safe-area-inset-bottom));
+  padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+  background: #ffffff;
+}
+
+.willow-native-shell body,
+.willow-standalone body {
   background: #ffffff;
 }
 
