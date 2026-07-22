@@ -14,6 +14,7 @@ $willow_allowed_paths = array(
     '/willow/auth_login.php',
     '/willow/menu.php',
     '/willow/splash.php',
+    '/offline.php',
 );
 
 $willow_is_allowed = in_array($willow_script, $willow_allowed_paths, true)
