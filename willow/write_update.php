@@ -120,6 +120,7 @@ sql_query(" insert into `{$tables['post']}`
         wp_category = '".sql_escape_string($wp_category)."',
         wp_tags = '".sql_escape_string($wp_tags)."',
         wp_datetime = '{$now}' ");
+$wp_id = sql_insert_id();
 
 if ($topic_mode === 'today') {
     sql_query(" update `{$tables['topic']}` set wt_participants = wt_participants + 1 where wt_id = '{$wt_id}' ");
@@ -129,6 +130,10 @@ if ($wd_id && !empty($member['mb_id'])) {
     sql_query(" delete from `{$tables['draft']}`
         where wd_id = '{$wd_id}'
             and mb_id = '".sql_escape_string($member['mb_id'])."' ", false);
+}
+
+if ($wp_id) {
+    goto_url(G5_URL.'/willow/post.php?wp_id='.(int) $wp_id);
 }
 
 goto_url(G5_URL.'/willow/today.php');
