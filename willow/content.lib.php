@@ -619,16 +619,16 @@ function willow_get_categories($active_only = true)
 
 function willow_member_avatar($member_row)
 {
-    if (!empty($member_row['mb_6'])) {
-        return $member_row['mb_6'];
-    }
-
     if (!empty($member_row['mb_id'])) {
         $image_path = G5_DATA_PATH.'/member_image/'.substr($member_row['mb_id'], 0, 2).'/'.get_mb_icon_name($member_row['mb_id']).'.gif';
         if (file_exists($image_path)) {
             $filetime = (defined('G5_USE_MEMBER_IMAGE_FILETIME') && G5_USE_MEMBER_IMAGE_FILETIME) ? '?'.filemtime($image_path) : '';
             return G5_DATA_URL.'/member_image/'.substr($member_row['mb_id'], 0, 2).'/'.get_mb_icon_name($member_row['mb_id']).'.gif'.$filetime;
         }
+    }
+
+    if (!empty($member_row['mb_6'])) {
+        return $member_row['mb_6'];
     }
 
     return G5_IMG_URL.'/no_profile.gif';

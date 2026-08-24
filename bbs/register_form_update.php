@@ -567,6 +567,7 @@ if (isset($_FILES['mb_icon']) && is_uploaded_file($_FILES['mb_icon']['tmp_name']
 if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['cf_member_img_height'] ){
     $mb_tmp_dir = G5_DATA_PATH.'/member_image/';
     $mb_dir = $mb_tmp_dir.substr($mb_id,0,2);
+    $willow_clear_member_avatar_url = false;
     if( !is_dir($mb_tmp_dir) ){
         @mkdir($mb_tmp_dir, G5_DIR_PERMISSION);
         @chmod($mb_tmp_dir, G5_DIR_PERMISSION);
@@ -575,6 +576,7 @@ if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['
     // 아이콘 삭제
     if (isset($_POST['del_mb_img'])) {
         @unlink($mb_dir.'/'.$mb_icon_img);
+        $willow_clear_member_avatar_url = true;
     }
 
     // 회원 프로필 이미지 업로드
@@ -610,6 +612,9 @@ if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['
                             @unlink($dest_path);
                         }
                     }
+                    if (file_exists($dest_path)) {
+                        $willow_clear_member_avatar_url = true;
+                    }
                     //=================================================================\
                 }
             } else {
@@ -619,6 +624,10 @@ if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['
         } else {
             $msg .= $_FILES['mb_img']['name'].'은(는) gif/jpg 파일이 아닙니다.';
         }
+    }
+
+    if ($willow_clear_member_avatar_url) {
+        sql_query(" update {$g5['member_table']} set mb_6 = '' where mb_id = '".sql_escape_string($mb_id)."' ");
     }
 }
 
