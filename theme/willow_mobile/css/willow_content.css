@@ -1163,9 +1163,9 @@ body.willow_write_body {
 }
 
 .willow_write_actions.has_tag_bar {
-  min-height: 113px;
-  padding-top: 0;
-  border-top: 0;
+  min-height: 61px;
+  padding-top: 10px;
+  border-top: 1px solid #e6e6e6;
 }
 
 .willow_write_tag_bar {
