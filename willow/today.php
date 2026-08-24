@@ -32,6 +32,11 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 </div>
 
 <main class="willow_content_app willow_today_app">
+    <header class="willow_detail_header">
+        <a class="willow_back" href="<?php echo G5_URL; ?>" aria-label="뒤로가기"></a>
+        <h1>오늘의 주제</h1>
+    </header>
+
     <section class="willow_today_page">
         <?php if ($has_visible_topic) { ?>
         <div class="willow_today_topic">
@@ -128,9 +133,6 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                     </div>
                 </div>
                 <a href="<?php echo $post['href']; ?>" aria-label="<?php echo $post['author']; ?> 글 보기">
-                    <?php if (!empty($post['title'])) { ?>
-                    <h3><?php echo $post['title']; ?></h3>
-                    <?php } ?>
                     <p><?php echo $post['body']; ?></p>
                     <?php if (!empty($post['image'])) { ?>
                     <img class="willow_feed_image" src="<?php echo $post['image']; ?>" alt="">

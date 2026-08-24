@@ -83,7 +83,6 @@ function willow_author_post_card($post)
             </div>
         </div>
         <a class="willow_author_post_body" href="<?php echo $post['href']; ?>">
-            <h2><?php echo $post['title']; ?></h2>
             <p><?php echo $post['excerpt']; ?></p>
             <?php if (!empty($post['image'])) { ?>
             <img class="willow_author_post_image" src="<?php echo $post['image']; ?>" alt="">

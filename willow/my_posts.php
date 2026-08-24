@@ -67,7 +67,6 @@ usort($items, function ($a, $b) {
             <article class="willow_simple_item">
                 <a href="<?php echo $item['href']; ?>">
                     <em><?php echo get_text($item['type']); ?></em>
-                    <strong><?php echo $item['title']; ?></strong>
                     <p><?php echo get_text($item['excerpt']); ?></p>
                     <span><?php echo get_text($item['date']); ?></span>
                 </a>

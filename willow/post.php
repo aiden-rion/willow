@@ -266,7 +266,6 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         </div>
 
         <?php if (!$is_general) { ?><p class="willow_article_kicker">오늘의 주제<?php if (!empty($topic['wt_subject'])) { ?> · <?php echo get_text($topic['wt_subject']); ?><?php } ?></p><?php } ?>
-        <h1 class="willow_article_title"><?php echo get_text($article_title); ?></h1>
 
         <a class="willow_article_byline" href="<?php echo $article_author_href ? $article_author_href : $article_subscribe_href; ?>">
             <div>
@@ -385,7 +384,6 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             <article class="<?php echo !empty($item['image']) ? 'has_thumb' : 'no_thumb'; ?>">
                 <a class="willow_other_post_link" href="<?php echo !empty($item['href']) ? $item['href'] : '#'; ?>">
                     <div>
-                        <h3><?php echo $item['title']; ?></h3>
                         <p><?php echo get_text(willow_content_excerpt($item['excerpt'], 46)); ?></p>
                         <span><?php echo !empty($item['author']) ? '작가 '.$item['author'] : '작가 '.$article_author; ?> · <?php echo $item['date']; ?> · <?php echo $item_access_label; ?></span>
                     </div>
