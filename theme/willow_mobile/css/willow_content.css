@@ -634,6 +634,11 @@ body.willow_write_body {
   text-align: center;
 }
 
+.willow_write_topic[hidden],
+.willow_write_app.is_free_topic .willow_write_topic {
+  display: none;
+}
+
 .willow_write_topic_label {
   display: inline-flex;
   align-items: center;
@@ -1246,11 +1251,6 @@ html.willow_pull_active body {
   to {
     transform: rotate(360deg);
   }
-}
-
-.willow_write_app.is_free_topic .willow_write_topic h2,
-.willow_write_app.is_free_topic .willow_write_topic p {
-  display: none;
 }
 
 .willow_write_app.is_free_topic .willow_write_field {
