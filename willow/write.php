@@ -187,7 +187,7 @@ if (!$can_subscriber_access) {
     var toastTimer = null;
     var confirmModal = document.querySelector('[data-write-confirm]');
     var confirmOk = document.querySelector('[data-confirm-ok]');
-    var contentLimit = 500;
+    var contentLimit = 5000;
     var isContentOverLimit = false;
 
     function showToast(message) {
@@ -251,7 +251,7 @@ if (!$can_subscriber_access) {
         var overLimit = length > contentLimit;
         content.classList.toggle('is_over_limit', overLimit);
         if (overLimit && !isContentOverLimit) {
-            showToast('500자 이내로 작성해주세요.');
+            showToast('5000자 이내로 작성해주세요.');
         }
         isContentOverLimit = overLimit;
     }
@@ -394,7 +394,7 @@ if (!$can_subscriber_access) {
             if ((content.value || '').length > contentLimit) {
                 event.preventDefault();
                 content.classList.add('is_over_limit');
-                showToast('500자 이내로 작성해주세요.');
+                showToast('5000자 이내로 작성해주세요.');
                 content.focus();
             }
         });
