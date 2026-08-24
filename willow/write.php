@@ -48,7 +48,7 @@ if ($draft_id && $is_member) {
     }
 }
 $draft_topic_mode = !empty($draft['wd_topic_mode']) && $draft['wd_topic_mode'] === 'free' ? 'free' : 'today';
-$draft_category = willow_story_normalize_category(!empty($draft['wd_category']) ? $draft['wd_category'] : ($draft_topic_mode === 'free' ? 'free' : willow_story_default_category()));
+$draft_category = willow_story_normalize_category(!empty($draft['wd_category']) ? $draft['wd_category'] : willow_story_default_category());
 $draft_subject = !empty($draft['wd_subject']) ? get_text($draft['wd_subject']) : '';
 $draft_content = !empty($draft['wd_content']) ? get_text($draft['wd_content'], 0) : '';
 $can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';
@@ -193,6 +193,7 @@ if (!$can_subscriber_access) {
     var topicDescription = <?php echo json_encode($willow_topic_description); ?>;
     var maxImageSize = 5 * 1024 * 1024;
     var topicMode = <?php echo json_encode($draft_topic_mode); ?>;
+    var defaultCategory = <?php echo json_encode(willow_story_default_category()); ?>;
     var form = document.querySelector('.willow_topic_write_form');
     var content = document.getElementById('wp_content');
     var subject = document.getElementById('wp_subject');
@@ -258,8 +259,8 @@ if (!$can_subscriber_access) {
         if (title) title.textContent = isFree ? '' : topicTitle;
         if (description) description.innerHTML = isFree ? '' : topicDescription;
         if (subject) subject.value = isFree ? '자유주제' : topicTitle;
-        if (categoryField && isFree && categoryField.value !== 'free') {
-            selectCategory('free');
+        if (categoryField && isFree && !categoryField.value) {
+            selectCategory(defaultCategory);
         }
         if (!isFree) {
             if (categoryField) categoryField.value = '';

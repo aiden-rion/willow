@@ -973,7 +973,7 @@ body.willow_write_body {
   gap: 8px;
   width: calc(100% + 48px);
   margin: 8px -24px 0;
-  padding: 6px 8px 8px;
+  padding: 6px 8px 2px;
   background: #ffffff;
 }
 
@@ -1064,6 +1064,19 @@ body.willow_write_body {
 
 .willow_keyword_panel[hidden] {
   display: none;
+}
+
+.willow_keyword_panel {
+  display: grid;
+  gap: 7px;
+}
+
+.willow_keyword_panel .willow_tag_chips {
+  padding-bottom: 0;
+}
+
+.willow_write_app.is_free_topic .willow_topic_write_form {
+  padding-bottom: 8px;
 }
 
 .willow_access_select {
