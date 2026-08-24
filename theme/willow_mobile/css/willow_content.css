@@ -1875,8 +1875,8 @@ html.willow_pull_active body {
 
 .willow_other_post_link {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 102px;
-  gap: 15px;
+  grid-template-columns: minmax(0, 1fr) 51px;
+  gap: 12px;
   color: inherit;
 }
 
@@ -1911,9 +1911,9 @@ html.willow_pull_active body {
 }
 
 .willow_other_posts img {
-  width: 102px;
-  height: 84px;
-  border-radius: 10px;
+  width: 51px;
+  height: 42px;
+  border-radius: 6px;
   object-fit: cover;
 }
 
