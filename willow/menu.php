@@ -3,6 +3,7 @@ include_once('./_common.php');
 include_once('./content.lib.php');
 
 $g5['title'] = '전체메뉴';
+$g5['body_script'] = ' class="willow_menu_body"';
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.G5_CSS_VER.'">', 10);
 
@@ -82,8 +83,6 @@ $member_avatar = $is_logged_in ? willow_member_avatar($member) : $menu_img_url.'
             <a href="<?php echo $logout_href; ?>"><?php echo $is_logged_in ? '로그아웃' : '로그인'; ?></a>
         </div>
     </section>
-
-    <?php willow_render_banner_area('menu_bottom', 'willow_menu_bottom_banner', '메뉴페이지 하단 배너'); ?>
 </main>
 
 <?php

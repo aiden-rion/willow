@@ -8,6 +8,7 @@ willow_report_install();
 
 $g5['title'] = '신고관리';
 $table = willow_report_table();
+$categories = willow_report_categories();
 $statuses = array(
     'pending' => '접수',
     'reviewing' => '검토중',
@@ -57,6 +58,8 @@ if ($stx !== '') {
         $where .= " and (wrp_reporter_mb_id like '%{$stx_sql}%' or wrp_reporter_name like '%{$stx_sql}%') ";
     } else if ($sfl === 'author') {
         $where .= " and (wrp_author_mb_id like '%{$stx_sql}%' or wrp_author_name like '%{$stx_sql}%') ";
+    } else if ($sfl === 'category') {
+        $where .= " and wrp_category like '%{$stx_sql}%' ";
     } else {
         $where .= " and (wrp_target_title like '%{$stx_sql}%' or wrp_content like '%{$stx_sql}%') ";
     }
@@ -84,6 +87,7 @@ require_once './admin.head.php';
     <label for="sfl" class="sound_only">검색대상</label>
     <select name="sfl" id="sfl">
         <option value="target" <?php echo get_selected($sfl, 'target'); ?>>신고내용/글제목</option>
+        <option value="category" <?php echo get_selected($sfl, 'category'); ?>>카테고리</option>
         <option value="reporter" <?php echo get_selected($sfl, 'reporter'); ?>>신고자</option>
         <option value="author" <?php echo get_selected($sfl, 'author'); ?>>작성자</option>
     </select>
@@ -102,6 +106,7 @@ require_once './admin.head.php';
                 <th scope="col">대상</th>
                 <th scope="col">작성자</th>
                 <th scope="col">신고자</th>
+                <th scope="col">카테고리</th>
                 <th scope="col">신고내용</th>
                 <th scope="col">상태</th>
                 <th scope="col">관리자 메모</th>
@@ -126,6 +131,7 @@ require_once './admin.head.php';
                 </td>
                 <td><?php echo get_text($report['wrp_author_name']); ?><br><span><?php echo get_text($report['wrp_author_mb_id']); ?></span></td>
                 <td><?php echo get_text($report['wrp_reporter_name']); ?><br><span><?php echo get_text($report['wrp_reporter_mb_id']); ?></span></td>
+                <td><?php echo get_text(willow_report_category_label($report['wrp_category'])); ?></td>
                 <td style="max-width:280px;white-space:normal"><?php echo nl2br(get_text($report['wrp_content'])); ?></td>
                 <td>
                     <select name="wrp_status[<?php echo (int) $report['wrp_id']; ?>]">
@@ -139,7 +145,7 @@ require_once './admin.head.php';
             </tr>
             <?php } ?>
             <?php } else { ?>
-            <tr><td colspan="8" class="empty_table">접수된 신고가 없습니다.</td></tr>
+            <tr><td colspan="9" class="empty_table">접수된 신고가 없습니다.</td></tr>
             <?php } ?>
             </tbody>
         </table>

@@ -1,5 +1,6 @@
 <?php
 include_once('./_common.php');
+include_once('./sms.lib.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     goto_url(G5_BBS_URL.'/login.php');
@@ -15,6 +16,10 @@ if (!$phone) {
 
 if (!$nick) {
     $nick = '윌로우 회원';
+}
+
+if (!willow_auth_is_phone_verified($phone)) {
+    alert('휴대폰 인증이 완료되지 않았습니다. 다시 인증해주세요.', G5_BBS_URL.'/login.php?auth_step=verify&phone='.urlencode($phone));
 }
 
 $mb_id = 'willow_'.substr(md5($phone), 0, 12);
@@ -73,6 +78,13 @@ generate_mb_key($mb);
 if (function_exists('update_auth_session_token')) {
     update_auth_session_token($mb['mb_datetime']);
 }
+
+set_session('ss_willow_sms_phone', '');
+set_session('ss_willow_sms_code_hash', '');
+set_session('ss_willow_sms_expires_at', '');
+set_session('ss_willow_sms_sent_at', '');
+set_session('ss_willow_phone_verified', '');
+set_session('ss_willow_phone_verified_at', '');
 
 if (!$return_url || strpos($return_url, 'login.php') !== false) {
     $return_url = G5_URL;

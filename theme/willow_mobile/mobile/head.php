@@ -22,7 +22,8 @@ include_once(G5_LIB_PATH.'/latest.lib.php');
     <div id="container" class="willow_container">
     <?php if (!defined("_INDEX_")) { ?>
         <div class="willow_page_title">
-            <a href="javascript:history.back();" aria-label="뒤로가기"><img src="<?php echo G5_IMG_URL; ?>/ico_back.png" alt=""></a>
+            <?php $willow_page_back_url = !empty($willow_page_back_url) ? $willow_page_back_url : 'javascript:history.back();'; ?>
+            <a href="<?php echo $willow_page_back_url; ?>" aria-label="뒤로가기"><img src="<?php echo G5_IMG_URL; ?>/ico_back.png" alt=""></a>
             <h2><?php echo get_head_title($g5['title']); ?></h2>
         </div>
     <?php } ?>

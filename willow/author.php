@@ -77,7 +77,7 @@ function willow_author_post_card($post)
                     <button type="button">수정하기</button>
                     <button type="button">삭제하기</button>
                     <?php } else { ?>
-                    <button type="button" class="willow_report_button" data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
+                    <button type="button" class="willow_report_button" data-willow-report-open data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
                     <?php } ?>
                 </div>
             </div>
@@ -151,7 +151,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
 <main class="willow_content_app willow_author_page" data-author-id="<?php echo get_text($author_id); ?>">
     <header class="willow_author_page_header">
-        <a href="javascript:history.back();" aria-label="뒤로가기"><img src="<?php echo G5_IMG_URL; ?>/ico_back.png" alt=""></a>
+        <button type="button" data-author-back data-fallback-url="<?php echo G5_URL; ?>" aria-label="뒤로가기"><img src="<?php echo G5_IMG_URL; ?>/ico_back.png" alt=""></button>
         <h1>작가보기</h1>
     </header>
 
@@ -196,47 +196,20 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
     <script>
     (function() {
-        document.addEventListener('click', function(event) {
-            var reportButton = event.target.closest('.willow_report_button');
-            if (reportButton) {
-                event.preventDefault();
-                var reportContent = prompt('신고 내용을 입력해주세요.');
-                if (reportContent === null) return;
-                reportContent = reportContent.trim();
-                if (!reportContent) {
-                    alert('신고 내용을 입력해주세요.');
+        var backButton = document.querySelector('[data-author-back]');
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                var fallbackUrl = backButton.getAttribute('data-fallback-url') || '<?php echo G5_URL; ?>';
+                var referrer = document.referrer || '';
+                if (window.history.length > 1 && referrer && referrer.indexOf('about:blank') !== 0) {
+                    window.history.back();
                     return;
                 }
-                reportButton.disabled = true;
-                var reportData = new FormData();
-                reportData.append('target_type', reportButton.getAttribute('data-target-type'));
-                reportData.append('target_id', reportButton.getAttribute('data-target-id'));
-                reportData.append('content', reportContent);
-                fetch('<?php echo G5_URL; ?>/willow/report_update.php', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: reportData,
-                    credentials: 'same-origin'
-                }).then(function(response) {
-                    return response.json();
-                }).then(function(data) {
-                    if (!data.success) {
-                        alert(data.message || '신고 접수에 실패했습니다.');
-                        return;
-                    }
-                    alert(data.message || '신고 내용이 접수되었습니다.');
-                    var wrap = reportButton.closest('.willow_more');
-                    if (wrap) wrap.classList.remove('is_open');
-                }).catch(function() {
-                    alert('신고 접수 중 오류가 발생했습니다.');
-                }).finally(function() {
-                    reportButton.disabled = false;
-                });
-                return;
-            }
+                window.location.href = fallbackUrl;
+            });
+        }
 
+        document.addEventListener('click', function(event) {
             var moreButton = event.target.closest('.willow_more_button');
             document.querySelectorAll('.willow_more.is_open').forEach(function(menu) {
                 if (!moreButton || !menu.contains(moreButton)) menu.classList.remove('is_open');
@@ -288,6 +261,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         }
     })();
     </script>
+    <?php include_once(G5_PATH.'/willow/report_modal.inc.php'); ?>
 </main>
 
 <?php

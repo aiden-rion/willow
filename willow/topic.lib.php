@@ -406,6 +406,28 @@ function willow_topic_write_url($topic)
     return G5_URL.'/willow/write.php?wt_id='.$wt_id;
 }
 
+function willow_topic_member_has_post($wt_id, $mb_id = '')
+{
+    global $member;
+
+    $tables = willow_topic_tables();
+    willow_topic_install();
+
+    $wt_id = (int) $wt_id;
+    if ($mb_id === '' && !empty($member['mb_id'])) {
+        $mb_id = $member['mb_id'];
+    }
+
+    if ($wt_id < 1 || $mb_id === '') {
+        return false;
+    }
+
+    $mb_id = sql_escape_string($mb_id);
+    $row = sql_fetch(" select wp_id from `{$tables['post']}` where wt_id = '{$wt_id}' and mb_id = '{$mb_id}' limit 1 ", false);
+
+    return !empty($row['wp_id']);
+}
+
 function willow_topic_post_url($post)
 {
     return G5_URL.'/willow/post.php?wp_id='.(int) $post['wp_id'];

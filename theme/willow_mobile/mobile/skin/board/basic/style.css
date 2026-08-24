@@ -155,7 +155,7 @@
 }
 
 .willow_write_page .willow_container {
-  padding-bottom: 96px;
+  padding-bottom: 74px;
   background: #fff;
 }
 
@@ -165,18 +165,18 @@
   z-index: 20;
   display: grid;
   grid-template-columns: 56px 1fr 56px;
-  height: 88px;
-  padding: 0 22px;
+  height: 72px;
+  padding: 0 18px;
   background: #fff;
 }
 
 .willow_write_page .willow_page_title a {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   color: #171717;
-  font-size: 30px;
+  font-size: 26px;
 }
 
 .willow_write_page .willow_page_title h2 {
@@ -184,8 +184,8 @@
   justify-self: center;
   margin: 0;
   color: #171717;
-  font-size: 21px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -196,8 +196,8 @@
 
 .willow_write_screen {
   box-sizing: border-box;
-  min-height: calc(100vh - 88px);
-  padding: 52px 26px 0;
+  min-height: calc(100vh - 72px);
+  padding: 34px 26px 0;
   border: 0;
   background: #fff;
 }
@@ -207,8 +207,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 28px;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
 .willow_topic_select select {
@@ -216,8 +216,8 @@
   border: 0;
   background: transparent;
   color: #171717;
-  font-size: 31px;
-  font-weight: 900;
+  font-size: 22px;
+  font-weight: 700;
   line-height: 1.2;
   text-align: center;
   text-align-last: center;
@@ -227,28 +227,28 @@
 
 .willow_topic_select i {
   color: #9a9a9a;
-  font-size: 22px;
+  font-size: 17px;
   pointer-events: none;
 }
 
 .willow_topic_intro {
-  margin-bottom: 106px;
+  margin-bottom: 74px;
   text-align: center;
 }
 
 .willow_topic_intro strong {
   display: block;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   color: #171717;
-  font-size: 40px;
-  font-weight: 900;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 1.1;
 }
 
 .willow_topic_intro p {
   margin: 0;
   color: #111;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.75;
 }
@@ -261,18 +261,18 @@
 }
 
 .willow_subject_field {
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   padding-bottom: 8px;
   border-bottom: 1px solid #f0f0f0;
 }
 
 .willow_subject_field #wr_subject {
   width: 100%;
-  height: 48px;
+  height: 40px;
   border: 0;
   background: #fff;
   color: #1a1a1a;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 28px;
   outline: none;
@@ -292,14 +292,14 @@
   display: block;
   box-sizing: border-box;
   width: 100%;
-  height: 220px !important;
-  min-height: 220px;
+  height: 180px !important;
+  min-height: 180px;
   padding: 0 2px;
   border: 0;
   background: #fff;
   color: #222;
   font-family: inherit;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 400;
   line-height: 1.8;
   resize: none;
@@ -309,15 +309,15 @@
 .willow_content_area textarea::placeholder,
 .willow_content_area #wr_content::placeholder {
   color: #a0a0a0;
-  font-size: 28px;
-  line-height: 1.35;
-  text-align: center;
+  font-size: 19px;
+  line-height: 1.45;
+  text-align: left;
 }
 
 .willow_write_page #char_count_wrap {
-  margin: 12px 0 30px;
+  margin: 10px 0 22px;
   color: #999;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 500;
   text-align: left;
 }
@@ -328,10 +328,10 @@
 
 .willow_attach_wrap {
   display: flex;
-  gap: 14px;
+  gap: 10px;
   overflow-x: auto;
-  margin: 0 -2px 34px;
-  padding: 24px 2px 0;
+  margin: 0 -2px 26px;
+  padding: 18px 2px 0;
   border-top: 1px solid #eeeeee;
   -webkit-overflow-scrolling: touch;
 }
@@ -348,15 +348,15 @@
 .willow_attach_tile {
   position: relative;
   display: grid;
-  width: 84px;
-  height: 84px;
+  width: 66px;
+  height: 66px;
   place-items: center;
   overflow: hidden;
   border: 1px solid #e8e8e8;
   border-radius: 10px;
   background: #fff;
   color: #9b9b9b;
-  font-size: 31px;
+  font-size: 24px;
 }
 
 .willow_attach_input {
@@ -402,8 +402,8 @@
 
 .willow_write_options {
   display: grid;
-  gap: 24px;
-  padding-bottom: 28px;
+  gap: 18px;
+  padding-bottom: 24px;
 }
 
 .willow_option_group > strong,
@@ -411,8 +411,8 @@
   display: block;
   margin: 0 0 13px 4px;
   color: #171717;
-  font-size: 20px;
-  font-weight: 900;
+  font-size: 16px;
+  font-weight: 700;
   line-height: 1.25;
 }
 
@@ -423,13 +423,13 @@
 }
 
 .willow_tag_chip {
-  min-height: 42px;
-  padding: 0 17px;
+  min-height: 34px;
+  padding: 0 13px;
   border: 1px solid #e3e3e3;
   border-radius: 999px;
   background: #fff;
   color: #222;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -446,13 +446,13 @@
 .willow_select_shell select {
   box-sizing: border-box;
   width: 100%;
-  height: 64px;
-  padding: 0 52px 0 18px;
+  height: 48px;
+  padding: 0 42px 0 15px;
   border: 1px solid #e4e4e4;
   border-radius: 10px;
   background: #fff;
   color: #222;
-  font-size: 20px;
+  font-size: 15px;
   font-weight: 500;
   appearance: none;
   -webkit-appearance: none;
@@ -474,11 +474,12 @@
   bottom: 0;
   left: 0;
   z-index: 40;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 66px;
   margin: 0;
-  padding: 0 !important;
+  padding: 9px 14px calc(9px + env(safe-area-inset-bottom)) !important;
   border-top: 1px solid #e5e5e5;
   background: #fff;
 }
@@ -488,28 +489,72 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: auto;
   max-width: none;
   min-width: 0;
-  height: 100%;
+  height: 42px;
   margin: 0;
-  padding: 0 !important;
+  padding: 0 16px !important;
   box-sizing: border-box;
   border: 0;
-  border-radius: 0;
-  font-size: 20px;
-  font-weight: 900;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1;
+  gap: 7px;
 }
 
 .willow_write_actions .btn_cancel {
-  background: #fff;
-  color: #171717;
+  flex: 0 0 auto;
+  background: #e9e9e9;
+  color: #686868;
 }
 
 .willow_write_actions .btn_submit {
-  background: #171717;
-  color: #fff;
+  flex: 0 0 auto;
+  background: #e9e9e9;
+  color: #686868;
+}
+
+.willow_write_toolset {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.willow_write_toolset::-webkit-scrollbar {
+  display: none;
+}
+
+.willow_write_tool {
+  display: grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #9a9a9a;
+  font-size: 21px;
+}
+
+.willow_write_tool span {
+  display: block;
+  margin-top: -17px;
+  color: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.willow_write_tool.is_active {
+  background: #f3f3f3;
+  color: #333333;
 }
 
 @media (max-width: 360px) {
@@ -519,16 +564,39 @@
   }
 
   .willow_topic_select select {
-    font-size: 28px;
+    font-size: 20px;
   }
 
   .willow_topic_intro strong {
-    font-size: 36px;
+    font-size: 28px;
   }
 
   .willow_content_area textarea::placeholder,
   .willow_content_area #wr_content::placeholder {
-    font-size: 25px;
+    font-size: 18px;
+  }
+
+  .willow_write_actions {
+    gap: 8px;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  .willow_write_actions .btn_cancel,
+  .willow_write_actions .btn_submit {
+    height: 40px;
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+  }
+
+  .willow_write_toolset {
+    gap: 4px;
+  }
+
+  .willow_write_tool {
+    width: 34px;
+    height: 36px;
+    font-size: 19px;
   }
 }
 
@@ -709,7 +777,7 @@ body.willow_write_page #bo_w {
 }
 
 body.willow_write_page #fwrite {
-  padding-bottom: 100px;
+  padding-bottom: 86px;
 }
 
 body.willow_write_page #bo_w .willow_write_actions {
@@ -718,13 +786,14 @@ body.willow_write_page #bo_w .willow_write_actions {
   bottom: 0;
   left: 0;
   z-index: 40;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 76px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 66px;
   margin: 0;
-  padding: 0 !important;
+  padding: 9px 14px calc(9px + env(safe-area-inset-bottom)) !important;
   border-top: 1px solid #e5e5e5;
-  background: #fff;
+  background: #f2f2f2;
   text-align: initial;
 }
 
@@ -733,30 +802,31 @@ body.willow_write_page #bo_w .willow_write_actions .btn_submit {
   display: flex;
   align-items: center;
   justify-content: center;
-  justify-self: stretch;
-  align-self: stretch;
-  width: 100% !important;
+  width: auto !important;
   max-width: none;
   min-width: 0;
-  height: 100% !important;
+  height: 42px !important;
   margin: 0;
-  padding: 0 !important;
+  padding: 0 16px !important;
   box-sizing: border-box;
   border: 0;
-  border-radius: 0;
-  font-size: 20px;
-  font-weight: 900;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1;
+  gap: 7px;
 }
 
 body.willow_write_page #bo_w .willow_write_actions .btn_cancel {
-  background: #fff;
-  color: #171717;
+  flex: 0 0 auto;
+  background: #e5e5e5;
+  color: #686868;
 }
 
 body.willow_write_page #bo_w .willow_write_actions .btn_submit {
-  background: #171717;
-  color: #fff;
+  flex: 0 0 auto;
+  background: #e5e5e5;
+  color: #686868;
 }
 body.willow_notice_body .willow_shell {
   min-height: 100vh;

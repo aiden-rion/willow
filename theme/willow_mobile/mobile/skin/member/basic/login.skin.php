@@ -2,6 +2,7 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 add_stylesheet('<link rel="stylesheet" href="'.$member_skin_url.'/willow_auth.css?ver='.G5_CSS_VER.'">', 0);
+include_once(G5_PATH.'/willow/sms.lib.php');
 
 $return_target = isset($url) ? urldecode($url) : '';
 $is_admin_login = $return_target && strpos($return_target, '/adm/') !== false;
@@ -35,10 +36,10 @@ function flogin_submit(f) {
     return;
 }
 
-$auth_step = isset($_GET['auth_step']) ? preg_replace('/[^a-z_]/', '', $_GET['auth_step']) : 'bridge';
-$allowed_steps = array('bridge', 'phone', 'verify', 'profile');
+$auth_step = isset($_GET['auth_step']) ? preg_replace('/[^a-z_]/', '', $_GET['auth_step']) : 'phone';
+$allowed_steps = array('phone', 'verify', 'profile');
 if (!in_array($auth_step, $allowed_steps, true)) {
-    $auth_step = 'bridge';
+    $auth_step = 'phone';
 }
 
 $base_login_url = G5_BBS_URL.'/login.php';
@@ -52,8 +53,25 @@ $phone_url = $base_login_url.'?auth_step=phone';
 $verify_url = $base_login_url.'?auth_step=verify'.$phone_query;
 $profile_url = $base_login_url.'?auth_step=profile'.$phone_query;
 $return_url = isset($login_url) && $login_url ? urldecode($login_url) : G5_URL;
+$code_value = isset($_GET['code']) ? preg_replace('/[^0-9]/', '', $_GET['code']) : '';
+$sms_send_result = array();
+
+if ($auth_step === 'verify') {
+    if (!$phone_value || !preg_match('/^01[0-9]{8,9}$/', $phone_value)) {
+        alert('휴대폰번호 형식이 올바르지 않습니다.', $phone_url);
+    }
+
+    $sms_send_result = willow_auth_issue_code($phone_value, isset($_GET['resend']));
+    if (empty($sms_send_result['success'])) {
+        alert('인증번호 발송에 실패했습니다. '.$sms_send_result['message'], $phone_url);
+    }
+}
 
 if ($auth_step === 'profile' && $phone_value) {
+    if (!willow_auth_is_phone_verified($phone_value) && !willow_auth_verify_code($phone_value, $code_value)) {
+        alert('인증번호가 올바르지 않거나 인증 시간이 만료되었습니다. 다시 인증해주세요.', $verify_url);
+    }
+
     $existing_mb_id = 'willow_'.substr(md5($phone_value), 0, 12);
     $existing_member = get_member($existing_mb_id);
 
@@ -77,6 +95,13 @@ if ($auth_step === 'profile' && $phone_value) {
         if (function_exists('update_auth_session_token')) {
             update_auth_session_token($existing_member['mb_datetime']);
         }
+
+        set_session('ss_willow_sms_phone', '');
+        set_session('ss_willow_sms_code_hash', '');
+        set_session('ss_willow_sms_expires_at', '');
+        set_session('ss_willow_sms_sent_at', '');
+        set_session('ss_willow_phone_verified', '');
+        set_session('ss_willow_phone_verified_at', '');
 
         if (!$return_url || strpos($return_url, 'login.php') !== false) {
             $return_url = G5_URL;
@@ -149,7 +174,7 @@ if ($auth_step === 'profile' && $phone_value) {
 
     <main class="willow_auth_body willow_auth_verify_body">
         <h2>휴대폰으로 전송된<br>인증번호를 입력하세요</h2>
-        <a class="willow_auth_resend" href="<?php echo $phone_url; ?>">인증번호 재발송 요청</a>
+        <a class="willow_auth_resend" href="<?php echo $verify_url; ?>&amp;resend=1">인증번호 재발송 요청</a>
 
         <div class="willow_auth_illust" aria-hidden="true">
             <svg viewBox="0 0 80 80">
@@ -160,6 +185,9 @@ if ($auth_step === 'profile' && $phone_value) {
         </div>
 
         <p class="willow_auth_phone">휴대폰번호 : <?php echo $display_phone; ?></p>
+        <?php if (!empty($sms_send_result['dry_run']) && !empty($sms_send_result['dev_code'])) { ?>
+        <p class="willow_auth_notice">개발 모드 인증번호 : <?php echo get_text($sms_send_result['dev_code']); ?></p>
+        <?php } ?>
 
         <form class="willow_auth_form willow_auth_code_form" action="<?php echo $profile_url; ?>" method="get">
             <input type="hidden" name="auth_step" value="profile">

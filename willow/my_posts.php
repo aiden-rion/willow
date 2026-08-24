@@ -77,7 +77,7 @@ usort($items, function ($a, $b) {
             <div class="willow_simple_empty">
                 <strong>작성한 글이 없습니다.</strong>
                 <p>첫 글을 작성하고 윌로우에 이야기를 남겨보세요.</p>
-                <a href="<?php echo G5_BBS_URL; ?>/write.php?bo_table=<?php echo willow_content_board(); ?>">글쓰기</a>
+                <a href="<?php echo G5_URL; ?>/willow/write.php">글쓰기</a>
             </div>
         <?php } ?>
     </div>

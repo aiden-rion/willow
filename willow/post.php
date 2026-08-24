@@ -114,6 +114,7 @@ function willow_article_author_meta($mb_id, $author_name)
 
 if ($wr_id) {
     willow_article_increment_board_hit($wr_id);
+    willow_record_post_view('board', $wr_id);
     $board_post = willow_get_board_post($wr_id);
     if (empty($board_post['id'])) {
         alert('글을 찾을 수 없습니다.', G5_URL);
@@ -147,6 +148,7 @@ if ($wp_id) {
     if (empty($topic_post['wp_id'])) {
         alert('글을 찾을 수 없습니다.', G5_URL.'/willow/today.php');
     }
+    willow_record_post_view('topic', $wp_id);
     $topic = sql_fetch(" select * from `{$tables['topic']}` where wt_id = '".(int) $topic_post['wt_id']."' ");
     $is_general = false;
     $article_requires_subscription = false;
@@ -338,7 +340,11 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                     <span>작성 글 : <?php echo number_format($article_author_post_count); ?>개, 구독자 : <?php echo number_format($article_author_subscriber_count); ?>명</span>
                 </div>
             </div>
-            <a class="willow_subscribe_button <?php echo $article_author_subscribed ? 'is_subscribed' : ''; ?>" href="<?php echo $article_author_subscribed ? G5_URL.'/willow/subscribe.php?mode=my&amp;author='.urlencode($article_author_id) : $article_subscribe_href; ?>"><?php echo $article_author_subscribed ? '구독중' : '작가 구독하기'; ?></a>
+            <?php if ($article_author_subscribed) { ?>
+            <span class="willow_subscribe_button is_subscribed" aria-disabled="true">구독중</span>
+            <?php } else { ?>
+            <a class="willow_subscribe_button" href="<?php echo $article_subscribe_href; ?>">작가 구독하기</a>
+            <?php } ?>
         </section>
 
         <?php if ($willow_target_id) { ?>

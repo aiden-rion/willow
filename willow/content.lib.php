@@ -58,6 +58,136 @@ function willow_report_table()
     return $prefix.'willow_report';
 }
 
+function willow_post_view_table()
+{
+    global $g5;
+
+    $prefix = defined('G5_TABLE_PREFIX') ? G5_TABLE_PREFIX : (isset($g5['table_prefix']) ? $g5['table_prefix'] : 'g5_');
+
+    return $prefix.'willow_post_view';
+}
+
+function willow_post_view_install()
+{
+    static $installed = false;
+
+    if ($installed) {
+        return;
+    }
+
+    $table = willow_post_view_table();
+    sql_query(" create table if not exists `{$table}` (
+        wpv_id int unsigned not null auto_increment,
+        target_type varchar(20) not null default '',
+        target_id int unsigned not null default 0,
+        viewer_key varchar(80) not null default '',
+        mb_id varchar(20) not null default '',
+        wpv_count int unsigned not null default 1,
+        wpv_first_datetime datetime not null,
+        wpv_datetime datetime not null,
+        primary key (wpv_id),
+        unique key target_viewer (target_type, target_id, viewer_key),
+        key viewer (viewer_key, wpv_datetime),
+        key mb_id (mb_id, wpv_datetime)
+    ) ", false);
+
+    $installed = true;
+}
+
+function willow_post_viewer_key()
+{
+    global $member;
+
+    if (!empty($member['mb_id'])) {
+        return 'm:'.$member['mb_id'];
+    }
+
+    if (session_id()) {
+        return 's:'.session_id();
+    }
+
+    return 'ip:'.(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'unknown');
+}
+
+function willow_record_post_view($target_type, $target_id)
+{
+    global $member;
+
+    $target_type = $target_type === 'topic' ? 'topic' : 'board';
+    $target_id = (int) $target_id;
+    if ($target_id < 1) {
+        return;
+    }
+
+    willow_post_view_install();
+
+    $table = willow_post_view_table();
+    $viewer_key = sql_escape_string(willow_post_viewer_key());
+    $mb_id = !empty($member['mb_id']) ? sql_escape_string($member['mb_id']) : '';
+    $now = G5_TIME_YMDHIS;
+
+    sql_query(" insert into `{$table}`
+        set target_type = '{$target_type}',
+            target_id = '{$target_id}',
+            viewer_key = '{$viewer_key}',
+            mb_id = '{$mb_id}',
+            wpv_count = 1,
+            wpv_first_datetime = '{$now}',
+            wpv_datetime = '{$now}'
+        on duplicate key update
+            mb_id = values(mb_id),
+            wpv_count = wpv_count + 1,
+            wpv_datetime = values(wpv_datetime) ", false);
+}
+
+function willow_recent_viewed_posts($days = 7)
+{
+    $days = max(1, (int) $days);
+    willow_post_view_install();
+
+    $table = willow_post_view_table();
+    $viewer_key = sql_escape_string(willow_post_viewer_key());
+    $from = sql_escape_string(date('Y-m-d H:i:s', G5_SERVER_TIME - ($days * 86400)));
+    $views = array();
+    $result = sql_query(" select target_type, target_id, wpv_count, wpv_datetime
+        from `{$table}`
+        where viewer_key = '{$viewer_key}'
+            and wpv_datetime >= '{$from}'
+        order by wpv_datetime desc
+        limit 300 ", false);
+
+    if ($result) {
+        while ($row = sql_fetch_array($result)) {
+            $key = $row['target_type'].':'.(int) $row['target_id'];
+            $views[$key] = array(
+                'hours' => max(0, (G5_SERVER_TIME - strtotime($row['wpv_datetime'])) / 3600),
+                'count' => (int) $row['wpv_count'],
+            );
+        }
+    }
+
+    return $views;
+}
+
+function willow_report_categories()
+{
+    return array(
+        'spam' => '스팸/광고',
+        'abuse' => '욕설/비방',
+        'privacy' => '개인정보 노출',
+        'illegal' => '불법/유해 콘텐츠',
+        'copyright' => '저작권 침해',
+        'etc' => '기타',
+    );
+}
+
+function willow_report_category_label($category)
+{
+    $categories = willow_report_categories();
+
+    return isset($categories[$category]) ? $categories[$category] : '미분류';
+}
+
 function willow_report_install()
 {
     static $installed = false;
@@ -76,6 +206,7 @@ function willow_report_install()
         wrp_author_name varchar(100) not null default '',
         wrp_reporter_mb_id varchar(20) not null default '',
         wrp_reporter_name varchar(100) not null default '',
+        wrp_category varchar(50) not null default '',
         wrp_content text not null,
         wrp_status varchar(20) not null default 'pending',
         wrp_admin_memo text not null,
@@ -87,6 +218,11 @@ function willow_report_install()
         key status (wrp_status),
         key wrp_datetime (wrp_datetime)
     ) ", false);
+
+    $column = sql_fetch(" show columns from `{$table}` like 'wrp_category' ", false);
+    if (empty($column['Field'])) {
+        sql_query(" alter table `{$table}` add wrp_category varchar(50) not null default '' after wrp_reporter_name ", false);
+    }
 
     $installed = true;
 }
@@ -593,11 +729,25 @@ function willow_split_images($value)
     return array_values(array_unique($images));
 }
 
+function willow_media_url($url)
+{
+    $url = trim((string) $url);
+    if ($url === '') {
+        return '';
+    }
+
+    if (strpos($url, 'http://localhost:8080/') === 0 || strpos($url, 'http://127.0.0.1:8080/') === 0) {
+        return preg_replace('#^http://(localhost|127\.0\.0\.1):8080#', G5_URL, $url);
+    }
+
+    return $url;
+}
+
 function willow_first_image($value)
 {
     $images = willow_split_images($value);
 
-    return isset($images[0]) ? $images[0] : '';
+    return isset($images[0]) ? willow_media_url($images[0]) : '';
 }
 
 function willow_get_board_attached_images($wr_id)
@@ -620,9 +770,9 @@ function willow_get_board_attached_images($wr_id)
             }
 
             if (!empty($row['bf_fileurl'])) {
-                $images[] = $row['bf_fileurl'];
+                $images[] = willow_media_url($row['bf_fileurl']);
             } else {
-                $images[] = G5_DATA_URL.'/file/'.$bo_table.'/'.$row['bf_file'];
+                $images[] = willow_media_url(G5_DATA_URL.'/file/'.$bo_table.'/'.$row['bf_file']);
             }
         }
     }
@@ -1009,7 +1159,7 @@ function willow_get_recommended_posts($limit = 3)
     return $posts;
 }
 
-function willow_personalization_profile()
+function willow_personalization_profile($feed_seed = '')
 {
     global $member;
 
@@ -1017,6 +1167,8 @@ function willow_personalization_profile()
         'mb_id' => !empty($member['mb_id']) ? $member['mb_id'] : '',
         'authors' => array(),
         'keywords' => array(),
+        'viewed' => willow_recent_viewed_posts(7),
+        'feed_seed' => preg_replace('/[^A-Za-z0-9_-]/', '', (string) $feed_seed),
     );
 
     if ($profile['mb_id'] === '') {
@@ -1083,6 +1235,22 @@ function willow_personalization_profile()
         }
     }
 
+    $view_table = willow_post_view_table();
+    $viewer_key = sql_escape_string(willow_post_viewer_key());
+    $viewed_board = sql_query(" select b.mb_id, b.wr_name, b.wr_1, b.wr_2, v.wpv_datetime
+        from `{$view_table}` v
+        inner join {$board_table} b on b.wr_id = v.target_id
+        where v.target_type = 'board'
+            and v.viewer_key = '{$viewer_key}'
+            and b.wr_is_comment = 0
+        order by v.wpv_datetime desc
+        limit 80 ", false);
+    if ($viewed_board) {
+        while ($row = sql_fetch_array($viewed_board)) {
+            willow_personalization_absorb_board_row($profile, $row, 7);
+        }
+    }
+
     if (!empty($tables['post'])) {
         $liked_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, t.wt_subject
             from `{$like_table}` l
@@ -1109,6 +1277,20 @@ function willow_personalization_profile()
         if ($commented_topic) {
             while ($row = sql_fetch_array($commented_topic)) {
                 willow_personalization_absorb_topic_row($profile, $row, 24);
+            }
+        }
+
+        $viewed_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, t.wt_subject, v.wpv_datetime
+            from `{$view_table}` v
+            inner join `{$tables['post']}` p on p.wp_id = v.target_id
+            left join `{$tables['topic']}` t on t.wt_id = p.wt_id
+            where v.target_type = 'topic'
+                and v.viewer_key = '{$viewer_key}'
+            order by v.wpv_datetime desc
+            limit 80 ", false);
+        if ($viewed_topic) {
+            while ($row = sql_fetch_array($viewed_topic)) {
+                willow_personalization_absorb_topic_row($profile, $row, 7);
             }
         }
     }
@@ -1162,13 +1344,14 @@ function willow_personalization_absorb_topic_row(&$profile, $row, $weight)
 
 function willow_personalization_score($item, $profile)
 {
+    $item_key = (!empty($item['target_type']) ? $item['target_type'] : 'board').':'.(int) $item['id'];
     $timestamp = !empty($item['sort_datetime']) ? strtotime($item['sort_datetime']) : 0;
     $age_hours = $timestamp ? max(0, (G5_SERVER_TIME - $timestamp) / 3600) : 720;
-    $recency = max(0, 40 - min(40, $age_hours / 6));
+    $recency = max(0, 36 - min(36, $age_hours / 8));
     $likes = isset($item['likes_raw']) ? (int) $item['likes_raw'] : (int) str_replace(',', '', isset($item['likes']) ? $item['likes'] : 0);
     $comments = isset($item['comments_raw']) ? (int) $item['comments_raw'] : (int) str_replace(',', '', isset($item['comments']) ? $item['comments'] : 0);
     $views = isset($item['views']) ? (int) $item['views'] : 0;
-    $score = $recency + ($likes * 3) + ($comments * 5) + log(max(1, $views + 1), 2);
+    $score = $recency + ($likes * 3.2) + ($comments * 5.2) + (log(max(1, $views + 1), 2) * 1.8);
 
     $author_keys = array();
     if (!empty($item['mb_id'])) {
@@ -1203,21 +1386,69 @@ function willow_personalization_score($item, $profile)
         $score += 2;
     }
 
+    if (!empty($profile['viewed'][$item_key])) {
+        $view = $profile['viewed'][$item_key];
+        $hours = isset($view['hours']) ? (float) $view['hours'] : 168;
+        if ($hours < 24) {
+            $score -= 65;
+        } else if ($hours < 72) {
+            $score -= 40;
+        } else {
+            $score -= 20;
+        }
+        $score -= min(12, isset($view['count']) ? (int) $view['count'] * 2 : 0);
+    }
+
+    $feed_seed = !empty($profile['feed_seed']) ? $profile['feed_seed'] : date('YmdHi');
+    $seed_key = $feed_seed.':'.(!empty($profile['mb_id']) ? $profile['mb_id'] : willow_post_viewer_key()).':'.$item_key;
+    $jitter = (crc32($seed_key) % 1000) / 1000;
+    $score += $jitter * 18;
+
     return $score;
 }
 
-function willow_get_personalized_feed($offset = 0, $limit = 6)
+function willow_record_feed_impressions($items)
+{
+    if (empty($items) || !is_array($items)) {
+        return;
+    }
+
+    foreach ($items as $item) {
+        if (empty($item['target_type']) || empty($item['id'])) {
+            continue;
+        }
+
+        willow_record_post_view($item['target_type'], (int) $item['id']);
+    }
+}
+
+function willow_get_personalized_feed($offset = 0, $limit = 6, $feed_seed = '', $exclude_keys = array())
 {
     $offset = max(0, (int) $offset);
     $limit = max(1, (int) $limit);
     $fetch_limit = max(80, $offset + $limit + 40);
-    $profile = willow_personalization_profile();
+    $profile = willow_personalization_profile($feed_seed);
     $items = array();
     $seen = array();
+    $excluded = array();
 
-    foreach (willow_get_board_posts($fetch_limit) as $item) {
+    if (is_array($exclude_keys)) {
+        foreach ($exclude_keys as $exclude_key) {
+            $exclude_key = preg_replace('/[^a-z0-9:_-]/i', '', (string) $exclude_key);
+            if ($exclude_key !== '') {
+                $excluded[$exclude_key] = true;
+            }
+        }
+    }
+
+    $board_candidates = array_merge(
+        willow_get_board_posts($fetch_limit),
+        willow_get_popular_board_posts($fetch_limit)
+    );
+
+    foreach ($board_candidates as $item) {
         $key = $item['target_type'].':'.$item['id'];
-        if (isset($seen[$key])) {
+        if (isset($seen[$key]) || isset($excluded[$key])) {
             continue;
         }
         $seen[$key] = true;
@@ -1242,7 +1473,7 @@ function willow_get_personalized_feed($offset = 0, $limit = 6)
             while ($row = sql_fetch_array($result)) {
                 $item = willow_topic_post_to_feed($row);
                 $key = $item['target_type'].':'.$item['id'];
-                if (isset($seen[$key])) {
+                if (isset($seen[$key]) || isset($excluded[$key])) {
                     continue;
                 }
                 $seen[$key] = true;
@@ -1265,15 +1496,24 @@ function willow_get_personalized_feed($offset = 0, $limit = 6)
 
     $balanced = array();
     $author_seen = array();
+    $type_seen = array();
     foreach ($items as $item) {
         $author_key = !empty($item['mb_id']) ? $item['mb_id'] : $item['author'];
         if (isset($author_seen[$author_key]) && $author_seen[$author_key] >= 2 && count($balanced) < $offset + $limit) {
             continue;
         }
+        $type_key = !empty($item['target_type']) ? $item['target_type'] : 'board';
+        if ($type_key === 'topic' && isset($type_seen[$type_key]) && $type_seen[$type_key] >= 1 && count($balanced) < $offset + $limit) {
+            continue;
+        }
         if (!isset($author_seen[$author_key])) {
             $author_seen[$author_key] = 0;
         }
+        if (!isset($type_seen[$type_key])) {
+            $type_seen[$type_key] = 0;
+        }
         $author_seen[$author_key]++;
+        $type_seen[$type_key]++;
         $balanced[] = $item;
     }
 
@@ -1303,7 +1543,7 @@ function willow_get_personalized_feed($offset = 0, $limit = 6)
             }
         }
 
-        if (!$has_paid) {
+        if (!$has_paid && count($slice) > 0) {
             foreach ($balanced as $item) {
                 if (empty($item['access']) || !willow_is_paid_access($item['access'])) {
                     continue;
@@ -1351,15 +1591,12 @@ function willow_render_post_card($post)
                     <button type="button" role="menuitem">수정하기</button>
                     <button type="button" role="menuitem">삭제하기</button>
                     <?php } else { ?>
-                    <button type="button" role="menuitem" class="willow_report_button" data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
+                    <button type="button" role="menuitem" class="willow_report_button" data-willow-report-open data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
                     <?php } ?>
                 </div>
             </div>
         </div>
         <a href="<?php echo $post['href']; ?>">
-            <?php if (!empty($post['title'])) { ?>
-            <h3><?php echo $post['title']; ?></h3>
-            <?php } ?>
             <p><?php echo $post['body']; ?></p>
             <?php if (!empty($post['image'])) { ?>
             <img class="willow_post_image" src="<?php echo $post['image']; ?>" alt="">

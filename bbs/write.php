@@ -3,6 +3,10 @@ include_once('./_common.php');
 include_once(G5_EDITOR_LIB);
 include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
 
+if (isset($bo_table) && $bo_table === 'free' && (!isset($w) || $w === '') && empty($wr_id)) {
+    goto_url(G5_URL.'/willow/write.php');
+}
+
 if (!$board['bo_table']) {
     alert('존재하지 않는 게시판입니다.', G5_URL);
 }

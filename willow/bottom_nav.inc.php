@@ -10,9 +10,9 @@ $willow_nav_script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : 
 $willow_nav_home_active = preg_match('#/(index\.php)?$#', $willow_nav_script)
     || strpos($willow_nav_script, '/willow/today.php') !== false
     || strpos($willow_nav_script, '/willow/post.php') !== false;
-$willow_nav_write_href = !empty($write_href)
-    ? $write_href
-    : ($is_member ? G5_URL.'/willow/write.php' : G5_BBS_URL.'/login.php?url='.urlencode(G5_URL.'/willow/write.php'));
+$willow_nav_write_href = $is_member
+    ? G5_URL.'/willow/write.php'
+    : G5_BBS_URL.'/login.php?url='.urlencode(G5_URL.'/willow/write.php');
 $willow_nav_account_href = $is_member
     ? G5_URL.'/willow/menu.php'
     : G5_BBS_URL.'/login.php?url='.urlencode(G5_URL);
@@ -33,3 +33,13 @@ $willow_nav_items = array(
     </a>
     <?php } ?>
 </nav>
+<script>
+(function() {
+    var nav = document.querySelector('.willow_bottom_nav');
+    if (!nav || !document.body) return;
+    document.body.classList.add('willow_has_bottom_nav');
+    if (nav.parentNode !== document.body) {
+        document.body.appendChild(nav);
+    }
+})();
+</script>

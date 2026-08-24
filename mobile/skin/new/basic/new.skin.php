@@ -1,16 +1,16 @@
 <?php
 if (!defined("_GNUBOARD_")) exit;
 
-add_stylesheet('<link rel="stylesheet" href="'.$new_skin_url.'/style.css">', 0);
+add_stylesheet('<link rel="stylesheet" href="'.$new_skin_url.'/style.css?ver='.G5_CSS_VER.'">', 0);
 
 $willow_notifications = isset($willow_notifications) && is_array($willow_notifications) ? $willow_notifications : array();
 $willow_notification_icons = array(
-    'comment' => '댓글',
-    'like' => '좋아요',
-    'subscriber' => '구독',
-    'subscribed_post' => '새글',
-    'topic' => '주제',
-    'topic_post' => '참여',
+    'comment' => array('label' => '댓글', 'icon' => 'ico_menu_comment.png'),
+    'like' => array('label' => '좋아요', 'icon' => 'ico_heart.png'),
+    'subscriber' => array('label' => '구독', 'icon' => 'ico_menu_bell.png'),
+    'subscribed_post' => array('label' => '새글', 'icon' => 'ico_menu_document.png'),
+    'topic' => array('label' => '주제', 'icon' => 'ico_menu_alert.png'),
+    'topic_post' => array('label' => '참여', 'icon' => 'ico_menu_document.png'),
 );
 ?>
 
@@ -45,10 +45,14 @@ $willow_notification_icons = array(
         <?php foreach ($willow_notifications as $notice) { ?>
         <?php
         $type = isset($notice['type']) ? $notice['type'] : '';
-        $type_label = isset($willow_notification_icons[$type]) ? $willow_notification_icons[$type] : '알림';
+        $type_meta = isset($willow_notification_icons[$type]) ? $willow_notification_icons[$type] : array('label' => '알림', 'icon' => 'ico_alert.png');
+        $type_label = $type_meta['label'];
+        $type_icon = G5_IMG_URL.'/'.$type_meta['icon'];
         ?>
         <a class="willow_notification_item type_<?php echo get_text($type); ?>" href="<?php echo $notice['href']; ?>">
-            <span class="willow_notification_badge"><?php echo $type_label; ?></span>
+            <span class="willow_notification_badge" aria-label="<?php echo get_text($type_label); ?>">
+                <img src="<?php echo $type_icon; ?>" alt="">
+            </span>
             <div>
                 <strong><?php echo $notice['title']; ?></strong>
                 <p><?php echo $notice['body']; ?></p>

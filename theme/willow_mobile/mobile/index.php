@@ -24,9 +24,16 @@ $write_href = $has_visible_topic ? willow_topic_write_url($willow_topic) : '#';
 
 $chips = willow_get_categories(true);
 
-$featured_posts = willow_get_personalized_feed(0, 3);
+$willow_feed_seed = substr(md5(uniqid('', true).mt_rand()), 0, 12);
+$featured_posts = willow_get_personalized_feed(0, 3, $willow_feed_seed);
+willow_record_feed_impressions($featured_posts);
 $recommended_authors = willow_get_recommended_authors();
 ?>
+
+<div class="willow_pull_refresh" data-pull-refresh aria-hidden="true">
+    <span class="willow_pull_spinner" aria-hidden="true"></span>
+    <strong data-pull-label>아래로 당겨 새로고침</strong>
+</div>
 
 <main id="willow_app" class="willow_app willow_user_home">
     <a class="willow_topic_card" href="<?php echo $today_href; ?>" aria-label="오늘의 주제 페이지로 이동">
@@ -97,8 +104,16 @@ $recommended_authors = willow_get_recommended_authors();
 
     <script>
     (function() {
+        if (window.WillowPullRefresh) {
+            window.WillowPullRefresh.init({ target: '.willow_user_home' });
+        }
+
         var feedOffset = <?php echo count($featured_posts); ?>;
         var feedLimit = 6;
+        var feedSeed = <?php echo json_encode($willow_feed_seed); ?>;
+        var feedSeen = Array.prototype.slice.call(document.querySelectorAll('[data-feed-item]')).map(function(item) {
+            return item.getAttribute('data-feed-item');
+        }).filter(Boolean);
         var feedLoading = false;
         var feedEnded = false;
         var feedMore = document.getElementById('willow_home_feed_more');
@@ -114,7 +129,7 @@ $recommended_authors = willow_get_recommended_authors();
             if (!feedMore || feedLoading || feedEnded) return;
             feedLoading = true;
             setFeedState();
-            fetch('<?php echo G5_URL; ?>/willow/home_feed.php?offset=' + encodeURIComponent(feedOffset) + '&limit=' + encodeURIComponent(feedLimit), {
+            fetch('<?php echo G5_URL; ?>/willow/home_feed.php?offset=' + encodeURIComponent(feedOffset) + '&limit=' + encodeURIComponent(feedLimit) + '&seed=' + encodeURIComponent(feedSeed) + '&seen=' + encodeURIComponent(feedSeen.join(',')), {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
@@ -129,6 +144,12 @@ $recommended_authors = willow_get_recommended_authors();
                 }
                 if (data.html) {
                     feedMore.insertAdjacentHTML('beforeend', data.html);
+                    Array.prototype.slice.call(feedMore.querySelectorAll('[data-feed-item]')).forEach(function(item) {
+                        var key = item.getAttribute('data-feed-item');
+                        if (key && feedSeen.indexOf(key) === -1) {
+                            feedSeen.push(key);
+                        }
+                    });
                 }
                 feedOffset += parseInt(data.count || 0, 10);
                 feedEnded = !data.has_more || parseInt(data.count || 0, 10) < feedLimit;
@@ -196,46 +217,6 @@ $recommended_authors = willow_get_recommended_authors();
                 return;
             }
 
-            var reportButton = event.target.closest('.willow_report_button');
-            if (reportButton) {
-                event.preventDefault();
-                var reportContent = prompt('신고 내용을 입력해주세요.');
-                if (reportContent === null) return;
-                reportContent = reportContent.trim();
-                if (!reportContent) {
-                    alert('신고 내용을 입력해주세요.');
-                    return;
-                }
-                reportButton.disabled = true;
-                var reportData = new FormData();
-                reportData.append('target_type', reportButton.getAttribute('data-target-type'));
-                reportData.append('target_id', reportButton.getAttribute('data-target-id'));
-                reportData.append('content', reportContent);
-                fetch('<?php echo G5_URL; ?>/willow/report_update.php', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: reportData,
-                    credentials: 'same-origin'
-                }).then(function(response) {
-                    return response.json();
-                }).then(function(data) {
-                    if (!data.success) {
-                        alert(data.message || '신고 접수에 실패했습니다.');
-                        return;
-                    }
-                    alert(data.message || '신고 내용이 접수되었습니다.');
-                    var wrap = reportButton.closest('.willow_more');
-                    if (wrap) wrap.classList.remove('is_open');
-                }).catch(function() {
-                    alert('신고 접수 중 오류가 발생했습니다.');
-                }).finally(function() {
-                    reportButton.disabled = false;
-                });
-                return;
-            }
-
             var toggle = event.target.closest('.willow_more_button');
             document.querySelectorAll('.willow_more.is_open').forEach(function(menu) {
                 if (!toggle || !menu.contains(toggle)) {
@@ -265,6 +246,8 @@ $recommended_authors = willow_get_recommended_authors();
         });
     })();
     </script>
+
+    <?php include_once(G5_PATH.'/willow/report_modal.inc.php'); ?>
 
     <footer class="willow_footer">
         <button type="button" class="willow_footer_toggle" aria-expanded="false" aria-controls="willow_footer_panel">

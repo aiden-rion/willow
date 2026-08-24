@@ -26,6 +26,11 @@ include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.G5_CSS_VER.'">', 10);
 ?>
 
+<div class="willow_pull_refresh" data-pull-refresh aria-hidden="true">
+    <span class="willow_pull_spinner" aria-hidden="true"></span>
+    <strong data-pull-label>아래로 당겨 새로고침</strong>
+</div>
+
 <main class="willow_content_app">
     <header class="willow_detail_header">
         <a class="willow_back" href="<?php echo G5_URL; ?>" aria-label="뒤로가기"></a>
@@ -114,7 +119,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                             <button type="button" role="menuitem">수정하기</button>
                             <button type="button" role="menuitem">삭제하기</button>
                             <?php } else { ?>
-                            <button type="button" role="menuitem" class="willow_report_button" data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
+                            <button type="button" role="menuitem" class="willow_report_button" data-willow-report-open data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
                             <?php } ?>
                         </div>
                     </div>
@@ -149,6 +154,14 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
     <script>
     (function() {
+        if (!window.location.hash && window.scrollY > 0) {
+            window.scrollTo(0, 0);
+        }
+
+        if (window.WillowPullRefresh) {
+            window.WillowPullRefresh.init({ target: '.willow_content_app' });
+        }
+
         var picker = document.querySelector('[data-topic-picker]');
         var pickerOpen = document.querySelector('[data-topic-picker-open]');
         var monthButtons = document.querySelectorAll('[data-topic-month]');
@@ -162,8 +175,17 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             document.documentElement.classList.toggle('willow_topic_picker_locked', open);
             if (open) {
                 var selected = picker.querySelector('[data-topic-item].is_selected');
-                if (selected) selected.scrollIntoView({block: 'nearest'});
+                var selectedList = selected ? selected.closest('.willow_topic_picker_list') : null;
+                if (selected && selectedList) {
+                    selectedList.scrollTop = Math.max(0, selected.offsetTop - selectedList.offsetTop - 8);
+                }
             }
+        }
+
+        function centerActiveMonth(button) {
+            var monthWrap = button ? button.closest('.willow_topic_months') : null;
+            if (!button || !monthWrap) return;
+            monthWrap.scrollLeft = Math.max(0, button.offsetLeft - ((monthWrap.clientWidth - button.offsetWidth) / 2));
         }
 
         function selectMonth(month) {
@@ -198,7 +220,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         var activeMonth = document.querySelector('[data-topic-month].is_active');
         if (activeMonth) {
             selectMonth(activeMonth.getAttribute('data-topic-month'));
-            activeMonth.scrollIntoView({inline: 'center', block: 'nearest'});
+            centerActiveMonth(activeMonth);
         }
 
         document.addEventListener('keydown', function(event) {
@@ -244,46 +266,6 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                 return;
             }
 
-            var reportButton = event.target.closest('.willow_report_button');
-            if (reportButton) {
-                event.preventDefault();
-                var reportContent = prompt('신고 내용을 입력해주세요.');
-                if (reportContent === null) return;
-                reportContent = reportContent.trim();
-                if (!reportContent) {
-                    alert('신고 내용을 입력해주세요.');
-                    return;
-                }
-                reportButton.disabled = true;
-                var reportData = new FormData();
-                reportData.append('target_type', reportButton.getAttribute('data-target-type'));
-                reportData.append('target_id', reportButton.getAttribute('data-target-id'));
-                reportData.append('content', reportContent);
-                fetch('<?php echo G5_URL; ?>/willow/report_update.php', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: reportData,
-                    credentials: 'same-origin'
-                }).then(function(response) {
-                    return response.json();
-                }).then(function(data) {
-                    if (!data.success) {
-                        alert(data.message || '신고 접수에 실패했습니다.');
-                        return;
-                    }
-                    alert(data.message || '신고 내용이 접수되었습니다.');
-                    var wrap = reportButton.closest('.willow_more');
-                    if (wrap) wrap.classList.remove('is_open');
-                }).catch(function() {
-                    alert('신고 접수 중 오류가 발생했습니다.');
-                }).finally(function() {
-                    reportButton.disabled = false;
-                });
-                return;
-            }
-
             var toggle = event.target.closest('.willow_more_button');
             document.querySelectorAll('.willow_more.is_open').forEach(function(menu) {
                 if (!toggle || !menu.contains(toggle)) {
@@ -301,6 +283,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
     })();
     </script>
 
+    <?php include_once(G5_PATH.'/willow/report_modal.inc.php'); ?>
     <?php include_once(G5_PATH.'/willow/bottom_nav.inc.php'); ?>
 </main>
 

@@ -19,11 +19,17 @@ if (empty($member['mb_id'])) {
 
 $target_type = isset($_POST['target_type']) && $_POST['target_type'] === 'topic' ? 'topic' : 'board';
 $target_id = isset($_POST['target_id']) ? (int) $_POST['target_id'] : 0;
+$category = isset($_POST['category']) ? preg_replace('/[^a-z_]/', '', $_POST['category']) : '';
 $content = isset($_POST['content']) ? trim($_POST['content']) : '';
 $content = preg_replace('/\s+/', ' ', $content);
+$categories = willow_report_categories();
 
 if ($target_id < 1) {
     willow_report_json(false, '신고 대상을 찾을 수 없습니다.');
+}
+
+if (!isset($categories[$category])) {
+    willow_report_json(false, '신고 카테고리를 선택해주세요.');
 }
 
 if ($content === '') {
@@ -51,6 +57,7 @@ $reporter_name = $member['mb_nick'] ? $member['mb_nick'] : $member['mb_name'];
 $target_type_sql = sql_escape_string($target['target_type']);
 $target_id_sql = (int) $target['target_id'];
 $reporter_sql = sql_escape_string($member['mb_id']);
+$category_sql = sql_escape_string($category);
 $content_sql = sql_escape_string($content);
 
 $exists = sql_fetch(" select wrp_id
@@ -62,7 +69,8 @@ $exists = sql_fetch(" select wrp_id
 
 if (!empty($exists['wrp_id'])) {
     sql_query(" update `{$table}`
-        set wrp_content = '{$content_sql}',
+        set wrp_category = '{$category_sql}',
+            wrp_content = '{$content_sql}',
             wrp_status = 'pending',
             wrp_update_datetime = '{$now}'
         where wrp_id = '".(int) $exists['wrp_id']."' ");
@@ -77,6 +85,7 @@ sql_query(" insert into `{$table}`
         wrp_author_name = '".sql_escape_string($target['author_name'])."',
         wrp_reporter_mb_id = '{$reporter_sql}',
         wrp_reporter_name = '".sql_escape_string($reporter_name)."',
+        wrp_category = '{$category_sql}',
         wrp_content = '{$content_sql}',
         wrp_status = 'pending',
         wrp_admin_memo = '',

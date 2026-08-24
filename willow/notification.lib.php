@@ -194,16 +194,25 @@ function willow_notification_post_meta($target_type, $target_id)
 
     if ($target_type === 'board') {
         $table = willow_content_table();
-        $post = sql_fetch(" select wr_id, mb_id, wr_name, wr_subject, wr_content, wr_datetime from `{$table}` where wr_id = '{$target_id}' and wr_is_comment = 0 ", false);
+        $post = sql_fetch(" select wr_id, mb_id, wr_name, wr_subject, wr_content, wr_datetime, wr_5 from `{$table}` where wr_id = '{$target_id}' and wr_is_comment = 0 ", false);
         if (empty($post['wr_id'])) {
             return array();
         }
+
+        $images = array_map('willow_media_url', willow_split_images($post['wr_5']));
+        $attached_images = willow_get_board_attached_images((int) $post['wr_id']);
+        if ($attached_images) {
+            $images = array_values(array_unique(array_merge($images, $attached_images)));
+        }
+        $image = isset($images[0]) ? $images[0] : '';
 
         return array(
             'author_mb_id' => $post['mb_id'],
             'author' => $post['wr_name'],
             'title' => $post['wr_subject'],
             'excerpt' => cut_str(trim(preg_replace('/\s+/', ' ', strip_tags($post['wr_content']))), 80, '...'),
+            'image' => $image,
+            'images' => $images,
             'href' => G5_URL.'/willow/post.php?wr_id='.(int) $post['wr_id'],
             'datetime' => $post['wr_datetime'],
         );
@@ -211,16 +220,20 @@ function willow_notification_post_meta($target_type, $target_id)
 
     if ($target_type === 'topic') {
         $tables = willow_topic_tables();
-        $post = sql_fetch(" select wp_id, mb_id, wp_author, wp_subject, wp_content, wp_datetime from `{$tables['post']}` where wp_id = '{$target_id}' ", false);
+        $post = sql_fetch(" select wp_id, mb_id, wp_author, wp_subject, wp_content, wp_image, wp_datetime from `{$tables['post']}` where wp_id = '{$target_id}' ", false);
         if (empty($post['wp_id'])) {
             return array();
         }
+
+        $images = array_map('willow_media_url', willow_split_images($post['wp_image']));
 
         return array(
             'author_mb_id' => $post['mb_id'],
             'author' => $post['wp_author'],
             'title' => $post['wp_subject'],
             'excerpt' => cut_str(trim(preg_replace('/\s+/', ' ', strip_tags($post['wp_content']))), 80, '...'),
+            'image' => isset($images[0]) ? $images[0] : '',
+            'images' => $images,
             'href' => G5_URL.'/willow/post.php?wp_id='.(int) $post['wp_id'],
             'datetime' => $post['wp_datetime'],
         );

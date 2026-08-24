@@ -33,6 +33,8 @@ if ($result) {
             'title' => get_text($post['title']),
             'excerpt' => get_text($post['excerpt']),
             'author' => get_text($post['author'] ? $post['author'] : '윌로우 회원'),
+            'image' => !empty($post['image']) ? $post['image'] : '',
+            'images' => !empty($post['images']) && is_array($post['images']) ? array_slice($post['images'], 0, 2) : array(),
             'href' => $post['href'],
             'liked_at' => $like['wl_datetime'],
         );
@@ -49,6 +51,7 @@ if (strpos($g5['body_script'], 'class=') === false) {
 }
 
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.G5_CSS_VER.'">', 10);
+$willow_page_back_url = G5_URL;
 include_once('./_head.php');
 ?>
 
@@ -61,12 +64,21 @@ include_once('./_head.php');
     <div class="willow_simple_list">
         <?php if ($liked_posts) { ?>
             <?php foreach ($liked_posts as $item) { ?>
-            <article class="willow_simple_item">
+            <article class="willow_simple_item <?php echo !empty($item['image']) ? 'has_thumb' : ''; ?>">
                 <a href="<?php echo $item['href']; ?>">
-                    <em><?php echo $item['type']; ?></em>
-                    <strong><?php echo $item['title']; ?></strong>
-                    <p><?php echo $item['excerpt']; ?></p>
-                    <span><?php echo $item['author']; ?> · 좋아요 <?php echo get_text(substr($item['liked_at'], 0, 16)); ?></span>
+                    <div class="willow_simple_item_body">
+                        <em><?php echo $item['type']; ?></em>
+                        <strong><?php echo $item['title']; ?></strong>
+                        <p><?php echo $item['excerpt']; ?></p>
+                        <span><?php echo $item['author']; ?> · 좋아요 <?php echo get_text(substr($item['liked_at'], 0, 16)); ?></span>
+                    </div>
+                    <?php if (!empty($item['images'])) { ?>
+                    <span class="willow_simple_thumb_stack is_count_<?php echo count($item['images']); ?>" aria-hidden="true">
+                        <?php foreach ($item['images'] as $thumb_index => $thumb_image) { ?>
+                        <img class="willow_simple_thumb" src="<?php echo get_text($thumb_image); ?>" alt="">
+                        <?php } ?>
+                    </span>
+                    <?php } ?>
                 </a>
             </article>
             <?php } ?>

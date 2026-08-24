@@ -53,6 +53,10 @@ textarea {
   overflow-x: hidden;
 }
 
+body.willow_has_bottom_nav .willow_content_app {
+  padding-bottom: calc(78px + env(safe-area-inset-bottom));
+}
+
 .willow_content_app *,
 .willow_content_app *::before,
 .willow_content_app *::after,
@@ -75,7 +79,10 @@ textarea {
 }
 
 .willow_detail_header h1 {
-  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
   max-width: calc(100% - 152px);
   margin: 0;
   font-size: 18px;
@@ -594,11 +601,19 @@ textarea {
   object-fit: contain;
 }
 
+body.willow_write_body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .willow_write_app {
   position: relative;
-  min-height: 100vh;
-  padding-top: 60px;
-  padding-bottom: 64px;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 52px;
+  padding-bottom: 124px;
   background: #ffffff;
 }
 
@@ -606,16 +621,31 @@ textarea {
   position: fixed;
   right: 0;
   left: 0;
-  height: 60px;
+  height: 52px;
   border-bottom: 0;
 }
 
 .willow_write_topic {
   display: grid;
   justify-items: center;
-  min-height: 180px;
-  padding: 26px 26px 24px;
+  min-height: 78px;
+  gap: 6px;
+  padding: 14px 24px 10px;
   text-align: center;
+}
+
+.willow_write_topic_label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f4f4f4;
+  color: #777777;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .willow_topic_toggle {
@@ -623,120 +653,182 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 34px;
   margin: 0;
-  padding: 4px 12px;
+  padding: 3px 10px;
   color: #1a1a1a;
-  font-size: 22px;
-  font-weight: 800;
-  line-height: 32px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
   letter-spacing: -0.44px;
 }
 
 .willow_topic_toggle i {
   color: #999999;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .willow_topic_toggle:focus:not(:focus-visible) {
   outline: none;
 }
 
+.willow_header_topic_toggle {
+  min-height: 36px;
+  padding: 0 10px;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.willow_topic_hint_bubble {
+  position: absolute;
+  top: 42px;
+  left: 50%;
+  z-index: 2;
+  display: block;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #1a1a1a;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+  transform: translateX(-50%);
+  animation: willowTopicBubble 3600ms ease both;
+}
+
+.willow_topic_hint_bubble::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  background: #1a1a1a;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+@keyframes willowTopicBubble {
+  0%,
+  68% {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+  }
+  78%,
+  94% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .willow_write_topic h2,
+  .willow_topic_hint_bubble {
+    animation: none;
+  }
+}
+
 .willow_write_topic h2 {
-  margin: 8px 0 0;
+  margin: 0;
   color: #1a1a1a;
-  font-size: 30px;
-  font-weight: 800;
-  line-height: 34px;
-  letter-spacing: -0.6px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+  letter-spacing: -0.4px;
+  transform-origin: center top;
+  animation: willowTopicTitleIntro 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes willowTopicTitleIntro {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(1.03);
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(6px) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .willow_write_topic p {
   max-width: 100%;
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: #000000;
   font-family: "DM Sans", "SUIT Variable", SUIT, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 400;
-  line-height: 26px;
+  line-height: 22px;
 }
 
 .willow_topic_write_form {
   display: flex;
-  min-height: calc(100vh - 124px);
+  height: calc(100vh - 52px - 112px - var(--willow-keyboard-offset, 0px));
+  height: calc(100dvh - 52px - 112px - var(--willow-keyboard-offset, 0px));
+  min-height: 0;
   flex-direction: column;
-  padding: 0 26px 24px;
+  padding: 0 24px 24px;
+  overflow: hidden;
 }
 
 .willow_write_field {
   display: flex;
-  min-height: 322px;
+  flex: 1 1 auto;
+  min-height: 0;
   flex-direction: column;
-}
-
-.willow_write_subject {
-  padding: 0 0 8px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.willow_write_subject input {
-  width: 100%;
-  height: 48px;
-  border: 0;
-  background: #ffffff;
-  color: #1a1a1a;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 28px;
-  outline: none;
-}
-
-.willow_write_subject input::placeholder {
-  color: #b5b5b5;
-  font-weight: 500;
 }
 
 .willow_write_field textarea {
   width: 100%;
   flex: 1 1 auto;
+  min-height: 0;
   box-sizing: border-box;
   border: 0;
   background: #ffffff;
   color: #1a1a1a;
   font-family: "Nanum Myeongjo", "AppleMyungjo", "Batang", serif;
-  font-size: 16px;
-  line-height: 1.9;
+  font-size: 14px;
+  line-height: 1.75;
   outline: none;
-  padding: 16px 0 0;
+  overflow-y: auto;
+  padding: 14px 0 0;
   resize: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .willow_write_field textarea::placeholder {
   color: #999999;
-  font-size: 24px;
-  line-height: 1.25;
-  text-align: center;
+  font-size: 16px;
+  line-height: 1.45;
 }
 
-.willow_write_count {
-  margin-top: 10px;
-  color: #999999;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: -0.26px;
+.willow_write_field textarea.is_over_limit {
+  color: #e53935;
+  caret-color: #e53935;
 }
 
 .willow_write_attach {
-  display: flex;
-  gap: 12px;
+  display: none;
+  gap: 10px;
   width: 100%;
-  margin-top: 16px;
-  padding-top: 16px;
+  margin-top: 12px;
+  padding-top: 14px;
   padding-bottom: 8px;
   overflow-x: auto;
   border-top: 1px solid #e6e6e6;
   -webkit-overflow-scrolling: touch;
+}
+
+.willow_write_attach.has_images {
+  display: flex;
 }
 
 .willow_write_attach::-webkit-scrollbar {
@@ -749,8 +841,6 @@ textarea {
   flex: 0 0 auto;
 }
 
-.willow_attach_item:first-child,
-.willow_attach_item.is_visible,
 .willow_attach_item.has_preview {
   display: block;
 }
@@ -758,8 +848,8 @@ textarea {
 .willow_attach_tile {
   position: relative;
   display: grid;
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   place-items: center;
   overflow: hidden;
   border: 1px solid #e6e6e6;
@@ -812,12 +902,12 @@ textarea {
 
 .willow_write_options {
   display: grid;
-  gap: 30px;
-  margin-top: 30px;
+  gap: 20px;
+  margin-top: 22px;
   padding-bottom: 24px;
 }
 
-.willow_write_app:not(.is_free_topic) .willow_write_options {
+.willow_access_select {
   display: none;
 }
 
@@ -834,11 +924,19 @@ textarea {
 
 .willow_tag_chips {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-wrap: nowrap;
+  gap: 5px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.willow_tag_chips::-webkit-scrollbar {
+  display: none;
 }
 
 .willow_tag_chip {
+  flex: 0 0 auto;
   min-height: 36px;
   padding: 7px 16px;
   border: 1px solid #e6e6e6;
@@ -849,6 +947,8 @@ textarea {
   font-weight: 400;
   line-height: 20px;
   letter-spacing: -0.28px;
+  white-space: nowrap;
+  scroll-snap-align: start;
 }
 
 .willow_tag_chip.is_selected {
@@ -863,13 +963,13 @@ textarea {
 
 .willow_select_shell select {
   width: 100%;
-  height: 56px;
+  height: 48px;
   padding: 0 48px 0 16px;
   border: 1px solid #e6e6e6;
   border-radius: 8px;
   background: #ffffff;
   color: #1a1a1a;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 400;
   line-height: 22px;
   letter-spacing: -0.32px;
@@ -890,41 +990,262 @@ textarea {
 .willow_write_actions {
   position: fixed;
   right: 0;
-  bottom: 0;
+  bottom: var(--willow-keyboard-offset, 0px);
   left: 0;
   z-index: 50;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 64px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-height: 61px;
+  padding: 10px 14px calc(9px + env(safe-area-inset-bottom));
   border-top: 1px solid #e6e6e6;
+  background: #f2f2f2;
+}
+
+.willow_write_actions.has_tag_bar {
+  min-height: 113px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.willow_write_tag_bar {
+  flex: 1 0 100%;
+  order: -1;
+  min-width: 0;
+  margin: -1px -14px 0;
+  padding: 8px 14px 10px;
+  border-bottom: 1px solid #e6e6e6;
   background: #ffffff;
 }
 
-.willow_save_button,
+.willow_write_tag_bar .willow_tag_chips {
+  gap: 5px;
+  margin: 0;
+}
+
+.willow_write_tag_bar .willow_tag_chip {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.willow_write_close_button,
 .willow_submit_button {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  place-items: center;
-  border-radius: 0;
-  font-size: 16px;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #e5e5e5;
+  color: #686868;
+  font-size: 14px;
   font-weight: 700;
-  line-height: 22px;
+  line-height: 1;
   letter-spacing: -0.32px;
 }
 
-.willow_save_button {
-  background: #ffffff;
-  color: #1a1a1a;
+.willow_write_toolset {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.willow_submit_button {
+.willow_write_toolset::-webkit-scrollbar {
+  display: none;
+}
+
+.willow_write_tool {
+  display: grid;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #9a9a9a;
+  font-size: 20px;
+}
+
+.willow_write_tool.is_active {
+  background: #ffffff;
+  color: #333333;
+}
+
+.willow_write_access_tool.is_active {
   background: #1a1a1a;
   color: #ffffff;
 }
 
-.willow_write_app.is_free_topic .willow_write_topic {
-  min-height: 116px;
+.willow_write_toast {
+  position: fixed;
+  right: 18px;
+  bottom: calc(124px + var(--willow-keyboard-offset, 0px) + env(safe-area-inset-bottom));
+  left: 18px;
+  z-index: 60;
+  display: grid;
+  min-height: 42px;
+  padding: 0 16px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.92);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.willow_write_toast.is_visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.willow_write_confirm[hidden] {
+  display: none;
+}
+
+.willow_write_confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.willow_write_confirm_dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.willow_write_confirm_panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 326px);
+  padding: 26px 20px 18px;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
+}
+
+.willow_write_confirm_panel h2 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 25px;
+}
+
+.willow_write_confirm_panel p {
+  margin: 10px 0 22px;
+  color: #777777;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.willow_write_confirm_actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.willow_write_confirm_actions button {
+  height: 44px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.willow_write_confirm_cancel {
+  background: #eeeeee;
+  color: #555555;
+}
+
+.willow_write_confirm_ok {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.willow_pull_refresh {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: 50%;
+  z-index: 120;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #1a1a1a;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  transform: translate(-50%, calc(-16px + (16px * var(--willow-pull-progress, 0)))) scale(calc(0.92 + (0.08 * var(--willow-pull-progress, 0))));
+  transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease;
+}
+
+.willow_pull_refresh.is_visible {
+  opacity: 1;
+}
+
+.willow_pull_refresh.is_ready {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.willow_pull_spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: calc(0.35 + (0.65 * var(--willow-pull-progress, 0)));
+  transform: rotate(calc(270deg * var(--willow-pull-progress, 0)));
+}
+
+.willow_pull_refreshing .willow_pull_spinner {
+  animation: willowPullSpin 720ms linear infinite;
+}
+
+.willow_pull_target {
+  will-change: transform;
+}
+
+.willow_pull_releasing {
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+html.willow_pull_active,
+html.willow_pull_active body {
+  overscroll-behavior-y: contain;
+}
+
+@keyframes willowPullSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .willow_write_app.is_free_topic .willow_write_topic h2,
@@ -933,13 +1254,14 @@ textarea {
 }
 
 .willow_write_app.is_free_topic .willow_write_field {
-  min-height: 400px;
+  min-height: 0;
 }
 
 @media (min-width: 431px) {
   .willow_write_app,
   .willow_write_app .willow_detail_header,
-  .willow_write_actions {
+  .willow_write_actions,
+  .willow_write_toast {
     max-width: 390px;
     margin-right: auto;
     margin-left: auto;
@@ -953,7 +1275,7 @@ textarea {
   }
 
   .willow_write_field textarea::placeholder {
-    font-size: 21px;
+    font-size: 16px;
   }
 }
 
@@ -1360,8 +1682,8 @@ textarea {
 }
 
 .willow_comments {
-  margin: 38px 0 34px;
-  padding-top: 28px;
+  margin: 30px 0 28px;
+  padding-top: 22px;
   border-top: 1px solid #eeeeee;
 }
 
@@ -1369,13 +1691,13 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .willow_comments_head h2 {
   margin: 0;
   color: #111111;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.35;
 }
 
@@ -1386,22 +1708,22 @@ textarea {
 .willow_comment_list {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 12px;
 }
 
 .willow_comment_item {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
   align-items: flex-start;
-  padding-bottom: 18px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #f0f0f0;
 }
 
 .willow_comment_avatar {
   display: block;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -1412,22 +1734,24 @@ textarea {
 
 .willow_comment_item strong {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 4px;
   color: #111111;
   font-size: 14px;
+  line-height: 1.3;
 }
 
 .willow_comment_item p {
-  margin: 0 0 8px;
+  margin: 0 0 5px;
   color: #333333;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.45;
 }
 
 .willow_comment_item time,
 .willow_comment_empty {
   color: #888888;
   font-size: 12px;
+  line-height: 1.35;
 }
 
 .willow_comment_empty {
@@ -1441,22 +1765,22 @@ textarea {
 
 .willow_comment_form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 64px;
+  grid-template-columns: minmax(0, 1fr) 58px;
   gap: 8px;
   align-items: stretch;
-  margin-top: 18px;
+  margin-top: 14px;
 }
 
 .willow_comment_form textarea {
   box-sizing: border-box;
   width: 100%;
-  min-height: 78px;
-  padding: 12px;
+  min-height: 62px;
+  padding: 10px 12px;
   border: 1px solid #dddddd;
   border-radius: 6px;
   color: #111111;
-  font-size: 16px;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 1.45;
   resize: vertical;
 }
 
@@ -1533,9 +1857,11 @@ textarea {
 }
 
 .willow_subscribe_button.is_subscribed {
-  border-color: #111111;
-  background: #111111;
-  color: #ffffff;
+  border-color: #dddddd;
+  background: #f2f2f2;
+  color: #999999;
+  cursor: default;
+  pointer-events: none;
 }
 
 .willow_other_posts {
@@ -1609,9 +1935,9 @@ textarea {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   align-items: center;
   width: 100%;
-  height: 78px;
+  min-height: calc(78px + env(safe-area-inset-bottom));
   margin: 0 auto;
-  padding: 8px 10px 10px;
+  padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
   background: #ffffff;
 }
 
@@ -2905,13 +3231,16 @@ textarea {
   background: #ffffff;
 }
 
-.willow_author_page_header a {
+.willow_author_page_header a,
+.willow_author_page_header button {
   position: absolute;
   left: 14px;
   display: grid;
   width: 48px;
   height: 48px;
   place-items: center;
+  border: 0;
+  background: transparent;
 }
 
 .willow_author_page_header img {
@@ -4264,6 +4593,170 @@ textarea {
 .willow_point_complete_nav a:first-child {
   background: #ffffff;
   color: #151515;
+}
+
+.willow_report_modal[hidden] {
+  display: none;
+}
+
+.willow_report_modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.willow_report_dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+}
+
+.willow_report_panel {
+  position: relative;
+  width: 100%;
+  padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  background: #ffffff;
+  box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.12);
+}
+
+.willow_report_head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.willow_report_head h2 {
+  margin: 0;
+  color: #151515;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.willow_report_close {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+}
+
+.willow_report_close::before,
+.willow_report_close::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: 8px;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: #151515;
+}
+
+.willow_report_close::before {
+  transform: rotate(45deg);
+}
+
+.willow_report_close::after {
+  transform: rotate(-45deg);
+}
+
+.willow_report_form {
+  display: grid;
+  gap: 18px;
+}
+
+.willow_report_form label {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  color: #151515;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.willow_report_form select,
+.willow_report_form textarea {
+  width: 100%;
+  border: 1px solid #e4e4e4;
+  border-radius: 14px;
+  background: #f8f8f8;
+  color: #151515;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.willow_report_form select {
+  height: 52px;
+  padding: 0 42px 0 16px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #777 50%), linear-gradient(135deg, #777 50%, transparent 50%);
+  background-position: calc(100% - 22px) 22px, calc(100% - 16px) 22px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.willow_report_form textarea {
+  min-height: 132px;
+  padding: 15px 16px;
+  line-height: 1.55;
+  resize: none;
+}
+
+.willow_report_message {
+  min-height: 20px;
+  margin: -4px 0 0;
+  color: #1677ff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.willow_report_message.is_error {
+  color: #e53935;
+}
+
+.willow_report_actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.willow_report_actions button {
+  height: 54px;
+  border: 0;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.willow_report_actions button:first-child {
+  background: #f1f1f1;
+  color: #555555;
+}
+
+.willow_report_actions button:last-child {
+  background: #151515;
+  color: #ffffff;
+}
+
+.willow_report_actions button:disabled {
+  opacity: 0.5;
+}
+
+body.willow_report_modal_open {
+  overflow: hidden;
+}
+
+@supports (-webkit-touch-callout: none) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 @media (max-width: 360px) {

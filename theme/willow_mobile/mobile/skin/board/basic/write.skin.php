@@ -201,8 +201,35 @@ $willow_tags = array('정착꿀팁', '정착상식', '정신건강', '범죄사�
     </div>
 
     <div class="btn_confirm willow_write_actions">
-        <a href="<?php echo get_pretty_url($bo_table); ?>" class="btn_cancel">임시저장</a>
-        <button type="submit" id="btn_submit" class="btn_submit" accesskey="s">작성완료</button>
+        <button type="button" class="btn_cancel willow_write_close" data-write-close>
+            <i class="fa fa-times" aria-hidden="true"></i>
+            <span>닫기</span>
+        </button>
+        <div class="willow_write_toolset" aria-label="작성 도구">
+            <button type="button" class="willow_write_tool is_active" data-align="left" aria-label="왼쪽 정렬">
+                <i class="fa fa-align-left" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="willow_write_tool" data-align="center" aria-label="가운데 정렬">
+                <i class="fa fa-align-center" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="willow_write_tool" data-align="right" aria-label="오른쪽 정렬">
+                <i class="fa fa-align-right" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="willow_write_tool" data-focus-subject aria-label="제목 입력">
+                <i class="fa fa-check" aria-hidden="true"></i>
+                <span>가</span>
+            </button>
+            <button type="button" class="willow_write_tool" data-trigger-file aria-label="이미지 첨부">
+                <i class="fa fa-clone" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="willow_write_tool" data-scroll-options aria-label="추가 설정">
+                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+            </button>
+        </div>
+        <button type="submit" id="btn_submit" class="btn_submit" accesskey="s">
+            <i class="fa fa-check" aria-hidden="true"></i>
+            <span>완료</span>
+        </button>
     </div>
     </form>
 </section>
@@ -265,6 +292,30 @@ $(function() {
     $(".willow_tag_chip").on("click", function() {
         $(this).toggleClass("is_selected");
         syncTags();
+    });
+
+    $("[data-write-close]").on("click", function() {
+        window.location.href = "<?php echo get_pretty_url($bo_table); ?>";
+    });
+
+    $("[data-align]").on("click", function() {
+        var align = $(this).data("align") || "left";
+        $("[data-align]").removeClass("is_active");
+        $(this).addClass("is_active");
+        $content.css("text-align", align).trigger("focus");
+    });
+
+    $("[data-focus-subject]").on("click", function() {
+        $subject.trigger("focus");
+    });
+
+    $("[data-trigger-file]").on("click", function() {
+        $(".willow_attach_input").first().trigger("click");
+    });
+
+    $("[data-scroll-options]").on("click", function() {
+        var options = document.querySelector(".willow_write_options");
+        if (options) options.scrollIntoView({ behavior: "smooth", block: "nearest" });
     });
     $(".willow_attach_input").on("change", function() {
         var input = this;

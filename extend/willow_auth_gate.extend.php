@@ -31,6 +31,9 @@ if (!$is_member && !$willow_is_allowed) {
     }
 
     $willow_return_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : G5_URL;
+    if (strpos($willow_return_url, '/bbs/write.php') !== false && strpos($willow_return_url, 'bo_table=free') !== false) {
+        $willow_return_url = '/willow/write.php';
+    }
     if (get_cookie('willow_splash_seen') !== '1') {
         goto_url(G5_URL.'/willow/splash.php?url='.urlencode($willow_return_url));
     }

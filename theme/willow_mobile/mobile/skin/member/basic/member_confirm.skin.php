@@ -16,7 +16,7 @@ $is_leave = ($url == 'member_leave.php');
 
 <div id="mb_confirm" class="willow_member_confirm">
     <header class="willow_member_confirm_header">
-        <a href="javascript:history.back();" aria-label="뒤로가기"></a>
+        <a href="<?php echo G5_URL; ?>/willow/menu.php" data-willow-safe-back aria-label="뒤로가기"></a>
         <h1>휴대폰인증확인</h1>
     </header>
 
@@ -50,6 +50,17 @@ $is_leave = ($url == 'member_leave.php');
 </div>
 
 <script>
+document.querySelectorAll('[data-willow-safe-back]').forEach(function(link) {
+    link.addEventListener('click', function(event) {
+        event.preventDefault();
+        if (window.history.length > 1) {
+            window.history.back();
+            return;
+        }
+        window.location.href = link.href;
+    });
+});
+
 var willowConfirmTimer = null;
 var willowConfirmRemain = 180;
 var willowConfirmHasPhone = <?php echo $confirm_phone ? 'true' : 'false'; ?>;

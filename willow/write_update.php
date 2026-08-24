@@ -50,6 +50,10 @@ if (!$wp_content) {
     alert('내용을 입력해 주세요.');
 }
 
+if (mb_strlen($wp_content, 'UTF-8') > 500) {
+    alert('500자 이내로 작성해 주세요.');
+}
+
 $mb_id = isset($member['mb_id']) ? $member['mb_id'] : '';
 $author = !empty($member['mb_nick']) ? $member['mb_nick'] : (!empty($member['mb_name']) ? $member['mb_name'] : '윌로우 회원');
 $now = G5_TIME_YMDHIS;

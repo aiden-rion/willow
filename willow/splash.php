@@ -5,6 +5,9 @@ $return_url = isset($_GET['url']) ? trim($_GET['url']) : G5_URL;
 if ($return_url === '' || preg_match('#^(https?:)?//#i', $return_url)) {
     $return_url = G5_URL;
 }
+if (strpos($return_url, '/bbs/write.php') !== false && strpos($return_url, 'bo_table=free') !== false) {
+    $return_url = '/willow/write.php';
+}
 
 if ($is_member) {
     goto_url($return_url);
