@@ -57,6 +57,10 @@ body.willow_has_bottom_nav .willow_content_app {
   padding-bottom: calc(78px + env(safe-area-inset-bottom));
 }
 
+body.willow_has_bottom_nav .willow_today_app {
+  padding-bottom: 0;
+}
+
 .willow_content_app *,
 .willow_content_app *::before,
 .willow_content_app *::after,
@@ -136,7 +140,9 @@ body.willow_has_bottom_nav .willow_content_app {
 }
 
 .willow_today_page {
-  padding: 8px 8px 98px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 8px 8px calc(98px + env(safe-area-inset-bottom));
   background: #f1f1f1;
 }
 

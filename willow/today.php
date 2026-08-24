@@ -31,7 +31,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
     <strong data-pull-label>아래로 당겨 새로고침</strong>
 </div>
 
-<main class="willow_content_app">
+<main class="willow_content_app willow_today_app">
     <section class="willow_today_page">
         <?php if ($has_visible_topic) { ?>
         <div class="willow_today_topic">
