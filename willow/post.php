@@ -36,6 +36,8 @@ $article_author_subscriber_count = 0;
 $article_author_href = '';
 $article_author_subscribed = false;
 $article_author_member = array();
+$article_category = '';
+$article_tags = array();
 
 function willow_article_increment_board_hit($wr_id)
 {
@@ -137,6 +139,8 @@ if ($wr_id) {
     $article_image = $board_post['image'];
     $article_images = array_merge(!empty($board_post['images']) ? $board_post['images'] : willow_split_images($article_image), willow_get_board_attached_images((int) $board_post['id']));
     $article_author_id = !empty($board_post['mb_id']) ? $board_post['mb_id'] : '';
+    $article_category = !empty($board_post['category']) ? $board_post['category'] : '';
+    $article_tags = !empty($board_post['tags']) && is_array($board_post['tags']) ? $board_post['tags'] : array();
     $g5['title'] = $article_title;
 }
 
@@ -167,6 +171,8 @@ if ($wp_id) {
     $article_image = willow_first_image($topic_post['wp_image']);
     $article_images = willow_split_images($topic_post['wp_image']);
     $article_author_id = $topic_post['mb_id'];
+    $article_category = !empty($topic_post['wp_category']) ? willow_story_category_label($topic_post['wp_category']) : (!empty($topic_post['wp_topic_mode']) && $topic_post['wp_topic_mode'] === 'free' ? '자유 주제' : '오늘의 주제');
+    $article_tags = !empty($topic_post['wp_tags']) ? array_filter(array_map('trim', explode(',', $topic_post['wp_tags']))) : array();
     $g5['title'] = $article_title;
 }
 
@@ -263,6 +269,8 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <div class="willow_article_tags">
             <?php if (!$is_general) { ?><span>유료구독</span><?php } ?>
             <span>스토리</span>
+            <?php if ($article_category !== '') { ?><span><?php echo get_text($article_category); ?></span><?php } ?>
+            <?php foreach (array_slice($article_tags, 0, 3) as $tag) { ?><span>#<?php echo get_text($tag); ?></span><?php } ?>
         </div>
 
         <?php if (!$is_general) { ?><p class="willow_article_kicker">오늘의 주제<?php if (!empty($topic['wt_subject'])) { ?> · <?php echo get_text($topic['wt_subject']); ?><?php } ?></p><?php } ?>

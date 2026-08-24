@@ -1,6 +1,8 @@
 <?php
 if (!defined('_GNUBOARD_')) exit;
 
+include_once(G5_PATH.'/willow/category.lib.php');
+
 function willow_topic_tables()
 {
     global $g5;
@@ -61,6 +63,8 @@ function willow_topic_install()
         wp_image text not null,
         wp_access varchar(20) not null default 'public',
         wp_topic_mode varchar(20) not null default 'today',
+        wp_category varchar(40) not null default '',
+        wp_tags varchar(255) not null default '',
         wp_like int unsigned not null default 0,
         wp_comment int unsigned not null default 0,
         wp_datetime datetime not null,
@@ -82,6 +86,14 @@ function willow_topic_install()
         sql_query(" alter table `{$tables['post']}` add `wp_topic_mode` varchar(20) not null default 'today' after `wp_access` ", false);
         sql_query(" update `{$tables['post']}` set wp_topic_mode = 'free' where wp_subject = '자유주제' ", false);
     }
+    $post_category_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_category' ", false);
+    if (empty($post_category_column['Field'])) {
+        sql_query(" alter table `{$tables['post']}` add `wp_category` varchar(40) not null default '' after `wp_topic_mode` ", false);
+    }
+    $post_tags_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_tags' ", false);
+    if (empty($post_tags_column['Field'])) {
+        sql_query(" alter table `{$tables['post']}` add `wp_tags` varchar(255) not null default '' after `wp_category` ", false);
+    }
 
     sql_query(" create table if not exists `{$tables['draft']}` (
         wd_id int unsigned not null auto_increment,
@@ -90,6 +102,7 @@ function willow_topic_install()
         wd_topic_mode varchar(20) not null default 'today',
         wd_subject varchar(255) not null default '',
         wd_content text not null,
+        wd_category varchar(40) not null default '',
         wd_tags varchar(255) not null default '',
         wd_access varchar(20) not null default 'public',
         wd_images text not null,
@@ -100,6 +113,10 @@ function willow_topic_install()
         key wt_id (wt_id),
         key wd_update_datetime (wd_update_datetime)
     ) ", false);
+    $draft_category_column = sql_fetch(" show columns from `{$tables['draft']}` like 'wd_category' ", false);
+    if (empty($draft_category_column['Field'])) {
+        sql_query(" alter table `{$tables['draft']}` add `wd_category` varchar(40) not null default '' after `wd_content` ", false);
+    }
 
     sql_query(" create table if not exists `{$tables['like']}` (
         wl_id int unsigned not null auto_increment,
@@ -493,5 +510,8 @@ function willow_topic_post_to_feed($post)
         'access' => $access,
         'access_label' => function_exists('willow_post_access_label') ? willow_post_access_label($access) : ($access === 'subscriber' ? '유료' : '무료'),
         'topic_mode' => !empty($post['wp_topic_mode']) && $post['wp_topic_mode'] === 'free' ? 'free' : 'today',
+        'category' => !empty($post['wp_category']) ? get_text(willow_story_category_label($post['wp_category'])) : (!empty($post['wp_topic_mode']) && $post['wp_topic_mode'] === 'free' ? '자유 주제' : '오늘의 주제'),
+        'category_key' => !empty($post['wp_category']) ? get_text(willow_story_normalize_category($post['wp_category'])) : '',
+        'tags' => !empty($post['wp_tags']) ? array_filter(array_map('trim', explode(',', $post['wp_tags']))) : array(),
     );
 }

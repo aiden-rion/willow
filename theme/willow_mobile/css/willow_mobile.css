@@ -1039,6 +1039,12 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
   color: #ff3d46 !important;
 }
 
+.willow_post_badge.is_tag {
+  border-color: #e5e7eb !important;
+  background: #f9fafb;
+  color: #4b5563 !important;
+}
+
 /*.willow_post_badge.is_subscribe::before {*/
 /*  display: inline-block;*/
 /*  width: 9px;*/

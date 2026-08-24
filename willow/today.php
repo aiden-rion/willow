@@ -111,6 +111,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <div class="willow_content_feed" aria-label="오늘의 주제 글">
             <?php foreach ($willow_feed_posts as $post) { ?>
             <?php $is_post_owner = !empty($member['mb_id']) && !empty($post['mb_id']) && $member['mb_id'] === $post['mb_id']; ?>
+            <?php $post_tags = !empty($post['tags']) && is_array($post['tags']) ? array_slice($post['tags'], 0, 2) : array(); ?>
             <article class="willow_feed_card">
                 <div class="willow_feed_head">
                     <img src="<?php echo $post['avatar']; ?>" alt="">
@@ -151,6 +152,14 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                         <a href="<?php echo G5_URL; ?>/willow/post.php?type=paid">스토리</a>
                     </div>
                     <?php } ?>
+                    <div class="willow_post_badges">
+                        <?php if (!empty($post['category'])) { ?>
+                        <span class="willow_post_badge"><?php echo get_text($post['category']); ?></span>
+                        <?php } ?>
+                        <?php foreach ($post_tags as $tag) { ?>
+                        <span class="willow_post_badge is_tag">#<?php echo get_text($tag); ?></span>
+                        <?php } ?>
+                    </div>
                 </div>
             </article>
             <?php } ?>

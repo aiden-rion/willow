@@ -1,6 +1,8 @@
 <?php
 if (!defined('_GNUBOARD_')) exit;
 
+include_once(G5_PATH.'/willow/category.lib.php');
+
 function willow_content_board()
 {
     return 'free';
@@ -592,6 +594,10 @@ function willow_category_install()
 
 function willow_get_categories($active_only = true)
 {
+    if (function_exists('willow_story_flat_search_categories')) {
+        return willow_story_flat_search_categories();
+    }
+
     $table = willow_category_table();
     willow_category_install();
 
@@ -1252,7 +1258,7 @@ function willow_personalization_profile($feed_seed = '')
     }
 
     if (!empty($tables['post'])) {
-        $liked_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, t.wt_subject
+        $liked_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, p.wp_category, p.wp_tags, t.wt_subject
             from `{$like_table}` l
             inner join `{$tables['post']}` p on p.wp_id = l.target_id
             left join `{$tables['topic']}` t on t.wt_id = p.wt_id
@@ -1266,7 +1272,7 @@ function willow_personalization_profile($feed_seed = '')
             }
         }
 
-        $commented_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, t.wt_subject
+        $commented_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, p.wp_category, p.wp_tags, t.wt_subject
             from `{$comment_table}` c
             inner join `{$tables['post']}` p on p.wp_id = c.target_id
             left join `{$tables['topic']}` t on t.wt_id = p.wt_id
@@ -1280,7 +1286,7 @@ function willow_personalization_profile($feed_seed = '')
             }
         }
 
-        $viewed_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, t.wt_subject, v.wpv_datetime
+        $viewed_topic = sql_query(" select p.mb_id, p.wp_author, p.wp_subject, p.wp_category, p.wp_tags, t.wt_subject, v.wpv_datetime
             from `{$view_table}` v
             inner join `{$tables['post']}` p on p.wp_id = v.target_id
             left join `{$tables['topic']}` t on t.wt_id = p.wt_id
@@ -1340,6 +1346,12 @@ function willow_personalization_absorb_topic_row(&$profile, $row, $weight)
     willow_personalization_add_author($profile, isset($row['mb_id']) ? $row['mb_id'] : '', isset($row['wp_author']) ? $row['wp_author'] : '', $weight);
     willow_personalization_add_keyword($profile, isset($row['wt_subject']) ? $row['wt_subject'] : '', $weight * 0.5);
     willow_personalization_add_keyword($profile, isset($row['wp_subject']) ? $row['wp_subject'] : '', $weight * 0.35);
+    if (!empty($row['wp_category']) && function_exists('willow_story_category_label')) {
+        willow_personalization_add_keyword($profile, willow_story_category_label($row['wp_category']), $weight * 0.7);
+    }
+    foreach (explode(',', isset($row['wp_tags']) ? $row['wp_tags'] : '') as $tag) {
+        willow_personalization_add_keyword($profile, $tag, $weight * 0.45);
+    }
 }
 
 function willow_personalization_score($item, $profile)
@@ -1477,7 +1489,9 @@ function willow_get_personalized_feed($offset = 0, $limit = 6, $feed_seed = '', 
                     continue;
                 }
                 $seen[$key] = true;
-                $item['category'] = !empty($row['wp_topic_mode']) && $row['wp_topic_mode'] === 'free' ? '자유주제' : get_text($row['wt_subject']);
+                if (empty($item['category'])) {
+                    $item['category'] = !empty($row['wp_topic_mode']) && $row['wp_topic_mode'] === 'free' ? '자유 주제' : get_text($row['wt_subject']);
+                }
                 $item['likes_raw'] = isset($row['wp_like']) ? (int) $row['wp_like'] : (int) str_replace(',', '', $item['likes']);
                 $item['comments_raw'] = isset($row['wp_comment']) ? (int) $row['wp_comment'] : (int) str_replace(',', '', $item['comments']);
                 $item['personal_score'] = willow_personalization_score($item, $profile);
@@ -1572,6 +1586,7 @@ function willow_render_post_card($post)
     global $member;
 
     $is_post_owner = !empty($member['mb_id']) && !empty($post['mb_id']) && $member['mb_id'] === $post['mb_id'];
+    $post_tags = !empty($post['tags']) && is_array($post['tags']) ? array_slice($post['tags'], 0, 2) : array();
 
     ob_start();
     ?>
@@ -1615,6 +1630,9 @@ function willow_render_post_card($post)
                 <?php } ?>
                 <?php if (!empty($post['category'])) { ?>
                 <span class="willow_post_badge"><?php echo get_text($post['category']); ?></span>
+                <?php } ?>
+                <?php foreach ($post_tags as $tag) { ?>
+                <span class="willow_post_badge is_tag">#<?php echo get_text($tag); ?></span>
                 <?php } ?>
             </div>
         </div>

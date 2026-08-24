@@ -24,7 +24,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
 $willow_topic_title = get_text($topic['wt_subject']);
 $willow_topic_description = !empty($topic['wt_description']) ? nl2br(get_text($topic['wt_description'])) : '';
-$willow_tags = array('정착꿀팁', '정착상식', '정신건강', '범죄사건', '종교문화', '이야기', '사람', '민주주의', '인권');
+$willow_story_categories = willow_story_categories();
 $draft_id = isset($_GET['wd_id']) ? (int) $_GET['wd_id'] : 0;
 $draft = array();
 $draft_images = array();
@@ -48,6 +48,7 @@ if ($draft_id && $is_member) {
     }
 }
 $draft_topic_mode = !empty($draft['wd_topic_mode']) && $draft['wd_topic_mode'] === 'free' ? 'free' : 'today';
+$draft_category = willow_story_normalize_category(!empty($draft['wd_category']) ? $draft['wd_category'] : ($draft_topic_mode === 'free' ? 'free' : willow_story_default_category()));
 $draft_subject = !empty($draft['wd_subject']) ? get_text($draft['wd_subject']) : '';
 $draft_content = !empty($draft['wd_content']) ? get_text($draft['wd_content'], 0) : '';
 $can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';
@@ -74,6 +75,7 @@ if (!$can_subscriber_access) {
         <input type="hidden" name="wt_id" value="<?php echo (int) $topic['wt_id']; ?>">
         <input type="hidden" id="topic_mode" name="topic_mode" value="<?php echo get_text($draft_topic_mode); ?>">
         <input type="hidden" id="wd_id" name="wd_id" value="<?php echo (int) $draft_id; ?>">
+        <input type="hidden" id="wp_category" name="wp_category" value="<?php echo get_text($draft_category); ?>">
         <input type="hidden" id="wp_tags" name="wp_tags" value="<?php echo get_text(!empty($draft['wd_tags']) ? $draft['wd_tags'] : ''); ?>">
         <?php foreach ($draft_images as $draft_image) { ?>
         <input type="hidden" name="existing_images[]" value="<?php echo get_text($draft_image); ?>" data-existing-image="<?php echo get_text($draft_image); ?>">
@@ -90,6 +92,36 @@ if (!$can_subscriber_access) {
             <label for="wp_content" class="sound_only">내용</label>
             <textarea id="wp_content" name="wp_content" placeholder="오늘의 주제에 대한 생각을&#10;자유롭게 작성해주세요" required><?php echo $draft_content; ?></textarea>
         </div>
+
+        <section class="willow_write_taxonomy" aria-label="글 분류 선택" <?php echo $draft_topic_mode === 'today' ? 'hidden' : ''; ?>>
+            <div class="willow_write_taxonomy_head">
+                <strong>잇다</strong>
+                <span>글의 큰 갈래를 먼저 선택해주세요.</span>
+            </div>
+            <div class="willow_category_picker" role="listbox" aria-label="대분류 선택">
+                <?php foreach ($willow_story_categories as $category_key => $category) { ?>
+                <button type="button" class="willow_category_option <?php echo $draft_category === $category_key ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" role="option" aria-selected="<?php echo $draft_category === $category_key ? 'true' : 'false'; ?>">
+                    <strong><?php echo get_text($category['label']); ?></strong>
+                    <span><?php echo get_text($category['description']); ?></span>
+                </button>
+                <?php } ?>
+            </div>
+            <div class="willow_keyword_panels">
+                <?php foreach ($willow_story_categories as $category_key => $category) { ?>
+                <div class="willow_keyword_panel" data-keyword-panel="<?php echo get_text($category_key); ?>" <?php echo $draft_category === $category_key ? '' : 'hidden'; ?>>
+                    <div class="willow_write_taxonomy_head is_compact">
+                        <strong>키워드</strong>
+                        <span>1개만 선택할 수 있습니다.</span>
+                    </div>
+                    <div class="willow_tag_chips" role="group" aria-label="<?php echo get_text($category['label']); ?> 키워드">
+                        <?php foreach ($category['tags'] as $tag) { ?>
+                        <button type="button" class="willow_tag_chip <?php echo in_array($tag, $draft_tags, true) ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" data-tag="<?php echo get_text($tag); ?>">#<?php echo get_text($tag); ?></button>
+                        <?php } ?>
+                    </div>
+                </div>
+                <?php } ?>
+            </div>
+        </section>
 
         <div class="willow_write_attach" aria-label="이미지 첨부">
             <?php for ($i = 0; $i < 4; $i++) { ?>
@@ -137,13 +169,6 @@ if (!$can_subscriber_access) {
                 <i class="fa fa-check" aria-hidden="true"></i>
                 <span>완료</span>
             </button>
-            <div class="willow_write_tag_bar" aria-label="감정태그선택" <?php echo $draft_topic_mode === 'today' ? 'hidden' : ''; ?>>
-                <div class="willow_tag_chips" role="group">
-                    <?php foreach ($willow_tags as $tag) { ?>
-                    <button type="button" class="willow_tag_chip <?php echo in_array($tag, $draft_tags, true) ? 'is_selected' : ''; ?>" data-tag="<?php echo $tag; ?>">#<?php echo $tag; ?></button>
-                    <?php } ?>
-                </div>
-            </div>
         </div>
     </form>
     <div class="willow_write_toast" data-write-toast aria-live="polite" aria-atomic="true"></div>
@@ -173,6 +198,7 @@ if (!$can_subscriber_access) {
     var subject = document.getElementById('wp_subject');
     var topicModeField = document.getElementById('topic_mode');
     var draftId = document.getElementById('wd_id');
+    var categoryField = document.getElementById('wp_category');
     var tags = document.getElementById('wp_tags');
     var app = document.querySelector('.willow_write_app');
     var actions = document.querySelector('.willow_write_actions');
@@ -182,7 +208,6 @@ if (!$can_subscriber_access) {
     var title = document.querySelector('[data-topic-title]');
     var description = document.querySelector('[data-topic-description]');
     var toggle = document.querySelector('.willow_topic_toggle');
-    var tagBar = document.querySelector('.willow_write_tag_bar');
     var saveButton = document.querySelector('.willow_save_button');
     var accessSelect = document.getElementById('wp_access');
     var toast = document.querySelector('[data-write-toast]');
@@ -233,20 +258,23 @@ if (!$can_subscriber_access) {
         if (title) title.textContent = isFree ? '' : topicTitle;
         if (description) description.innerHTML = isFree ? '' : topicDescription;
         if (subject) subject.value = isFree ? '자유주제' : topicTitle;
-        if (topicModeField) topicModeField.value = topicMode;
-        content.placeholder = isFree ? '자유롭게 글을 작성해주세요' : '오늘의 주제에 대한 생각을\n자유롭게 작성해주세요';
-        if (actions) {
-            actions.classList.toggle('has_tag_bar', isFree);
-        }
-        if (tagBar) {
-            tagBar.hidden = !isFree;
+        if (categoryField && isFree && categoryField.value !== 'free') {
+            selectCategory('free');
         }
         if (!isFree) {
+            if (categoryField) categoryField.value = '';
             document.querySelectorAll('.willow_tag_chip.is_selected').forEach(function(chip) {
                 chip.classList.remove('is_selected');
             });
             syncTags();
         }
+        if (topicModeField) topicModeField.value = topicMode;
+        content.placeholder = isFree ? '자유롭게 글을 작성해주세요' : '오늘의 주제에 대한 생각을\n자유롭게 작성해주세요';
+        if (actions) {
+            actions.classList.toggle('has_tag_bar', isFree);
+        }
+        var taxonomy = document.querySelector('.willow_write_taxonomy');
+        if (taxonomy) taxonomy.hidden = !isFree;
     }
 
     function syncContentLimit() {
@@ -261,10 +289,32 @@ if (!$can_subscriber_access) {
 
     function syncTags() {
         var selected = [];
+        var currentCategory = categoryField ? categoryField.value : '';
         document.querySelectorAll('.willow_tag_chip.is_selected').forEach(function(chip) {
+            if (currentCategory && chip.getAttribute('data-category') !== currentCategory) {
+                return;
+            }
             selected.push(chip.getAttribute('data-tag'));
         });
         tags.value = selected.join(',');
+    }
+
+    function selectCategory(category) {
+        if (categoryField) categoryField.value = category;
+        document.querySelectorAll('.willow_category_option').forEach(function(button) {
+            var isSelected = button.getAttribute('data-category') === category;
+            button.classList.toggle('is_selected', isSelected);
+            button.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        });
+        document.querySelectorAll('.willow_keyword_panel').forEach(function(panel) {
+            panel.hidden = panel.getAttribute('data-keyword-panel') !== category;
+        });
+        document.querySelectorAll('.willow_tag_chip.is_selected').forEach(function(chip) {
+            if (chip.getAttribute('data-category') !== category) {
+                chip.classList.remove('is_selected');
+            }
+        });
+        syncTags();
     }
 
     function syncAttachVisibility() {
@@ -292,8 +342,20 @@ if (!$can_subscriber_access) {
 
     document.querySelectorAll('.willow_tag_chip').forEach(function(chip) {
         chip.addEventListener('click', function() {
+            var selectedInCategory = Array.prototype.slice.call(document.querySelectorAll('.willow_tag_chip.is_selected')).filter(function(item) {
+                return item.getAttribute('data-category') === chip.getAttribute('data-category');
+            });
+            selectedInCategory.forEach(function(item) {
+                if (item !== chip) item.classList.remove('is_selected');
+            });
             chip.classList.toggle('is_selected');
             syncTags();
+        });
+    });
+
+    document.querySelectorAll('.willow_category_option').forEach(function(button) {
+        button.addEventListener('click', function() {
+            selectCategory(button.getAttribute('data-category'));
         });
     });
 
@@ -394,6 +456,7 @@ if (!$can_subscriber_access) {
 
     if (form) {
         form.addEventListener('submit', function(event) {
+            syncTags();
             if ((content.value || '').length > contentLimit) {
                 event.preventDefault();
                 content.classList.add('is_over_limit');

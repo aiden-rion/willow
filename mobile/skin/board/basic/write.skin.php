@@ -4,14 +4,17 @@ if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
 add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css?v='.filemtime($board_skin_path.'/style.css').'">', 0);
 
+include_once(G5_PATH.'/willow/category.lib.php');
+
 $willow_topics = array(
     array('value' => 'today', 'label' => '오늘의 주제', 'title' => '인권', 'description' => '인권이 우리 사회에 미치는 영향에 대해<br>깊이 생각해보게 되었습니다.'),
     array('value' => 'free', 'label' => '자유주제', 'title' => '자유주제', 'description' => ''),
 );
-$willow_selected_topic = $w == 'u' && !empty($write['wr_1']) ? $write['wr_1'] : 'today';
+$willow_selected_topic = $w == 'u' && !empty($write['wr_4']) ? $write['wr_4'] : 'today';
 $willow_selected_access = $w == 'u' && !empty($write['wr_3']) ? $write['wr_3'] : 'public';
 $willow_selected_tags = $w == 'u' && !empty($write['wr_2']) ? array_filter(array_map('trim', explode(',', $write['wr_2']))) : array();
-$willow_tags = array('정착꿀팁', '정착상식', '정신건강', '범죄사건', '종교문화', '이야기', '사람', '민주주의', '인권');
+$willow_story_categories = willow_story_categories();
+$willow_selected_category = willow_story_normalize_category($w == 'u' && !empty($write['wr_1']) ? $write['wr_1'] : willow_story_default_category());
 ?>
 
 <section id="bo_w">
@@ -26,7 +29,9 @@ $willow_tags = array('정착꿀팁', '정착상식', '정신건강', '범죄사�
     <input type="hidden" name="sst" value="<?php echo $sst ?>">
     <input type="hidden" name="sod" value="<?php echo $sod ?>">
     <input type="hidden" name="page" value="<?php echo $page ?>">
+    <input type="hidden" name="wr_1" value="<?php echo $willow_selected_topic === 'free' ? get_text($willow_selected_category) : ''; ?>" id="willow_selected_category">
     <input type="hidden" name="wr_2" value="<?php echo isset($write['wr_2']) ? get_text($write['wr_2']) : ''; ?>" id="willow_selected_tags">
+    <input type="hidden" name="wr_4" value="<?php echo get_text($willow_selected_topic); ?>" id="willow_selected_topic_mode">
     <?php
     $option = '';
     $option_hidden = '';
@@ -61,7 +66,7 @@ $willow_tags = array('정착꿀팁', '정착상식', '정신건강', '범죄사�
 
         <div class="willow_topic_select">
             <label for="willow_topic" class="sound_only">주제 선택</label>
-            <select name="wr_1" id="willow_topic" aria-label="주제 선택">
+            <select name="willow_topic_mode" id="willow_topic" aria-label="주제 선택">
                 <?php foreach ($willow_topics as $topic) { ?>
                 <option value="<?php echo $topic['value']; ?>" data-title="<?php echo $topic['title']; ?>" data-description="<?php echo $topic['description']; ?>"<?php echo get_selected($willow_selected_topic, $topic['value']); ?>><?php echo $topic['label']; ?></option>
                 <?php } ?>
@@ -168,14 +173,31 @@ $willow_tags = array('정착꿀팁', '정착상식', '정신건강', '범죄사�
         </div>
         <?php } ?>
 
-        <div class="willow_write_options">
+        <div class="willow_write_options" data-write-taxonomy <?php echo $willow_selected_topic === 'today' ? 'hidden' : ''; ?>>
             <div class="willow_option_group">
-                <strong>감정태그선택</strong>
-                <div class="willow_tag_chips" role="group" aria-label="감정태그선택">
-                    <?php foreach ($willow_tags as $tag) {
-                        $is_tag_selected = in_array($tag, $willow_selected_tags);
-                    ?>
-                    <button type="button" class="willow_tag_chip<?php echo $is_tag_selected ? ' is_selected' : ''; ?>" data-tag="<?php echo $tag; ?>">#<?php echo $tag; ?></button>
+                <strong>잇다</strong>
+                <div class="willow_category_picker" role="listbox" aria-label="대분류 선택">
+                    <?php foreach ($willow_story_categories as $category_key => $category) { ?>
+                    <button type="button" class="willow_category_option <?php echo $willow_selected_category === $category_key ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" role="option" aria-selected="<?php echo $willow_selected_category === $category_key ? 'true' : 'false'; ?>">
+                        <strong><?php echo get_text($category['label']); ?></strong>
+                        <span><?php echo get_text($category['description']); ?></span>
+                    </button>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="willow_option_group">
+                <strong>키워드</strong>
+                <div class="willow_keyword_panels">
+                    <?php foreach ($willow_story_categories as $category_key => $category) { ?>
+                    <div class="willow_keyword_panel" data-keyword-panel="<?php echo get_text($category_key); ?>" <?php echo $willow_selected_category === $category_key ? '' : 'hidden'; ?>>
+                        <div class="willow_tag_chips" role="group" aria-label="<?php echo get_text($category['label']); ?> 키워드">
+                            <?php foreach ($category['tags'] as $tag) {
+                                $is_tag_selected = in_array($tag, $willow_selected_tags);
+                            ?>
+                            <button type="button" class="willow_tag_chip<?php echo $is_tag_selected ? ' is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" data-tag="<?php echo get_text($tag); ?>">#<?php echo get_text($tag); ?></button>
+                            <?php } ?>
+                        </div>
+                    </div>
                     <?php } ?>
                 </div>
             </div>
@@ -235,7 +257,9 @@ $(function() {
     var $topicTitle = $("[data-topic-title]");
     var $topicDescription = $("[data-topic-description]");
     var $content = $("#wr_content");
+    var $categoryValue = $("#willow_selected_category");
     var $tagValue = $("#willow_selected_tags");
+    var $topicModeValue = $("#willow_selected_topic_mode");
 
     function syncTopic() {
         var selected = $topic.find("option:selected");
@@ -244,15 +268,45 @@ $(function() {
         $topicTitle.text(title);
         $topicDescription.html(description);
         $topicCard.toggle($topic.val() !== "free");
+        $topicModeValue.val($topic.val());
+        if ($topic.val() === "free") {
+            selectCategory("free");
+        } else {
+            $categoryValue.val("");
+            $(".willow_tag_chip.is_selected").removeClass("is_selected");
+            syncTags();
+        }
+        $("[data-write-taxonomy]").prop("hidden", $topic.val() !== "free");
         $content.attr("placeholder", $topic.val() === "free" ? "자유롭게 글을 작성해주세요" : "오늘의 주제에 대한 생각을\n자유롭게 작성해주세요");
     }
 
     function syncTags() {
         var tags = [];
+        var currentCategory = $categoryValue.val();
         $(".willow_tag_chip.is_selected").each(function() {
+            if (currentCategory && $(this).data("category") !== currentCategory) {
+                return;
+            }
             tags.push($(this).data("tag"));
         });
         $tagValue.val(tags.join(","));
+    }
+
+    function selectCategory(category) {
+        $categoryValue.val(category);
+        $(".willow_category_option").each(function() {
+            var isSelected = $(this).data("category") === category;
+            $(this).toggleClass("is_selected", isSelected).attr("aria-selected", isSelected ? "true" : "false");
+        });
+        $(".willow_keyword_panel").each(function() {
+            $(this).prop("hidden", $(this).data("keyword-panel") !== category);
+        });
+        $(".willow_tag_chip.is_selected").each(function() {
+            if ($(this).data("category") !== category) {
+                $(this).removeClass("is_selected");
+            }
+        });
+        syncTags();
     }
 
     window.willow_update_char_count = function() {
@@ -263,8 +317,18 @@ $(function() {
     $topic.on("change", syncTopic);
     $content.on("input keyup", window.willow_update_char_count);
     $(".willow_tag_chip").on("click", function() {
+        var $chip = $(this);
+        var selectedInCategory = $(".willow_tag_chip.is_selected").filter(function() {
+            return $(this).data("category") === $chip.data("category");
+        }).length;
+        $(".willow_tag_chip.is_selected").filter(function() {
+            return $(this).data("category") === $chip.data("category") && this !== $chip[0];
+        }).removeClass("is_selected");
         $(this).toggleClass("is_selected");
         syncTags();
+    });
+    $(".willow_category_option").on("click", function() {
+        selectCategory($(this).data("category"));
     });
     $(".willow_attach_input").on("change", function() {
         var input = this;

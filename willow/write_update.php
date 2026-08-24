@@ -24,6 +24,8 @@ if (!willow_topic_is_visible($topic)) {
 $wp_subject = isset($_POST['wp_subject']) ? trim(strip_tags($_POST['wp_subject'])) : '';
 $wp_content = isset($_POST['wp_content']) ? trim(strip_tags($_POST['wp_content'])) : '';
 $topic_mode = isset($_POST['topic_mode']) && $_POST['topic_mode'] === 'free' ? 'free' : 'today';
+$wp_category = $topic_mode === 'free' ? willow_story_normalize_category(isset($_POST['wp_category']) ? $_POST['wp_category'] : '') : '';
+$wp_tags = $topic_mode === 'free' ? willow_story_normalize_tags($wp_category, isset($_POST['wp_tags']) ? $_POST['wp_tags'] : '', 1) : '';
 $can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';
 $wp_access = $can_subscriber_access && isset($_POST['wp_access']) && $_POST['wp_access'] === 'subscriber' ? 'subscriber' : 'public';
 $wp_images = array();
@@ -115,6 +117,8 @@ sql_query(" insert into `{$tables['post']}`
         wp_image = '".sql_escape_string($wp_image)."',
         wp_access = '".sql_escape_string($wp_access)."',
         wp_topic_mode = '".sql_escape_string($topic_mode)."',
+        wp_category = '".sql_escape_string($wp_category)."',
+        wp_tags = '".sql_escape_string($wp_tags)."',
         wp_datetime = '{$now}' ");
 
 if ($topic_mode === 'today') {

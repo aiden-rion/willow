@@ -439,6 +439,67 @@
   color: #fff;
 }
 
+.willow_category_picker {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(164px, 62%);
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.willow_category_picker::-webkit-scrollbar {
+  display: none;
+}
+
+.willow_category_option {
+  display: grid;
+  gap: 5px;
+  min-height: 76px;
+  padding: 12px 13px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  text-align: left;
+  scroll-snap-align: start;
+}
+
+.willow_category_option strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 19px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.willow_category_option span {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 17px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.willow_category_option.is_selected {
+  border-color: #111;
+  background: #111;
+  color: #fff;
+}
+
+.willow_category_option.is_selected span {
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.willow_keyword_panel[hidden] {
+  display: none;
+}
+
 .willow_select_shell {
   position: relative;
 }
