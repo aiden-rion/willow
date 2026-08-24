@@ -1021,8 +1021,7 @@ body.willow_write_body {
 
 .willow_category_option {
   display: grid;
-  gap: 5px;
-  min-height: 76px;
+  min-height: 52px;
   padding: 12px 13px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -1043,7 +1042,7 @@ body.willow_write_body {
 }
 
 .willow_category_option span {
-  display: -webkit-box;
+  display: none;
   overflow: hidden;
   color: #6b7280;
   font-size: 12px;
