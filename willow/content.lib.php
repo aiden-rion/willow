@@ -1046,6 +1046,63 @@ function willow_get_popular_board_posts($limit = 10)
     return $posts;
 }
 
+function willow_get_recent_feed_posts($limit = 3, $exclude_keys = array())
+{
+    $limit = max(1, (int) $limit);
+    $fetch_limit = max($limit * 3, 12);
+    $excluded = array();
+    $seen = array();
+    $items = array();
+
+    if (is_array($exclude_keys)) {
+        foreach ($exclude_keys as $exclude_key) {
+            $exclude_key = preg_replace('/[^a-z0-9:_-]/i', '', (string) $exclude_key);
+            if ($exclude_key !== '') {
+                $excluded[$exclude_key] = true;
+            }
+        }
+    }
+
+    foreach (willow_get_board_posts($fetch_limit) as $item) {
+        $key = $item['target_type'].':'.$item['id'];
+        if (isset($seen[$key]) || isset($excluded[$key])) {
+            continue;
+        }
+        $seen[$key] = true;
+        $items[] = $item;
+    }
+
+    if (!function_exists('willow_topic_tables')) {
+        include_once(G5_PATH.'/willow/topic.lib.php');
+    }
+    if (function_exists('willow_topic_install')) {
+        willow_topic_install();
+        $tables = willow_topic_tables();
+        $result = sql_query(" select p.*, t.wt_subject
+            from `{$tables['post']}` p
+            left join `{$tables['topic']}` t on t.wt_id = p.wt_id
+            order by p.wp_datetime desc, p.wp_id desc
+            limit {$fetch_limit} ", false);
+        if ($result) {
+            while ($row = sql_fetch_array($result)) {
+                $item = willow_topic_post_to_feed($row);
+                $key = $item['target_type'].':'.$item['id'];
+                if (isset($seen[$key]) || isset($excluded[$key])) {
+                    continue;
+                }
+                $seen[$key] = true;
+                $items[] = $item;
+            }
+        }
+    }
+
+    usort($items, function($left, $right) {
+        return strcmp($right['sort_datetime'], $left['sort_datetime']);
+    });
+
+    return array_slice($items, 0, $limit);
+}
+
 function willow_add_search_suggestion(&$suggestions, &$seen, $label, $keyword = '', $type = 'keyword')
 {
     $label = trim(strip_tags($label));
@@ -1359,11 +1416,11 @@ function willow_personalization_score($item, $profile)
     $item_key = (!empty($item['target_type']) ? $item['target_type'] : 'board').':'.(int) $item['id'];
     $timestamp = !empty($item['sort_datetime']) ? strtotime($item['sort_datetime']) : 0;
     $age_hours = $timestamp ? max(0, (G5_SERVER_TIME - $timestamp) / 3600) : 720;
-    $recency = max(0, 36 - min(36, $age_hours / 8));
+    $recency = max(0, 70 - min(70, $age_hours / 3));
     $likes = isset($item['likes_raw']) ? (int) $item['likes_raw'] : (int) str_replace(',', '', isset($item['likes']) ? $item['likes'] : 0);
     $comments = isset($item['comments_raw']) ? (int) $item['comments_raw'] : (int) str_replace(',', '', isset($item['comments']) ? $item['comments'] : 0);
     $views = isset($item['views']) ? (int) $item['views'] : 0;
-    $score = $recency + ($likes * 3.2) + ($comments * 5.2) + (log(max(1, $views + 1), 2) * 1.8);
+    $score = $recency + ($likes * 2.4) + ($comments * 4.2) + (log(max(1, $views + 1), 2) * 1.2);
 
     $author_keys = array();
     if (!empty($item['mb_id'])) {

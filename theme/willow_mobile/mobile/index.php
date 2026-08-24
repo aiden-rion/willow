@@ -25,7 +25,7 @@ $write_href = $has_visible_topic ? willow_topic_write_url($willow_topic) : '#';
 $chips = willow_get_categories(true);
 
 $willow_feed_seed = substr(md5(uniqid('', true).mt_rand()), 0, 12);
-$featured_posts = willow_get_personalized_feed(0, 3, $willow_feed_seed);
+$featured_posts = willow_get_recent_feed_posts(3);
 willow_record_feed_impressions($featured_posts);
 $recommended_authors = willow_get_recommended_authors();
 ?>
