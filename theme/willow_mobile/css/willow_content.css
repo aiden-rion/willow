@@ -970,8 +970,10 @@ body.willow_write_body {
 
 .willow_write_taxonomy {
   display: grid;
-  gap: 12px;
-  margin: 18px 0 14px;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 8px 8px;
+  background: #ffffff;
 }
 
 .willow_write_taxonomy[hidden] {
@@ -983,7 +985,7 @@ body.willow_write_body {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 4px;
+  padding: 0 2px;
 }
 
 .willow_write_taxonomy_head strong {
@@ -1007,7 +1009,7 @@ body.willow_write_body {
   grid-auto-columns: minmax(164px, 62%);
   gap: 8px;
   overflow-x: auto;
-  padding: 0 4px 2px;
+  padding: 0 0 2px;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
 }

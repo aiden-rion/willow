@@ -70,6 +70,36 @@ if (!$can_subscriber_access) {
         </h1>
     </header>
 
+    <section class="willow_write_taxonomy" aria-label="글 분류 선택" <?php echo $draft_topic_mode === 'today' ? 'hidden' : ''; ?>>
+        <div class="willow_write_taxonomy_head">
+            <strong>잇다</strong>
+            <span>글의 큰 갈래를 먼저 선택해주세요.</span>
+        </div>
+        <div class="willow_category_picker" role="listbox" aria-label="대분류 선택">
+            <?php foreach ($willow_story_categories as $category_key => $category) { ?>
+            <button type="button" class="willow_category_option <?php echo $draft_category === $category_key ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" role="option" aria-selected="<?php echo $draft_category === $category_key ? 'true' : 'false'; ?>">
+                <strong><?php echo get_text($category['label']); ?></strong>
+                <span><?php echo get_text($category['description']); ?></span>
+            </button>
+            <?php } ?>
+        </div>
+        <div class="willow_keyword_panels">
+            <?php foreach ($willow_story_categories as $category_key => $category) { ?>
+            <div class="willow_keyword_panel" data-keyword-panel="<?php echo get_text($category_key); ?>" <?php echo $draft_category === $category_key ? '' : 'hidden'; ?>>
+                <div class="willow_write_taxonomy_head is_compact">
+                    <strong>키워드</strong>
+                    <span>1개만 선택할 수 있습니다.</span>
+                </div>
+                <div class="willow_tag_chips" role="group" aria-label="<?php echo get_text($category['label']); ?> 키워드">
+                    <?php foreach ($category['tags'] as $tag) { ?>
+                    <button type="button" class="willow_tag_chip <?php echo in_array($tag, $draft_tags, true) ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" data-tag="<?php echo get_text($tag); ?>">#<?php echo get_text($tag); ?></button>
+                    <?php } ?>
+                </div>
+            </div>
+            <?php } ?>
+        </div>
+    </section>
+
     <form class="willow_topic_write_form" action="<?php echo G5_URL; ?>/willow/write_update.php" method="post" enctype="multipart/form-data" autocomplete="off">
         <input type="hidden" name="MAX_FILE_SIZE" value="5242880">
         <input type="hidden" name="wt_id" value="<?php echo (int) $topic['wt_id']; ?>">
@@ -92,36 +122,6 @@ if (!$can_subscriber_access) {
             <label for="wp_content" class="sound_only">내용</label>
             <textarea id="wp_content" name="wp_content" placeholder="오늘의 주제에 대한 생각을&#10;자유롭게 작성해주세요" required><?php echo $draft_content; ?></textarea>
         </div>
-
-        <section class="willow_write_taxonomy" aria-label="글 분류 선택" <?php echo $draft_topic_mode === 'today' ? 'hidden' : ''; ?>>
-            <div class="willow_write_taxonomy_head">
-                <strong>잇다</strong>
-                <span>글의 큰 갈래를 먼저 선택해주세요.</span>
-            </div>
-            <div class="willow_category_picker" role="listbox" aria-label="대분류 선택">
-                <?php foreach ($willow_story_categories as $category_key => $category) { ?>
-                <button type="button" class="willow_category_option <?php echo $draft_category === $category_key ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" role="option" aria-selected="<?php echo $draft_category === $category_key ? 'true' : 'false'; ?>">
-                    <strong><?php echo get_text($category['label']); ?></strong>
-                    <span><?php echo get_text($category['description']); ?></span>
-                </button>
-                <?php } ?>
-            </div>
-            <div class="willow_keyword_panels">
-                <?php foreach ($willow_story_categories as $category_key => $category) { ?>
-                <div class="willow_keyword_panel" data-keyword-panel="<?php echo get_text($category_key); ?>" <?php echo $draft_category === $category_key ? '' : 'hidden'; ?>>
-                    <div class="willow_write_taxonomy_head is_compact">
-                        <strong>키워드</strong>
-                        <span>1개만 선택할 수 있습니다.</span>
-                    </div>
-                    <div class="willow_tag_chips" role="group" aria-label="<?php echo get_text($category['label']); ?> 키워드">
-                        <?php foreach ($category['tags'] as $tag) { ?>
-                        <button type="button" class="willow_tag_chip <?php echo in_array($tag, $draft_tags, true) ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" data-tag="<?php echo get_text($tag); ?>">#<?php echo get_text($tag); ?></button>
-                        <?php } ?>
-                    </div>
-                </div>
-                <?php } ?>
-            </div>
-        </section>
 
         <div class="willow_write_attach" aria-label="이미지 첨부">
             <?php for ($i = 0; $i < 4; $i++) { ?>
