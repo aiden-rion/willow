@@ -53,10 +53,6 @@ $is_leave = ($url == 'member_leave.php');
 document.querySelectorAll('[data-willow-safe-back]').forEach(function(link) {
     link.addEventListener('click', function(event) {
         event.preventDefault();
-        if (window.history.length > 1) {
-            window.history.back();
-            return;
-        }
         window.location.href = link.href;
     });
 });

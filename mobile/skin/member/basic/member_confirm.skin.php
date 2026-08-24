@@ -16,7 +16,7 @@ $is_leave = ($url == 'member_leave.php');
 
 <div id="mb_confirm" class="willow_member_confirm">
     <header class="willow_member_confirm_header">
-        <a href="javascript:history.back();" aria-label="뒤로가기"></a>
+        <a href="<?php echo G5_URL; ?>/willow/menu.php" aria-label="뒤로가기"></a>
         <h1>휴대폰인증확인</h1>
     </header>
 
