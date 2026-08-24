@@ -4,6 +4,8 @@
 html,
 body {
   min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
   background: #ffffff;
   overscroll-behavior-y: none;
   -webkit-text-size-adjust: 100%;
@@ -686,11 +688,19 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 .willow_app {
   display: grid;
   gap: 16px;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
   padding: 16px 16px 0;
 }
 
 .willow_topic_card,
 .willow_post_card {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
   border: 1px solid #dddddd;
   border-radius: 10px;
   background: #ffffff;
@@ -760,8 +770,11 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
   display: flex;
   flex-wrap: nowrap;
   gap: 8px 3px;
+  min-width: 0;
+  max-width: 100%;
   overflow-x: auto;
   padding: 0;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
@@ -788,6 +801,8 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 .willow_feed {
   display: grid;
   gap: 24px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .willow_home_more_feed:empty {
@@ -808,6 +823,13 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 
 .willow_post_card {
   padding: 16px;
+}
+
+.willow_post_card > a {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .willow_post_head {
@@ -872,6 +894,7 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 .willow_post_card > p,
 .willow_post_card > a > p {
   margin: 10px 0 0;
+  overflow-wrap: anywhere;
   color: #243449;
   font-size: 14px;
   line-height: 1.72;
@@ -957,6 +980,7 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 .willow_post_image {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: 226px;
   margin-top: 20px;
   border-radius: 3px;
