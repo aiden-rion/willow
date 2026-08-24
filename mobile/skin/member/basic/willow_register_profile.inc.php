@@ -30,7 +30,7 @@ $willow_bank_options = array('국민은행', '신한은행', '우리은행', '�
 
 <div class="willow_profile_edit">
     <header class="willow_detail_header">
-        <a class="willow_back" href="javascript:history.back();" aria-label="뒤로가기"></a>
+        <a class="willow_back" href="<?php echo G5_URL; ?>/willow/menu.php" data-willow-safe-back aria-label="뒤로가기"></a>
         <h1><?php echo get_head_title($g5['title']); ?></h1>
     </header>
 
@@ -160,6 +160,17 @@ $willow_bank_options = array('국민은행', '신한은행', '우리은행', '�
 </div>
 
 <script>
+document.querySelectorAll('[data-willow-safe-back]').forEach(function(link) {
+    link.addEventListener('click', function(event) {
+        event.preventDefault();
+        if (document.referrer && document.referrer !== window.location.href && window.history.length > 1) {
+            window.history.back();
+            return;
+        }
+        window.location.href = link.href;
+    });
+});
+
 function fregisterform_submit(f)
 {
     if (f.mb_nick && f.mb_nick.defaultValue != f.mb_nick.value) {
