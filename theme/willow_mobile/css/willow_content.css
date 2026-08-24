@@ -136,7 +136,7 @@ body.willow_has_bottom_nav .willow_content_app {
 }
 
 .willow_today_page {
-  padding: 22px 8px 98px;
+  padding: 8px 8px 98px;
   background: #f1f1f1;
 }
 
@@ -149,6 +149,28 @@ body.willow_has_bottom_nav .willow_content_app {
   border-radius: 10px;
   background: #ffffff;
   text-align: center;
+}
+
+.willow_topic_categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+}
+
+.willow_topic_categories h3 {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  margin: 0;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: #f5f7fb;
+  color: #1476ff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .willow_today_topic strong {

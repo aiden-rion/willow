@@ -32,14 +32,13 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 </div>
 
 <main class="willow_content_app">
-    <header class="willow_detail_header">
-        <a class="willow_back" href="<?php echo G5_URL; ?>" aria-label="뒤로가기"></a>
-        <h1>오늘의 주제</h1>
-    </header>
-
     <section class="willow_today_page">
         <?php if ($has_visible_topic) { ?>
         <div class="willow_today_topic">
+            <div class="willow_topic_categories" aria-label="주제 카테고리">
+                <h3>#오늘의주제</h3>
+                <h3>#자유주제</h3>
+            </div>
             <button type="button" class="willow_topic_date_button" data-topic-picker-open aria-haspopup="dialog" aria-expanded="false">
                 <strong><?php echo willow_topic_date($willow_topic['wt_date']); ?></strong>
                 <i class="fa fa-angle-down" aria-hidden="true"></i>
@@ -92,6 +91,10 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         </div>
         <?php } else { ?>
         <div class="willow_today_topic">
+            <div class="willow_topic_categories" aria-label="주제 카테고리">
+                <h3>#오늘의주제</h3>
+                <h3>#자유주제</h3>
+            </div>
             <strong><?php echo willow_topic_date(G5_TIME_YMD); ?></strong>
             <h2>아직 공개된 오늘의 주제가 없습니다.</h2>
             <div class="willow_topic_participants">
