@@ -39,7 +39,7 @@ if ($result) {
             'excerpt' => cut_str(trim(preg_replace('/\s+/', ' ', strip_tags($row['wp_content']))), 110, '...'),
             'date' => willow_format_date($row['wp_datetime']),
             'href' => willow_topic_post_url($row),
-            'type' => '오늘의 주제',
+            'type' => !empty($row['wp_topic_mode']) && $row['wp_topic_mode'] === 'free' ? '자유주제' : '오늘의 주제',
             'sort_datetime' => $row['wp_datetime'],
         );
     }

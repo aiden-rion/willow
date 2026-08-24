@@ -1477,7 +1477,7 @@ function willow_get_personalized_feed($offset = 0, $limit = 6, $feed_seed = '', 
                     continue;
                 }
                 $seen[$key] = true;
-                $item['category'] = get_text($row['wt_subject']);
+                $item['category'] = !empty($row['wp_topic_mode']) && $row['wp_topic_mode'] === 'free' ? '자유주제' : get_text($row['wt_subject']);
                 $item['likes_raw'] = isset($row['wp_like']) ? (int) $row['wp_like'] : (int) str_replace(',', '', $item['likes']);
                 $item['comments_raw'] = isset($row['wp_comment']) ? (int) $row['wp_comment'] : (int) str_replace(',', '', $item['comments']);
                 $item['personal_score'] = willow_personalization_score($item, $profile);

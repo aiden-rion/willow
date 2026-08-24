@@ -60,6 +60,7 @@ function willow_topic_install()
         wp_content text not null,
         wp_image text not null,
         wp_access varchar(20) not null default 'public',
+        wp_topic_mode varchar(20) not null default 'today',
         wp_like int unsigned not null default 0,
         wp_comment int unsigned not null default 0,
         wp_datetime datetime not null,
@@ -75,6 +76,11 @@ function willow_topic_install()
     $post_access_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_access' ", false);
     if (empty($post_access_column['Field'])) {
         sql_query(" alter table `{$tables['post']}` add `wp_access` varchar(20) not null default 'public' after `wp_image` ", false);
+    }
+    $post_topic_mode_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_topic_mode' ", false);
+    if (empty($post_topic_mode_column['Field'])) {
+        sql_query(" alter table `{$tables['post']}` add `wp_topic_mode` varchar(20) not null default 'today' after `wp_access` ", false);
+        sql_query(" update `{$tables['post']}` set wp_topic_mode = 'free' where wp_subject = '자유주제' ", false);
     }
 
     sql_query(" create table if not exists `{$tables['draft']}` (
@@ -358,7 +364,8 @@ function willow_topic_participant_count($wt_id)
     $wt_id = (int) $wt_id;
     $row = sql_fetch(" select count(*) as cnt
         from `{$tables['post']}`
-        where wt_id = '{$wt_id}' ");
+        where wt_id = '{$wt_id}'
+            and (wp_topic_mode = '' or wp_topic_mode = 'today') ");
 
     return isset($row['cnt']) ? (int) $row['cnt'] : 0;
 }
@@ -376,7 +383,7 @@ function willow_topic_recent_participants($wt_id, $limit = 3)
     $limit = max(1, (int) $limit);
     $participants = array();
     $seen = array();
-    $result = sql_query(" select mb_id, wp_author from `{$tables['post']}` where wt_id = '{$wt_id}' order by wp_id desc limit 30 ");
+    $result = sql_query(" select mb_id, wp_author from `{$tables['post']}` where wt_id = '{$wt_id}' and (wp_topic_mode = '' or wp_topic_mode = 'today') order by wp_id desc limit 30 ");
 
     while ($row = sql_fetch_array($result)) {
         $key = $row['mb_id'] ? 'm:'.$row['mb_id'] : 'a:'.$row['wp_author'];
@@ -423,7 +430,7 @@ function willow_topic_member_has_post($wt_id, $mb_id = '')
     }
 
     $mb_id = sql_escape_string($mb_id);
-    $row = sql_fetch(" select wp_id from `{$tables['post']}` where wt_id = '{$wt_id}' and mb_id = '{$mb_id}' limit 1 ", false);
+    $row = sql_fetch(" select wp_id from `{$tables['post']}` where wt_id = '{$wt_id}' and mb_id = '{$mb_id}' and (wp_topic_mode = '' or wp_topic_mode = 'today') limit 1 ", false);
 
     return !empty($row['wp_id']);
 }
@@ -441,7 +448,7 @@ function willow_get_topic_posts($wt_id, $limit = 20)
     $wt_id = (int) $wt_id;
     $limit = max(1, (int) $limit);
     $posts = array();
-    $result = sql_query(" select * from `{$tables['post']}` where wt_id = '{$wt_id}' order by wp_id desc limit {$limit} ");
+    $result = sql_query(" select * from `{$tables['post']}` where wt_id = '{$wt_id}' and (wp_topic_mode = '' or wp_topic_mode = 'today') order by wp_id desc limit {$limit} ");
 
     while ($row = sql_fetch_array($result)) {
         $posts[] = $row;
@@ -485,5 +492,6 @@ function willow_topic_post_to_feed($post)
         'title' => get_text($post['wp_subject']),
         'access' => $access,
         'access_label' => function_exists('willow_post_access_label') ? willow_post_access_label($access) : ($access === 'subscriber' ? '유료' : '무료'),
+        'topic_mode' => !empty($post['wp_topic_mode']) && $post['wp_topic_mode'] === 'free' ? 'free' : 'today',
     );
 }

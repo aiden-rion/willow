@@ -72,6 +72,7 @@ if (!$can_subscriber_access) {
     <form class="willow_topic_write_form" action="<?php echo G5_URL; ?>/willow/write_update.php" method="post" enctype="multipart/form-data" autocomplete="off">
         <input type="hidden" name="MAX_FILE_SIZE" value="5242880">
         <input type="hidden" name="wt_id" value="<?php echo (int) $topic['wt_id']; ?>">
+        <input type="hidden" id="topic_mode" name="topic_mode" value="<?php echo get_text($draft_topic_mode); ?>">
         <input type="hidden" id="wd_id" name="wd_id" value="<?php echo (int) $draft_id; ?>">
         <input type="hidden" id="wp_tags" name="wp_tags" value="<?php echo get_text(!empty($draft['wd_tags']) ? $draft['wd_tags'] : ''); ?>">
         <?php foreach ($draft_images as $draft_image) { ?>
@@ -170,6 +171,7 @@ if (!$can_subscriber_access) {
     var form = document.querySelector('.willow_topic_write_form');
     var content = document.getElementById('wp_content');
     var subject = document.getElementById('wp_subject');
+    var topicModeField = document.getElementById('topic_mode');
     var draftId = document.getElementById('wd_id');
     var tags = document.getElementById('wp_tags');
     var app = document.querySelector('.willow_write_app');
@@ -231,6 +233,7 @@ if (!$can_subscriber_access) {
         if (title) title.textContent = isFree ? '' : topicTitle;
         if (description) description.innerHTML = isFree ? '' : topicDescription;
         if (subject) subject.value = isFree ? '자유주제' : topicTitle;
+        if (topicModeField) topicModeField.value = topicMode;
         content.placeholder = isFree ? '자유롭게 글을 작성해주세요' : '오늘의 주제에 대한 생각을\n자유롭게 작성해주세요';
         if (actions) {
             actions.classList.toggle('has_tag_bar', isFree);

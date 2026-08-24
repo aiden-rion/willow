@@ -363,7 +363,9 @@ function willow_get_notifications($mb_id, $limit = 50)
 
         $result = sql_query(" select wp_id, mb_id, wp_author, wp_subject, wp_datetime
             from `{$tables['post']}`
-            where wt_id = '".(int) $topic['wt_id']."' and mb_id <> '{$mb_id}'
+            where wt_id = '".(int) $topic['wt_id']."'
+                and mb_id <> '{$mb_id}'
+                and (wp_topic_mode = '' or wp_topic_mode = 'today')
             order by wp_id desc
             limit 10 ", false);
         if ($result) {
