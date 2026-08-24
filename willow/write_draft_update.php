@@ -30,7 +30,8 @@ $topic_mode = isset($_POST['topic_mode']) && $_POST['topic_mode'] === 'free' ? '
 $subject = isset($_POST['wp_subject']) ? trim(strip_tags($_POST['wp_subject'])) : '';
 $content = isset($_POST['wp_content']) ? trim(strip_tags($_POST['wp_content'])) : '';
 $tags = isset($_POST['wp_tags']) ? trim(strip_tags($_POST['wp_tags'])) : '';
-$access = isset($_POST['wp_access']) && $_POST['wp_access'] === 'subscriber' ? 'subscriber' : 'public';
+$can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';
+$access = $can_subscriber_access && isset($_POST['wp_access']) && $_POST['wp_access'] === 'subscriber' ? 'subscriber' : 'public';
 $mb_id = sql_escape_string($member['mb_id']);
 $now = G5_TIME_YMDHIS;
 $image_upload_limit = 5 * 1024 * 1024;

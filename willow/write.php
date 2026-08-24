@@ -50,7 +50,11 @@ if ($draft_id && $is_member) {
 $draft_topic_mode = !empty($draft['wd_topic_mode']) && $draft['wd_topic_mode'] === 'free' ? 'free' : 'today';
 $draft_subject = !empty($draft['wd_subject']) ? get_text($draft['wd_subject']) : '';
 $draft_content = !empty($draft['wd_content']) ? get_text($draft['wd_content'], 0) : '';
+$can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';
 $draft_access = !empty($draft['wd_access']) && $draft['wd_access'] === 'subscriber' ? 'subscriber' : 'public';
+if (!$can_subscriber_access) {
+    $draft_access = 'public';
+}
 ?>
 
 <main class="willow_content_app willow_write_app <?php echo $draft_topic_mode === 'free' ? 'is_free_topic' : ''; ?>">
@@ -102,7 +106,9 @@ $draft_access = !empty($draft['wd_access']) && $draft['wd_access'] === 'subscrib
 
         <select id="wp_access" name="wp_access" class="willow_access_select" aria-hidden="true" tabindex="-1">
             <option value="public" <?php echo $draft_access === 'public' ? 'selected' : ''; ?>>전체공개</option>
+            <?php if ($can_subscriber_access) { ?>
             <option value="subscriber" <?php echo $draft_access === 'subscriber' ? 'selected' : ''; ?>>구독자 전용</option>
+            <?php } ?>
         </select>
 
         <div class="willow_write_actions <?php echo $draft_topic_mode === 'free' ? 'has_tag_bar' : ''; ?>">
@@ -120,9 +126,11 @@ $draft_access = !empty($draft['wd_access']) && $draft['wd_access'] === 'subscrib
                 <button type="button" class="willow_write_tool" data-copy-content aria-label="내용 복사">
                     <i class="fa fa-clone" aria-hidden="true"></i>
                 </button>
+                <?php if ($can_subscriber_access) { ?>
                 <button type="button" class="willow_write_tool willow_write_access_tool <?php echo $draft_access === 'subscriber' ? 'is_active' : ''; ?>" data-toggle-access aria-pressed="<?php echo $draft_access === 'subscriber' ? 'true' : 'false'; ?>" aria-label="구독자 전용">
                     <i class="fa fa-lock" aria-hidden="true"></i>
                 </button>
+                <?php } ?>
             </div>
             <button type="submit" class="willow_submit_button">
                 <i class="fa fa-check" aria-hidden="true"></i>
