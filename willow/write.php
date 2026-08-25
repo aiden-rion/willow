@@ -156,8 +156,14 @@ if (!$can_subscriber_access) {
                 <button type="button" class="willow_write_tool" data-trigger-file aria-label="사진첨부">
                     <i class="fa fa-picture-o" aria-hidden="true"></i>
                 </button>
+                <?php /*
                 <button type="button" class="willow_write_tool" data-copy-content aria-label="내용 복사">
                     <i class="fa fa-clone" aria-hidden="true"></i>
+                </button>
+                */ ?>
+                <button type="button" class="willow_write_tool willow_save_button" aria-label="임시저장">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                    <span class="sound_only" data-save-label>임시저장</span>
                 </button>
                 <?php if ($can_subscriber_access) { ?>
                 <button type="button" class="willow_write_tool willow_write_access_tool <?php echo $draft_access === 'subscriber' ? 'is_active' : ''; ?>" data-toggle-access aria-pressed="<?php echo $draft_access === 'subscriber' ? 'true' : 'false'; ?>" aria-label="구독자 전용">
@@ -210,6 +216,7 @@ if (!$can_subscriber_access) {
     var description = document.querySelector('[data-topic-description]');
     var toggle = document.querySelector('.willow_topic_toggle');
     var saveButton = document.querySelector('.willow_save_button');
+    var saveButtonLabel = saveButton ? saveButton.querySelector('[data-save-label]') : null;
     var accessSelect = document.getElementById('wp_access');
     var toast = document.querySelector('[data-write-toast]');
     var toastTimer = null;
@@ -525,7 +532,7 @@ if (!$can_subscriber_access) {
             var formData = new FormData(form);
             formData.append('topic_mode', topicMode);
             saveButton.disabled = true;
-            saveButton.textContent = '저장중';
+            if (saveButtonLabel) saveButtonLabel.textContent = '저장중';
 
             fetch('<?php echo G5_URL; ?>/willow/write_draft_update.php', {
                 method: 'POST',
@@ -558,12 +565,12 @@ if (!$can_subscriber_access) {
                         input.value = '';
                     });
                 }
-                alert(data.message || '임시저장되었습니다.');
+                showToast(data.message || '임시저장되었습니다.');
             }).catch(function() {
                 alert('임시저장 중 오류가 발생했습니다.');
             }).finally(function() {
                 saveButton.disabled = false;
-                saveButton.textContent = '임시저장';
+                if (saveButtonLabel) saveButtonLabel.textContent = '임시저장';
             });
         });
     }

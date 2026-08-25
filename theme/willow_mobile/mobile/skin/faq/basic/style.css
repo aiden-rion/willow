@@ -50,25 +50,28 @@ body.willow_faq_body .willow_shell {
 
 .willow_faq_search .btn_submit::before {
   position: absolute;
-  top: 14px;
-  left: 14px;
-  width: 16px;
-  height: 16px;
-  border: 2px solid #111111;
+  top: 50%;
+  left: 50%;
+  width: 17px;
+  height: 17px;
+  margin: -12px 0 0 -13px;
+  border: 2.5px solid #111111;
   border-radius: 50%;
   content: "";
 }
 
 .willow_faq_search .btn_submit::after {
   position: absolute;
-  top: 29px;
-  left: 30px;
-  width: 10px;
-  height: 2px;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 2.5px;
+  margin: 8px 0 0 4px;
   border-radius: 999px;
   background: #111111;
   content: "";
   transform: rotate(45deg);
+  transform-origin: left center;
 }
 
 .willow_faq_cate {

@@ -15,8 +15,8 @@ body.willow_faq_body #container {max-width:none;margin:0;padding:0;background:#f
 .willow_faq_search .frm_input {display:block;width:100%;height:48px;padding:0 54px 0 16px;border:0;border-radius:6px;background:#f5f6f8;color:#1a1a1a;font-size:16px;outline:none}
 .willow_faq_search .frm_input::placeholder {color:#a1a4ab}
 .willow_faq_search .btn_submit {position:absolute;top:0;right:0;width:52px;height:48px;border:0;background:transparent;color:transparent}
-.willow_faq_search .btn_submit::before {position:absolute;top:14px;left:14px;width:16px;height:16px;border:2px solid #111;border-radius:50%;content:""}
-.willow_faq_search .btn_submit::after {position:absolute;top:29px;left:30px;width:10px;height:2px;border-radius:999px;background:#111;content:"";transform:rotate(45deg)}
+.willow_faq_search .btn_submit::before {position:absolute;top:50%;left:50%;width:17px;height:17px;margin:-12px 0 0 -13px;border:2.5px solid #111;border-radius:50%;content:""}
+.willow_faq_search .btn_submit::after {position:absolute;top:50%;left:50%;width:13px;height:2.5px;margin:8px 0 0 4px;border-radius:999px;background:#111;content:"";transform:rotate(45deg);transform-origin:left center}
 .willow_faq_cate {margin:0 auto;padding:6px 0 18px 26px;overflow-x:auto;background:#fff;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .willow_faq_cate::-webkit-scrollbar {display:none}
 .willow_faq_cate h2 {position:absolute;overflow:hidden;width:1px;height:1px;clip:rect(0,0,0,0)}

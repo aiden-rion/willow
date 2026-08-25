@@ -13,21 +13,20 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.
 include_once(G5_PATH.'/willow/topic.lib.php');
 include_once(G5_PATH.'/willow/content.lib.php');
 
-$willow_topic = willow_get_topic();
-$has_visible_topic = !empty($willow_topic['wt_id']);
-$willow_topic_participant_count = $has_visible_topic ? willow_topic_participant_count((int) $willow_topic['wt_id']) : 0;
-$willow_topic_recent_participants = $has_visible_topic ? willow_topic_recent_participants((int) $willow_topic['wt_id'], 3) : array();
+$willow_topic = willow_get_topic(); /* 오늘의 주제 정보 */
+$has_visible_topic = !empty($willow_topic['wt_id']); /* 오늘의 주제 존재 여부 */
+$willow_topic_participant_count = $has_visible_topic ? willow_topic_participant_count((int) $willow_topic['wt_id']) : 0; /* 오늘의 주제 참여자 수 */
+$willow_topic_recent_participants = $has_visible_topic ? willow_topic_recent_participants((int) $willow_topic['wt_id'], 3) : array(); /* 오늘의 주제 참여자 최근 3명 */
 
-$login_href = G5_BBS_URL.'/login.php?url='.urlencode(G5_URL);
-$today_href = G5_URL.'/willow/today.php';
-$write_href = $has_visible_topic ? willow_topic_write_url($willow_topic) : '#';
+$login_href = G5_BBS_URL.'/login.php?url='.urlencode(G5_URL); /* 로그인 페이지 링크 */
+$today_href = G5_URL.'/willow/today.php'; /* 오늘의 주제 페이지 링크 */
+$write_href = $has_visible_topic ? willow_topic_write_url($willow_topic) : '#'; /* 오늘의 주제 글쓰기 버튼 링크 */
 
-$chips = willow_get_categories(true);
-
-$willow_feed_seed = substr(md5(uniqid('', true).mt_rand()), 0, 12);
-$featured_posts = willow_get_recent_feed_posts(3);
-willow_record_feed_impressions($featured_posts);
-$recommended_authors = willow_get_recommended_authors();
+$chips = array_slice(willow_get_categories(true), 0, 10); /* 카테고리 chips */
+$willow_feed_seed = substr(md5(uniqid('', true).mt_rand()), 0, 12); /* 피드 시드값 */
+$featured_posts = willow_get_mixed_feed_posts(0, 3, $willow_feed_seed); /* 초기 피드 글 */
+willow_record_feed_impressions($featured_posts); /* 피드 글 노출 기록 */
+$recommended_authors = willow_get_recommended_authors(); /* 추천 작가 */
 ?>
 
 <div class="willow_pull_refresh" data-pull-refresh aria-hidden="true">

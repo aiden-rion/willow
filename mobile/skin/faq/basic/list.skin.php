@@ -8,7 +8,7 @@ add_stylesheet('<link rel="stylesheet" href="'.$faq_skin_url.'/style.css">', 0);
 <!-- FAQ 시작 { -->
 <script>document.body.classList.add('willow_inner_title_body','willow_faq_body');var willowAutoTitle=document.querySelector('.willow_page_title');if(willowAutoTitle)willowAutoTitle.style.display='none';</script>
 <header class="willow_member_confirm_header">
-    <a href="javascript:history.back();" aria-label="뒤로가기"></a>
+    <a href="<?php echo G5_URL; ?>/willow/menu.php" data-faq-back aria-label="뒤로가기"></a>
     <h1>FAQ</h1>
 </header>
 <?php
@@ -105,6 +105,16 @@ echo '<div id="faq_thtml">'.conv_content($fm['fm_mobile_tail_html'], 1).'</div>'
 <!-- } FAQ 끝 -->
 
 <script src="<?php echo G5_JS_URL; ?>/viewimageresize.js"></script>
+<script>
+document.addEventListener("click", function(event) {
+    var back = event.target.closest("[data-faq-back]");
+    if (!back) return;
+    if (window.history.length > 1) {
+        event.preventDefault();
+        window.history.back();
+    }
+});
+</script>
 <script>
 jQuery(function() {
     $(".closer_btn").on("click", function() {

@@ -154,8 +154,9 @@ if ($wp_id) {
     }
     willow_record_post_view('topic', $wp_id);
     $topic = sql_fetch(" select * from `{$tables['topic']}` where wt_id = '".(int) $topic_post['wt_id']."' ");
-    $is_general = false;
-    $article_requires_subscription = false;
+    $topic_access = willow_normalize_post_access(isset($topic_post['wp_access']) ? $topic_post['wp_access'] : '');
+    $article_requires_subscription = willow_is_paid_access($topic_access);
+    $is_general = !$article_requires_subscription;
     $article_title = $topic_post['wp_subject'];
     $article_author = $topic_post['wp_author'] ? $topic_post['wp_author'] : '윌로우 회원';
     $member = $topic_post['mb_id'] ? get_member($topic_post['mb_id']) : array();
@@ -267,13 +268,13 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
     <article class="willow_article_inner">
         <div class="willow_article_tags">
-            <?php if (!$is_general) { ?><span>유료구독</span><?php } ?>
+            <?php if ($article_requires_subscription) { ?><span>유료구독</span><?php } ?>
             <span>스토리</span>
             <?php if ($article_category !== '') { ?><span><?php echo get_text($article_category); ?></span><?php } ?>
             <?php foreach (array_slice($article_tags, 0, 3) as $tag) { ?><span>#<?php echo get_text($tag); ?></span><?php } ?>
         </div>
 
-        <?php if (!$is_general) { ?><p class="willow_article_kicker">오늘의 주제<?php if (!empty($topic['wt_subject'])) { ?> · <?php echo get_text($topic['wt_subject']); ?><?php } ?></p><?php } ?>
+        <?php if (!empty($topic_post) && (!empty($topic_post['wp_topic_mode']) && $topic_post['wp_topic_mode'] === 'today')) { ?><p class="willow_article_kicker">오늘의 주제<?php if (!empty($topic['wt_subject'])) { ?> · <?php echo get_text($topic['wt_subject']); ?><?php } ?></p><?php } ?>
 
         <a class="willow_article_byline" href="<?php echo $article_author_href ? $article_author_href : $article_subscribe_href; ?>">
             <div>

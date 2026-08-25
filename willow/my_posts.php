@@ -19,29 +19,18 @@ $topic_tables = willow_topic_tables();
 $result = sql_query(" select * from `{$board_table}` where wr_is_comment = 0 and mb_id = '{$mb_id}' order by wr_datetime desc, wr_id desc ", false);
 if ($result) {
     while ($row = sql_fetch_array($result)) {
-        $post = willow_board_post_to_feed($row);
-        $items[] = array(
-            'title' => $post['title'],
-            'excerpt' => $post['excerpt'],
-            'date' => $post['date'],
-            'href' => $post['href'],
-            'type' => willow_is_paid_access($post['access']) ? '유료글' : '무료글',
-            'sort_datetime' => $post['sort_datetime'],
-        );
+        $items[] = willow_board_post_to_feed($row);
     }
 }
 
-$result = sql_query(" select * from `{$topic_tables['post']}` where mb_id = '{$mb_id}' order by wp_datetime desc, wp_id desc ", false);
+$result = sql_query(" select p.*, t.wt_subject
+    from `{$topic_tables['post']}` p
+    left join `{$topic_tables['topic']}` t on t.wt_id = p.wt_id
+    where p.mb_id = '{$mb_id}'
+    order by p.wp_datetime desc, p.wp_id desc ", false);
 if ($result) {
     while ($row = sql_fetch_array($result)) {
-        $items[] = array(
-            'title' => get_text($row['wp_subject']),
-            'excerpt' => cut_str(trim(preg_replace('/\s+/', ' ', strip_tags($row['wp_content']))), 110, '...'),
-            'date' => willow_format_date($row['wp_datetime']),
-            'href' => willow_topic_post_url($row),
-            'type' => !empty($row['wp_topic_mode']) && $row['wp_topic_mode'] === 'free' ? '자유주제' : '오늘의 주제',
-            'sort_datetime' => $row['wp_datetime'],
-        );
+        $items[] = willow_topic_post_to_feed($row);
     }
 }
 
@@ -56,21 +45,11 @@ usort($items, function ($a, $b) {
     <h1>내가 쓴 글</h1>
 </header>
 
-<main class="willow_list_page">
-    <section class="willow_list_intro">
-        <p>일반 글과 오늘의 주제 참여글을 최신순으로 모았습니다.</p>
-    </section>
-
-    <div class="willow_simple_list">
+<main class="willow_app willow_my_posts_page">
+    <section class="willow_feed" aria-label="내가 쓴 글 목록">
         <?php if ($items) { ?>
             <?php foreach ($items as $item) { ?>
-            <article class="willow_simple_item">
-                <a href="<?php echo $item['href']; ?>">
-                    <em><?php echo get_text($item['type']); ?></em>
-                    <p><?php echo get_text($item['excerpt']); ?></p>
-                    <span><?php echo get_text($item['date']); ?></span>
-                </a>
-            </article>
+            <?php echo willow_render_post_card($item); ?>
             <?php } ?>
         <?php } else { ?>
             <div class="willow_simple_empty">
@@ -79,8 +58,60 @@ usort($items, function ($a, $b) {
                 <a href="<?php echo G5_URL; ?>/willow/write.php">글쓰기</a>
             </div>
         <?php } ?>
-    </div>
+    </section>
 </main>
+
+<script>
+document.addEventListener('click', function(event) {
+    var likeButton = event.target.closest('.willow_like_button');
+    if (likeButton) {
+        event.preventDefault();
+        if (likeButton.disabled) return;
+        likeButton.disabled = true;
+        var formData = new FormData();
+        formData.append('target_type', likeButton.getAttribute('data-target-type'));
+        formData.append('target_id', likeButton.getAttribute('data-target-id'));
+        fetch('<?php echo G5_URL; ?>/willow/like.php', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            body: formData,
+            credentials: 'same-origin'
+        }).then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            if (!data.success) {
+                alert(data.message || '좋아요 처리에 실패했습니다.');
+                return;
+            }
+            likeButton.classList.toggle('is_liked', !!data.liked);
+            likeButton.setAttribute('aria-pressed', data.liked ? 'true' : 'false');
+            var icon = likeButton.querySelector('[data-icon-heart]');
+            if (icon) icon.src = data.liked ? icon.getAttribute('data-icon-active') : icon.getAttribute('data-icon-default');
+            var count = likeButton.querySelector('[data-like-count]');
+            if (count) count.textContent = parseInt(String(data.count).replace(/,/g, ''), 10) > 0 ? data.count : '';
+        }).catch(function() {
+            alert('좋아요 처리 중 오류가 발생했습니다.');
+        }).finally(function() {
+            likeButton.disabled = false;
+        });
+        return;
+    }
+
+    var toggle = event.target.closest('.willow_more_button');
+    document.querySelectorAll('.willow_more.is_open').forEach(function(menu) {
+        if (!toggle || !menu.contains(toggle)) {
+            menu.classList.remove('is_open');
+            var button = menu.querySelector('.willow_more_button');
+            if (button) button.setAttribute('aria-expanded', 'false');
+        }
+    });
+    if (!toggle) return;
+    event.preventDefault();
+    var wrap = toggle.closest('.willow_more');
+    var isOpen = wrap.classList.toggle('is_open');
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+});
+</script>
 
 <?php
 include_once(G5_THEME_MOBILE_PATH.'/tail.php');

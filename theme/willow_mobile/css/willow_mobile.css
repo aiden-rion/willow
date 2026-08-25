@@ -451,7 +451,7 @@ body.willow_menu_body .willow_menu_point {
 
 body.willow_menu_body .willow_menu_nav {
   flex: 1 1 auto;
-  gap: 2px;
+  gap: 7px;
   margin-top: 18px;
   overflow: hidden;
 }
@@ -472,14 +472,39 @@ body.willow_menu_body .willow_menu_support {
 }
 
 body.willow_menu_body .willow_menu_support h2 {
-  margin-bottom: 10px;
+  margin: 0 0 10px;
+  color: #151515;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 20px;
 }
 
 body.willow_menu_body .willow_menu_support div {
-  row-gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
 }
 
 body.willow_menu_body .willow_menu_support a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 42px;
+  min-width: 0;
+  padding: 0 8px;
+  border: 1px solid #e6e8ec;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #20242b;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+body.willow_menu_body .willow_menu_support a i {
+  color: #98a2b3;
   font-size: 16px;
 }
 
@@ -881,6 +906,41 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
   margin-top: 4px;
   color: #9a9a9a;
   font-size: 12px;
+}
+
+.willow_draft_card .willow_post_head {
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+}
+
+.willow_draft_card .willow_post_head > em {
+  align-self: center;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #f3f5f8;
+  color: #667085;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.willow_draft_card .willow_post_meta {
+  align-items: center;
+}
+
+.willow_draft_resume {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #111111;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 34px;
 }
 
 .willow_post_card > a > h3 {

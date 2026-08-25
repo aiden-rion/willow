@@ -1,5 +1,6 @@
 <?php
 include_once('./_common.php');
+include_once(G5_PATH.'/willow/content.lib.php');
 
 $g5['title'] = '전체검색 결과';
 $willow_topbar_open = true;
@@ -66,6 +67,7 @@ if ($stx) {
     }
 
     $text_stx = get_text(stripslashes($stx));
+    willow_record_search_recent($text_stx);
     
     $search_query = 'sfl='.urlencode($sfl).'&amp;stx='.urlencode($stx).'&amp;sop='.$sop;
 

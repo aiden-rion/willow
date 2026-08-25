@@ -21,7 +21,7 @@ $offset = max(0, $offset);
 $limit = min(12, max(1, $limit));
 $effective_offset = $seen_keys ? 0 : $offset;
 
-$items = willow_get_personalized_feed($effective_offset, $limit + 1, $seed, $seen_keys);
+$items = willow_get_mixed_feed_posts($effective_offset, $limit + 1, $seed, $seen_keys);
 $has_more = count($items) > $limit;
 if ($has_more) {
     $items = array_slice($items, 0, $limit);

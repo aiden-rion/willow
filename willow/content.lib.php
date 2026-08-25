@@ -69,6 +69,134 @@ function willow_post_view_table()
     return $prefix.'willow_post_view';
 }
 
+function willow_search_recent_table()
+{
+    global $g5;
+
+    $prefix = defined('G5_TABLE_PREFIX') ? G5_TABLE_PREFIX : (isset($g5['table_prefix']) ? $g5['table_prefix'] : 'g5_');
+
+    return $prefix.'willow_search_recent';
+}
+
+function willow_search_recent_install()
+{
+    static $installed = false;
+
+    if ($installed) {
+        return;
+    }
+
+    $table = willow_search_recent_table();
+    sql_query(" create table if not exists `{$table}` (
+        wsr_id int unsigned not null auto_increment,
+        viewer_key varchar(80) not null default '',
+        mb_id varchar(20) not null default '',
+        wsr_keyword varchar(100) not null default '',
+        wsr_count int unsigned not null default 1,
+        wsr_first_datetime datetime not null,
+        wsr_datetime datetime not null,
+        primary key (wsr_id),
+        unique key viewer_keyword (viewer_key, wsr_keyword),
+        key viewer_datetime (viewer_key, wsr_datetime),
+        key mb_id (mb_id, wsr_datetime)
+    ) ", false);
+
+    $installed = true;
+}
+
+function willow_search_recent_normalize($keyword)
+{
+    $keyword = trim(strip_tags((string) $keyword));
+    $keyword = preg_replace('/\s+/u', ' ', $keyword);
+
+    return cut_str($keyword, 50, '');
+}
+
+function willow_record_search_recent($keyword)
+{
+    global $member;
+
+    $keyword = willow_search_recent_normalize($keyword);
+    if ($keyword === '') {
+        return;
+    }
+
+    willow_search_recent_install();
+
+    $table = willow_search_recent_table();
+    $viewer_key = sql_escape_string(willow_post_viewer_key());
+    $mb_id = !empty($member['mb_id']) ? sql_escape_string($member['mb_id']) : '';
+    $keyword_sql = sql_escape_string($keyword);
+    $now = G5_TIME_YMDHIS;
+
+    sql_query(" insert into `{$table}`
+        set viewer_key = '{$viewer_key}',
+            mb_id = '{$mb_id}',
+            wsr_keyword = '{$keyword_sql}',
+            wsr_count = 1,
+            wsr_first_datetime = '{$now}',
+            wsr_datetime = '{$now}'
+        on duplicate key update
+            mb_id = values(mb_id),
+            wsr_count = wsr_count + 1,
+            wsr_datetime = values(wsr_datetime) ", false);
+}
+
+function willow_get_recent_searches($limit = 6, $days = 365)
+{
+    $limit = max(1, (int) $limit);
+    $days = max(1, (int) $days);
+    willow_search_recent_install();
+
+    $table = willow_search_recent_table();
+    $viewer_key = sql_escape_string(willow_post_viewer_key());
+    $from = sql_escape_string(date('Y-m-d H:i:s', G5_SERVER_TIME - ($days * 86400)));
+    $items = array();
+    $result = sql_query(" select wsr_id, wsr_keyword, wsr_datetime
+        from `{$table}`
+        where viewer_key = '{$viewer_key}'
+            and wsr_datetime >= '{$from}'
+        order by wsr_datetime desc, wsr_id desc
+        limit {$limit} ", false);
+
+    if ($result) {
+        while ($row = sql_fetch_array($result)) {
+            $items[] = array(
+                'id' => (int) $row['wsr_id'],
+                'word' => get_text($row['wsr_keyword']),
+                'date' => get_text(substr($row['wsr_datetime'], 5, 5)),
+            );
+        }
+    }
+
+    return $items;
+}
+
+function willow_delete_recent_search($recent_id)
+{
+    $recent_id = (int) $recent_id;
+    if ($recent_id < 1) {
+        return false;
+    }
+
+    willow_search_recent_install();
+    $table = willow_search_recent_table();
+    $viewer_key = sql_escape_string(willow_post_viewer_key());
+
+    sql_query(" delete from `{$table}` where wsr_id = '{$recent_id}' and viewer_key = '{$viewer_key}' ", false);
+
+    return true;
+}
+
+function willow_clear_recent_searches()
+{
+    willow_search_recent_install();
+    $table = willow_search_recent_table();
+    $viewer_key = sql_escape_string(willow_post_viewer_key());
+
+    sql_query(" delete from `{$table}` where viewer_key = '{$viewer_key}' ", false);
+}
+
 function willow_post_view_install()
 {
     static $installed = false;
@@ -1026,6 +1154,103 @@ function willow_get_board_posts($limit = 10, $keyword = '')
     return $posts;
 }
 
+function willow_topic_search_category_keys($keyword)
+{
+    $keyword = trim((string) $keyword);
+    if ($keyword === '' || !function_exists('willow_story_categories')) {
+        return array();
+    }
+
+    $needle = preg_replace('/[\s#]+/u', '', $keyword);
+    $keys = array();
+    foreach (willow_story_categories() as $category_key => $category) {
+        $targets = array(
+            isset($category['label']) ? $category['label'] : '',
+            isset($category['full_label']) ? $category['full_label'] : '',
+            isset($category['description']) ? $category['description'] : '',
+        );
+
+        foreach ($targets as $target) {
+            $target = preg_replace('/[\s#]+/u', '', $target);
+            if ($target !== '' && (strpos($target, $needle) !== false || strpos($needle, $target) !== false)) {
+                $keys[] = $category_key;
+                break;
+            }
+        }
+    }
+
+    return array_values(array_unique($keys));
+}
+
+function willow_get_topic_search_posts($limit = 10, $keyword = '')
+{
+    $keyword = trim((string) $keyword);
+    if ($keyword === '') {
+        return array();
+    }
+
+    if (!function_exists('willow_topic_tables')) {
+        include_once(G5_PATH.'/willow/topic.lib.php');
+    }
+    if (!function_exists('willow_topic_install')) {
+        return array();
+    }
+
+    willow_topic_install();
+    $tables = willow_topic_tables();
+    $limit = max(1, (int) $limit);
+    $keyword_sql = sql_escape_string($keyword);
+    $where = array(
+        "p.wp_subject like '%{$keyword_sql}%'",
+        "p.wp_content like '%{$keyword_sql}%'",
+        "p.wp_author like '%{$keyword_sql}%'",
+        "p.wp_tags like '%{$keyword_sql}%'",
+        "t.wt_subject like '%{$keyword_sql}%'",
+    );
+
+    foreach (willow_topic_search_category_keys($keyword) as $category_key) {
+        $where[] = "p.wp_category = '".sql_escape_string($category_key)."'";
+    }
+
+    $posts = array();
+    $result = sql_query(" select p.*, t.wt_subject
+        from `{$tables['post']}` p
+        left join `{$tables['topic']}` t on t.wt_id = p.wt_id
+        where (".implode(' or ', $where).")
+        order by p.wp_datetime desc, p.wp_id desc
+        limit {$limit} ", false);
+    if ($result) {
+        while ($row = sql_fetch_array($result)) {
+            $posts[] = willow_topic_post_to_feed($row);
+        }
+    }
+
+    return $posts;
+}
+
+function willow_get_search_posts($limit = 10, $keyword = '')
+{
+    $limit = max(1, (int) $limit);
+    $fetch_limit = max($limit * 2, 10);
+    $items = array();
+    $seen = array();
+
+    foreach (array_merge(willow_get_board_posts($fetch_limit, $keyword), willow_get_topic_search_posts($fetch_limit, $keyword)) as $item) {
+        $key = $item['target_type'].':'.$item['id'];
+        if (isset($seen[$key])) {
+            continue;
+        }
+        $seen[$key] = true;
+        $items[] = $item;
+    }
+
+    usort($items, function($left, $right) {
+        return strcmp($right['sort_datetime'], $left['sort_datetime']);
+    });
+
+    return array_slice($items, 0, $limit);
+}
+
 function willow_get_popular_board_posts($limit = 10)
 {
     $table = willow_content_table();
@@ -1048,8 +1273,30 @@ function willow_get_popular_board_posts($limit = 10)
 
 function willow_get_recent_feed_posts($limit = 3, $exclude_keys = array())
 {
+    return willow_get_mixed_feed_posts(0, $limit, '', $exclude_keys);
+}
+
+function willow_mixed_feed_score($item, $seed)
+{
+    $timestamp = !empty($item['sort_datetime']) ? strtotime($item['sort_datetime']) : 0;
+    $age_hours = $timestamp ? max(0, (G5_SERVER_TIME - $timestamp) / 3600) : 720;
+    $recency_score = max(0, 44 - min(44, $age_hours / 7));
+    $views = isset($item['views']) ? (int) $item['views'] : 0;
+    $likes = isset($item['likes_raw']) ? (int) $item['likes_raw'] : (int) str_replace(',', '', isset($item['likes']) ? $item['likes'] : 0);
+    $comments = isset($item['comments_raw']) ? (int) $item['comments_raw'] : (int) str_replace(',', '', isset($item['comments']) ? $item['comments'] : 0);
+    $popularity_score = min(48, (log(max(1, $views + 1), 2) * 4.2) + ($likes * 3.8) + ($comments * 5.5));
+    $key = (!empty($item['target_type']) ? $item['target_type'] : 'post').':'.(int) $item['id'];
+    $random_score = (crc32($seed.':'.$key) % 1000) / 1000 * 34;
+
+    return $recency_score + $popularity_score + $random_score;
+}
+
+function willow_get_mixed_feed_posts($offset = 0, $limit = 6, $seed = '', $exclude_keys = array())
+{
+    $offset = max(0, (int) $offset);
     $limit = max(1, (int) $limit);
-    $fetch_limit = max($limit * 3, 12);
+    $seed = $seed !== '' ? $seed : substr(md5(uniqid('', true).mt_rand()), 0, 12);
+    $fetch_limit = max(80, $offset + $limit + 40);
     $excluded = array();
     $seen = array();
     $items = array();
@@ -1063,12 +1310,19 @@ function willow_get_recent_feed_posts($limit = 3, $exclude_keys = array())
         }
     }
 
-    foreach (willow_get_board_posts($fetch_limit) as $item) {
+    $board_candidates = array_merge(
+        willow_get_board_posts($fetch_limit),
+        willow_get_popular_board_posts($fetch_limit)
+    );
+
+    foreach ($board_candidates as $item) {
         $key = $item['target_type'].':'.$item['id'];
         if (isset($seen[$key]) || isset($excluded[$key])) {
             continue;
         }
         $seen[$key] = true;
+        $item['likes_raw'] = (int) str_replace(',', '', $item['likes']);
+        $item['comments_raw'] = (int) str_replace(',', '', $item['comments']);
         $items[] = $item;
     }
 
@@ -1081,7 +1335,7 @@ function willow_get_recent_feed_posts($limit = 3, $exclude_keys = array())
         $result = sql_query(" select p.*, t.wt_subject
             from `{$tables['post']}` p
             left join `{$tables['topic']}` t on t.wt_id = p.wt_id
-            order by p.wp_datetime desc, p.wp_id desc
+            order by p.wp_datetime desc, p.wp_like desc, p.wp_comment desc, p.wp_id desc
             limit {$fetch_limit} ", false);
         if ($result) {
             while ($row = sql_fetch_array($result)) {
@@ -1091,16 +1345,40 @@ function willow_get_recent_feed_posts($limit = 3, $exclude_keys = array())
                     continue;
                 }
                 $seen[$key] = true;
+                $item['likes_raw'] = isset($row['wp_like']) ? (int) $row['wp_like'] : (int) str_replace(',', '', $item['likes']);
+                $item['comments_raw'] = isset($row['wp_comment']) ? (int) $row['wp_comment'] : (int) str_replace(',', '', $item['comments']);
                 $items[] = $item;
             }
         }
     }
 
+    foreach ($items as $idx => $item) {
+        $items[$idx]['mixed_score'] = willow_mixed_feed_score($item, $seed);
+    }
+
     usort($items, function($left, $right) {
+        if ($left['mixed_score'] != $right['mixed_score']) {
+            return $left['mixed_score'] < $right['mixed_score'] ? 1 : -1;
+        }
+
         return strcmp($right['sort_datetime'], $left['sort_datetime']);
     });
 
-    return array_slice($items, 0, $limit);
+    $balanced = array();
+    $author_seen = array();
+    foreach ($items as $item) {
+        $author_key = !empty($item['mb_id']) ? $item['mb_id'] : $item['author'];
+        if (isset($author_seen[$author_key]) && $author_seen[$author_key] >= 2 && count($balanced) < $offset + $limit) {
+            continue;
+        }
+        if (!isset($author_seen[$author_key])) {
+            $author_seen[$author_key] = 0;
+        }
+        $author_seen[$author_key]++;
+        $balanced[] = $item;
+    }
+
+    return array_slice($balanced, $offset, $limit);
 }
 
 function willow_add_search_suggestion(&$suggestions, &$seen, $label, $keyword = '', $type = 'keyword')

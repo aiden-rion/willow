@@ -110,7 +110,8 @@ body.willow_search_body .willow_container {
   padding: 24px 26px 0;
 }
 
-.willow_search_tags a {
+.willow_search_tags a,
+.willow_search_tags button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -122,6 +123,56 @@ body.willow_search_body .willow_container {
   color: #222222;
   font-size: 14px;
   line-height: 36px;
+}
+
+.willow_search_tags button {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.willow_search_tags button[aria-expanded="true"] {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+.willow_search_tag_all {
+  padding: 18px 26px 0;
+}
+
+.willow_search_tag_all[hidden] {
+  display: none;
+}
+
+.willow_search_tag_group + .willow_search_tag_group {
+  margin-top: 18px;
+}
+
+.willow_search_tag_group h2 {
+  margin: 0 0 10px;
+  color: #151515;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 20px;
+}
+
+.willow_search_tag_group div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.willow_search_tag_group a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid #e2e2e2;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #333333;
+  font-size: 13px;
+  line-height: 34px;
 }
 
 .willow_recent_search {

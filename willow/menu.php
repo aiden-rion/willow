@@ -78,9 +78,9 @@ $member_avatar = $is_logged_in ? willow_member_avatar($member) : $menu_img_url.'
     <section class="willow_menu_support">
         <h2>고객센터</h2>
         <div>
-            <a href="<?php echo get_pretty_url('notice'); ?>">공지사항</a>
-            <a href="<?php echo G5_BBS_URL; ?>/faq.php">FAQ</a>
-            <a href="<?php echo $logout_href; ?>"><?php echo $is_logged_in ? '로그아웃' : '로그인'; ?></a>
+            <a href="<?php echo get_pretty_url('notice'); ?>"><span>공지사항</span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+            <a href="<?php echo G5_BBS_URL; ?>/faq.php"><span>FAQ</span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+            <a href="<?php echo $logout_href; ?>"><span><?php echo $is_logged_in ? '로그아웃' : '로그인'; ?></span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
         </div>
     </section>
 </main>
