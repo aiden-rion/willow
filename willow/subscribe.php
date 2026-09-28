@@ -265,6 +265,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <div class="willow_subscribe_my_intro">
             <h2>총 <em><?php echo number_format(count($my_payment_rows)); ?></em>건의 결제내역이 있습니다.</h2>
             <p>구독일 : <?php echo get_text(str_replace('-', '.', substr($my_subscription_detail['subscribed_at'], 0, 10))); ?></p>
+            <a class="willow_subscribe_author_link" href="<?php echo G5_URL; ?>/willow/author.php?author=<?php echo urlencode($my_subscription_detail['id']); ?>">작가 페이지 보기</a>
         </div>
 
         <form class="willow_subscribe_filter" method="get" action="<?php echo G5_URL; ?>/willow/subscribe.php">
@@ -327,7 +328,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <?php if ($my_subscriptions) { ?>
         <div class="willow_subscribe_my_list">
             <?php foreach ($my_subscriptions as $item) { ?>
-            <a class="willow_subscribe_my_item" href="<?php echo G5_URL; ?>/willow/subscribe.php?mode=my&amp;author=<?php echo urlencode($item['id']); ?>">
+            <article class="willow_subscribe_my_item">
                 <div class="willow_subscribe_my_item_top">
                     <span class="willow_subscribe_badge">구독중</span>
                     <span>구독일 : <?php echo get_text(str_replace('-', '.', substr($item['subscribed_at'], 0, 10))); ?></span>
@@ -350,8 +351,12 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                     <span>월 구독료 <em>(VAT포함)</em></span>
                     <strong><?php echo number_format($item['price']); ?>원</strong>
                 </div>
-                <span class="willow_subscribe_cancel">구독취소</span>
-            </a>
+                <div class="willow_subscribe_my_actions">
+                    <a href="<?php echo G5_URL; ?>/willow/subscribe.php?mode=my&amp;author=<?php echo urlencode($item['id']); ?>">결제내역</a>
+                    <a href="<?php echo G5_URL; ?>/willow/author.php?author=<?php echo urlencode($item['id']); ?>">작가 페이지</a>
+                    <span class="willow_subscribe_cancel">구독취소</span>
+                </div>
+            </article>
             <?php } ?>
         </div>
         <?php } else { ?>

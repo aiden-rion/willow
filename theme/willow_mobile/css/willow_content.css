@@ -2695,6 +2695,21 @@ html.willow_pull_active body {
   line-height: 20px;
 }
 
+.willow_subscribe_author_link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  margin-top: 14px;
+  padding: 0 14px;
+  border: 1px solid #1a1a1a;
+  border-radius: 999px;
+  color: #1a1a1a;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
 .willow_subscribe_status_select,
 .willow_subscribe_filter label {
   position: relative;
@@ -2876,7 +2891,6 @@ html.willow_pull_active body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-top: 18px;
   color: #1a1a1a;
   font-size: 13px;
   line-height: 20px;
@@ -2889,6 +2903,40 @@ html.willow_pull_active body {
   border-right: 1.4px solid #1a1a1a;
   content: "";
   transform: rotate(45deg);
+}
+
+.willow_subscribe_my_actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 18px;
+}
+
+.willow_subscribe_my_actions a,
+.willow_subscribe_my_actions .willow_subscribe_cancel {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #f4f4f4;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.willow_subscribe_my_actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a1a1a;
+}
+
+.willow_subscribe_my_actions a:last-of-type {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.willow_subscribe_my_actions .willow_subscribe_cancel {
+  margin-left: auto;
 }
 
 .willow_subscribe_filter {
