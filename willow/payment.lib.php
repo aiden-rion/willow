@@ -174,6 +174,44 @@ function willow_payment_find_card_by_billkey($mb_id, $billkey)
     return array();
 }
 
+function willow_payment_normalize_card_token($value)
+{
+    return preg_replace('/[^0-9A-Za-z가-힣]/u', '', (string) $value);
+}
+
+function willow_payment_find_duplicate_card($mb_id, $card_number, $card_name, $card_expiry)
+{
+    $target_number = willow_payment_normalize_card_token($card_number);
+    if ($target_number === '') {
+        return array();
+    }
+
+    $target_name = willow_payment_normalize_card_token($card_name);
+    $target_expiry = willow_payment_normalize_card_token($card_expiry);
+    $cards = willow_payment_cards($mb_id);
+
+    foreach ($cards as $card) {
+        $stored_number = willow_payment_normalize_card_token(isset($card['card_mask_number']) ? $card['card_mask_number'] : '');
+        if ($stored_number === '' || $stored_number !== $target_number) {
+            continue;
+        }
+
+        $stored_name = willow_payment_normalize_card_token(isset($card['od_card_name']) ? $card['od_card_name'] : '');
+        if ($target_name !== '' && $stored_name !== '' && $stored_name !== $target_name) {
+            continue;
+        }
+
+        $stored_expiry = willow_payment_normalize_card_token(willow_payment_card_expiry((int) $card['ci_id']));
+        if ($target_expiry !== '' && $stored_expiry !== '' && $stored_expiry !== $target_expiry) {
+            continue;
+        }
+
+        return $card;
+    }
+
+    return array();
+}
+
 function willow_payment_default_id($mb_id)
 {
     willow_payment_install();

@@ -50,6 +50,12 @@ $od_test = function_exists('get_subs_option') && get_subs_option('su_card_test')
 $pg_id = function_exists('get_subs_option') ? (string) get_subs_option('su_tosspayments_mid') : '';
 
 $existing = willow_payment_find_card_by_billkey($member['mb_id'], $billing_key);
+$duplicate_card = empty($existing['ci_id']) ? willow_payment_find_duplicate_card($member['mb_id'], $card_number, $card_name, $card_expiry) : array();
+if (!empty($duplicate_card['ci_id'])) {
+    willow_payment_set_default($member['mb_id'], (int) $duplicate_card['ci_id']);
+    alert('이미 등록된 카드입니다.', G5_URL.'/willow/payment.php?return='.urlencode($return_url));
+}
+
 $stored_billing_key = willow_payment_encrypt_billkey($billing_key);
 
 if (!empty($existing['ci_id'])) {
