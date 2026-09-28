@@ -256,6 +256,11 @@ function willow_auth_issue_code($phone, $force = false)
     $status = willow_popbill_config_status();
     $code = !empty($status['dry_run']) ? $config['dev_code'] : (string) random_int(100000, 999999);
     $content = '[WILLOW] 휴대폰 인증번호는 '.$code.'입니다. 4분 이내에 입력해주세요.';
+
+    if (defined('G5_URL') && (strpos(G5_URL, 'localhost') !== false || strpos(G5_URL, '127.0.0.1') !== false)) {
+        error_log('[WILLOW AUTH CODE] phone='.$phone.' code='.$code);
+    }
+
     $result = willow_sms_send($phone, $content, '', 'willow-auth-'.date('YmdHis').'-'.substr(md5($phone), 0, 8));
 
     if (empty($result['success'])) {

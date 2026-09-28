@@ -185,10 +185,6 @@ if ($auth_step === 'profile' && $phone_value) {
         </div>
 
         <p class="willow_auth_phone">휴대폰번호 : <?php echo $display_phone; ?></p>
-        <?php if (!empty($sms_send_result['dry_run']) && !empty($sms_send_result['dev_code'])) { ?>
-        <p class="willow_auth_notice">개발 모드 인증번호 : <?php echo get_text($sms_send_result['dev_code']); ?></p>
-        <?php } ?>
-
         <form class="willow_auth_form willow_auth_code_form" action="<?php echo $profile_url; ?>" method="get">
             <input type="hidden" name="auth_step" value="profile">
             <input type="hidden" name="phone" value="<?php echo $phone_value; ?>">

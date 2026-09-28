@@ -27,12 +27,34 @@ function willow_notification_install()
         author_mb_id varchar(20) not null default '',
         subscriber_mb_id varchar(20) not null default '',
         ws_status varchar(20) not null default 'active',
+        ws_card_ci_id int unsigned not null default 0,
+        ws_last_billing_date date not null default '0000-00-00',
+        ws_next_billing_date date not null default '0000-00-00',
         ws_datetime datetime not null,
         primary key (ws_id),
         unique key author_subscriber (author_mb_id, subscriber_mb_id),
         key subscriber_status (subscriber_mb_id, ws_status),
-        key author_status (author_mb_id, ws_status)
+        key author_status (author_mb_id, ws_status),
+        key next_billing (ws_status, ws_next_billing_date)
     ) ", false);
+
+    $columns = array();
+    $result = sql_query(" show columns from `{$table}` ", false);
+    if ($result) {
+        while ($row = sql_fetch_array($result)) {
+            $columns[$row['Field']] = true;
+        }
+    }
+    if (empty($columns['ws_card_ci_id'])) {
+        sql_query(" alter table `{$table}` add ws_card_ci_id int unsigned not null default 0 after ws_status ", false);
+    }
+    if (empty($columns['ws_last_billing_date'])) {
+        sql_query(" alter table `{$table}` add ws_last_billing_date date not null default '0000-00-00' after ws_card_ci_id ", false);
+    }
+    if (empty($columns['ws_next_billing_date'])) {
+        sql_query(" alter table `{$table}` add ws_next_billing_date date not null default '0000-00-00' after ws_last_billing_date ", false);
+    }
+    sql_query(" alter table `{$table}` add key next_billing (ws_status, ws_next_billing_date) ", false);
 
     $setting_table = willow_notification_setting_table();
     sql_query(" create table if not exists `{$setting_table}` (

@@ -4,6 +4,7 @@ include_once('./content.lib.php');
 include_once('./topic.lib.php');
 include_once('./notification.lib.php');
 include_once('./payment.lib.php');
+include_once('./revenue.lib.php');
 
 function willow_subscribe_price($value)
 {
@@ -163,31 +164,41 @@ function willow_subscribe_my_detail($author_id)
 function willow_subscribe_payment_rows($subscription, $card)
 {
     $rows = array();
-    if (empty($subscription['subscribed_at'])) {
+    if (empty($subscription['subscription_id'])) {
         return $rows;
     }
 
-    $start = strtotime(substr($subscription['subscribed_at'], 0, 10).' '.substr($subscription['subscribed_at'], 11, 8));
-    if (!$start) {
-        return $rows;
+    willow_revenue_install();
+    $payment_table = willow_subscription_payment_table();
+    $result = sql_query(" select *
+        from `{$payment_table}`
+        where ws_id = '".(int) $subscription['subscription_id']."'
+        order by wsp_paid_datetime desc, wsp_id desc
+        limit 36 ", false);
+    if ($result) {
+        while ($row = sql_fetch_array($result)) {
+            $datetime = $row['wsp_paid_datetime'] && $row['wsp_paid_datetime'] !== '0000-00-00 00:00:00' ? $row['wsp_paid_datetime'] : $row['wsp_datetime'];
+            $rows[] = array(
+                'status' => $row['wsp_status'] === 'paid' ? '정상결제' : get_text($row['wsp_status']),
+                'datetime' => date('Y.m.d H:i', strtotime($datetime)),
+                'product' => $subscription['name'].' 작가 구독료',
+                'method' => $card ? '카드 정기결제' : '카드 정기결제',
+                'amount' => (int) $row['wsp_amount'],
+            );
+        }
     }
 
-    $now = G5_SERVER_TIME;
-    $cursor = $start;
-    $limit = 36;
-
-    while ($cursor <= $now && count($rows) < $limit) {
+    if (!$rows && !empty($subscription['subscribed_at'])) {
         $rows[] = array(
-            'status' => '정상결제',
-            'datetime' => date('Y.m.d H:i', $cursor),
+            'status' => '결제대기',
+            'datetime' => date('Y.m.d H:i', strtotime($subscription['subscribed_at'])),
             'product' => $subscription['name'].' 작가 구독료',
             'method' => $card ? '카드 정기결제' : '카드 정기결제',
             'amount' => $subscription['price'],
         );
-        $cursor = strtotime('+1 month', $cursor);
     }
 
-    return array_reverse($rows);
+    return $rows;
 }
 
 $mode = isset($_GET['mode']) ? preg_replace('/[^a-z_]/', '', $_GET['mode']) : '';
@@ -395,6 +406,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
     <section class="willow_subscribe_card_box <?php echo $card ? '' : 'is_empty'; ?>">
         <?php if ($card) { ?>
+        <?php $card_expiry = willow_payment_card_expiry($card['ci_id']); ?>
         <div class="willow_subscribe_card_headline">
             <span><em>카드</em> 기본카드</span>
             <a href="<?php echo $payment_href; ?>">카드변경 <i class="fa fa-angle-right" aria-hidden="true"></i></a>
@@ -402,7 +414,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <strong><?php echo get_text($card['od_card_name'] ? $card['od_card_name'] : '등록카드'); ?> <?php echo get_text(substr($card['card_mask_number'], -4)); ?></strong>
         <dl>
             <div><dt>카드번호</dt><dd><?php echo get_text($card['card_mask_number']); ?></dd></div>
-            <div><dt>소유주명</dt><dd><?php echo get_text($member['mb_name'] ? $member['mb_name'] : $member['mb_nick']); ?></dd></div>
+            <div><dt>유효기간</dt><dd><?php echo get_text($card_expiry ? $card_expiry : '-'); ?></dd></div>
             <div><dt>등록일시</dt><dd><?php echo get_text(substr($card['ci_time'], 0, 16)); ?></dd></div>
             <div><dt>결제동의</dt><dd>완료</dd></div>
         </dl>

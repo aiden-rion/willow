@@ -219,6 +219,26 @@ body.willow_profile_edit_body .willow_shell {
   font-weight: 800;
 }
 
+.willow_profile_sub_button:disabled {
+  color: #999999;
+  background: #f4f4f4;
+}
+
+.willow_account_check_message {
+  margin: 10px 0 0 4px;
+  color: #8a8a8a;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.willow_account_check_message.is_success {
+  color: #167a46;
+}
+
+.willow_account_check_message.is_error {
+  color: #e53935;
+}
+
 .willow_profile_submit_bar {
   position: fixed;
   right: 0;

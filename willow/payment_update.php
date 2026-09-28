@@ -1,42 +1,92 @@
 <?php
 include_once('./_common.php');
 include_once('./payment.lib.php');
+include_once(G5_LIB_PATH.'/subscription.lib.php');
 
 if (!$is_member) {
     alert('로그인 후 이용해주세요.', G5_BBS_URL.'/login.php');
 }
 
-$return_url = isset($_POST['return']) ? trim($_POST['return']) : G5_URL.'/willow/menu.php';
+$return_url = isset($_GET['return']) ? trim($_GET['return']) : (isset($_POST['return']) ? trim($_POST['return']) : G5_URL.'/willow/menu.php');
 if ($return_url === '') {
     $return_url = G5_URL.'/willow/menu.php';
 }
 check_url_host($return_url);
 
-$card_name = isset($_POST['card_name']) ? trim($_POST['card_name']) : '';
-$card_digits = isset($_POST['card_last4']) ? preg_replace('/[^0-9]/', '', $_POST['card_last4']) : '';
-$card_last4 = strlen($card_digits) >= 4 ? substr($card_digits, -4) : $card_digits;
-$owner_name = isset($_POST['owner_name']) ? trim($_POST['owner_name']) : ($member['mb_name'] ? $member['mb_name'] : $member['mb_nick']);
+$auth_key = isset($_GET['authKey']) ? trim($_GET['authKey']) : '';
+$customer_key = isset($_GET['customerKey']) ? trim($_GET['customerKey']) : '';
+$expected_customer_key = willow_toss_customer_key($member['mb_id']);
 
-if ($card_name === '' || strlen($card_last4) !== 4) {
-    alert('카드 정보를 확인해주세요.', G5_URL.'/willow/payment.php?return='.urlencode($return_url));
+if ($auth_key === '' || $customer_key === '') {
+    alert('토스페이먼츠 카드 인증 정보가 없습니다.', G5_URL.'/willow/payment.php?step=toss&return='.urlencode($return_url));
 }
 
-$card_table = isset($g5['g5_subscription_mb_cardinfo_table']) ? $g5['g5_subscription_mb_cardinfo_table'] : G5_TABLE_PREFIX.'subscription_mb_cardinfo';
-$mb_id = sql_escape_string($member['mb_id']);
-$card_name_sql = sql_escape_string($card_name);
-$card_mask = '**** '.$card_last4;
-$card_mask_sql = sql_escape_string($card_mask);
-$billkey = 'willow_demo_'.sha1($member['mb_id'].'|'.$card_name.'|'.$card_last4.'|'.G5_TIME_YMDHIS);
-$order_number = substr(preg_replace('/[^0-9]/', '', G5_TIME_YMDHIS), 2).sprintf('%04d', mt_rand(0, 9999));
+if (!hash_equals($expected_customer_key, $customer_key)) {
+    alert('카드 인증 사용자 정보가 일치하지 않습니다.', G5_URL.'/willow/payment.php?return='.urlencode($return_url));
+}
 
-sql_query(" insert into `{$card_table}`
-        (mb_id, pg_service, pg_id, pg_apikey, first_ordernumber, card_mask_number, card_billkey, od_card_name, od_tno, od_id, od_test, ci_time)
-    values
-        ('{$mb_id}', 'willow', 'willow', '', '{$order_number}', '{$card_mask_sql}', '".sql_escape_string($billkey)."', '{$card_name_sql}', '', 0, 1, '".G5_TIME_YMDHIS."') ", false);
+$issue = willow_toss_issue_billing_key($auth_key, $customer_key);
+if (empty($issue['success'])) {
+    $message = isset($issue['message']) ? $issue['message'] : '빌링키 발급에 실패했습니다.';
+    alert($message, G5_URL.'/willow/payment.php?step=toss&return='.urlencode($return_url));
+}
 
-$ci_id = sql_insert_id();
+$result = $issue['response'];
+$billing_key = isset($result['billingKey']) ? trim($result['billingKey']) : '';
+if ($billing_key === '') {
+    alert('토스페이먼츠 빌링키를 확인할 수 없습니다.', G5_URL.'/willow/payment.php?step=toss&return='.urlencode($return_url));
+}
+
+$card_table = willow_payment_card_table();
+$card_number = willow_toss_card_number($result);
+$card_name = willow_toss_card_name($result);
+$card_expiry = willow_toss_card_expiry($result);
+$tno = '';
+if (!empty($result['mId']) && !empty($result['authenticatedAt'])) {
+    $tno = $result['mId'].'_'.preg_replace('/[^0-9]/', '', $result['authenticatedAt']);
+}
+$order_number = willow_toss_order_id('WILLOWCARD', $member['mb_id']);
+$od_test = function_exists('get_subs_option') && get_subs_option('su_card_test') ? 1 : 0;
+$pg_id = function_exists('get_subs_option') ? (string) get_subs_option('su_tosspayments_mid') : '';
+
+$existing = willow_payment_find_card_by_billkey($member['mb_id'], $billing_key);
+$stored_billing_key = willow_payment_encrypt_billkey($billing_key);
+
+if (!empty($existing['ci_id'])) {
+    $ci_id = (int) $existing['ci_id'];
+    sql_query(" update `{$card_table}`
+        set card_mask_number = '".sql_escape_string($card_number)."',
+            card_billkey = '".sql_escape_string($stored_billing_key)."',
+            od_card_name = '".sql_escape_string($card_name)."',
+            od_tno = '".sql_escape_string($tno)."',
+            pg_service = 'tosspayments',
+            pg_id = '".sql_escape_string($pg_id)."',
+            pg_apikey = '',
+            od_test = '{$od_test}',
+            ci_time = '".G5_TIME_YMDHIS."'
+        where ci_id = '{$ci_id}' ", false);
+} else {
+    sql_query(" insert into `{$card_table}`
+            (mb_id, pg_service, pg_id, pg_apikey, first_ordernumber, card_mask_number, card_billkey, od_card_name, od_tno, od_id, od_test, ci_time)
+        values
+            ('".sql_escape_string($member['mb_id'])."',
+             'tosspayments',
+             '".sql_escape_string($pg_id)."',
+             '',
+             '".sql_escape_string($order_number)."',
+             '".sql_escape_string($card_number)."',
+             '".sql_escape_string($stored_billing_key)."',
+             '".sql_escape_string($card_name)."',
+             '".sql_escape_string($tno)."',
+             0,
+             '{$od_test}',
+             '".G5_TIME_YMDHIS."') ", false);
+    $ci_id = sql_insert_id();
+}
+
 if ($ci_id) {
     willow_payment_set_default($member['mb_id'], (int) $ci_id);
+    willow_payment_set_card_expiry((int) $ci_id, $card_expiry);
 }
 
 goto_url(G5_URL.'/willow/payment.php?step=complete&ci_id='.(int) $ci_id.'&return='.urlencode($return_url));

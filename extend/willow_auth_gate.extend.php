@@ -12,6 +12,7 @@ $willow_allowed_paths = array(
     '/bbs/logout.php',
     '/bbs/search.php',
     '/willow/auth_login.php',
+    '/willow/account_check.php',
     '/willow/menu.php',
     '/willow/splash.php',
     '/offline.php',

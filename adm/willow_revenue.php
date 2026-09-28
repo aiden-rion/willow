@@ -8,6 +8,8 @@ willow_revenue_backfill_subscription_payments();
 
 $g5['title'] = '수익 대시보드';
 $summary = willow_revenue_summary();
+$author_share_rate = willow_revenue_author_share_rate();
+$platform_share_rate = 100 - $author_share_rate;
 $author_rows = array_slice(willow_revenue_author_balance_rows(), 0, 10);
 $payment_table = willow_subscription_payment_table();
 $recent_payments = array();
@@ -34,6 +36,11 @@ require_once './admin.head.php';
 .willow_admin_nav{display:flex;gap:6px;margin:0 0 14px}
 .willow_admin_nav a{padding:8px 12px;border:1px solid #ddd;background:#fff}
 .willow_admin_nav a.on{border-color:#333;background:#333;color:#fff}
+.willow_revenue_setting{padding:18px;margin:0 0 18px;border:1px solid #ddd;background:#fff}
+.willow_revenue_setting h2{margin:0 0 12px;font-size:16px}
+.willow_revenue_setting .row{display:flex;align-items:center;gap:8px}
+.willow_revenue_setting input[type=number]{width:90px}
+.willow_revenue_setting p{margin:10px 0 0;color:#666}
 @media (max-width:1100px){.willow_dash_cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 
@@ -43,10 +50,24 @@ require_once './admin.head.php';
     <a href="./willow_settlement.php">정산관리</a>
 </div>
 
+<section class="willow_revenue_setting">
+    <h2>구독료 배분율 설정</h2>
+    <form method="post" action="./willow_revenue_update.php">
+        <input type="hidden" name="token" value="<?php echo get_admin_token(); ?>">
+        <div class="row">
+            <label for="author_share_rate">작가 배분율</label>
+            <input type="number" name="author_share_rate" id="author_share_rate" value="<?php echo (int) $author_share_rate; ?>" min="0" max="100" class="frm_input">
+            <span>%</span>
+            <input type="submit" value="저장" class="btn_submit btn">
+        </div>
+        <p>현재 기준: 작가 <?php echo (int) $author_share_rate; ?>% / 플랫폼 <?php echo (int) $platform_share_rate; ?>%. 변경 후 신규 결제부터 적용됩니다.</p>
+    </form>
+</section>
+
 <div class="willow_dash_cards">
     <div class="willow_dash_card"><span>총 구독매출</span><strong><?php echo number_format($summary['total_amount']); ?>원</strong></div>
-    <div class="willow_dash_card"><span>작가 배분 70%</span><strong><?php echo number_format($summary['author_amount']); ?>P</strong></div>
-    <div class="willow_dash_card"><span>플랫폼 수익 30%</span><strong><?php echo number_format($summary['platform_amount']); ?>원</strong></div>
+    <div class="willow_dash_card"><span>작가 배분 <?php echo (int) $author_share_rate; ?>%</span><strong><?php echo number_format($summary['author_amount']); ?>P</strong></div>
+    <div class="willow_dash_card"><span>플랫폼 수익 <?php echo (int) $platform_share_rate; ?>%</span><strong><?php echo number_format($summary['platform_amount']); ?>원</strong></div>
     <div class="willow_dash_card"><span>활성 구독</span><strong><?php echo number_format($summary['active_subscriptions']); ?>건</strong></div>
     <div class="willow_dash_card"><span>정산 요청</span><strong><?php echo number_format($summary['pending_settlement_amount']); ?>P</strong></div>
     <div class="willow_dash_card"><span>정산 완료</span><strong><?php echo number_format($summary['settled_amount']); ?>P</strong></div>

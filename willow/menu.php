@@ -64,6 +64,10 @@ $member_avatar = $is_logged_in ? willow_member_avatar($member) : $menu_img_url.'
             <span>결제수단 등록/변경</span>
         </a>
         <?php if ($is_author) { ?>
+        <a href="<?php echo G5_URL; ?>/willow/my_subscribers.php">
+            <img src="<?php echo $menu_img_url; ?>/ico_menu_bell.png" alt="">
+            <span>나의 구독자</span>
+        </a>
         <a href="<?php echo G5_URL; ?>/willow/point_settlement.php">
             <img src="<?php echo $menu_img_url; ?>/ico_menu_document.png" alt="">
             <span>수익 정산요청</span>

@@ -7,6 +7,7 @@ auth_check_menu($auth, $sub_menu, 'r');
 willow_revenue_backfill_subscription_payments();
 
 $g5['title'] = '정산관리';
+$author_share_rate = willow_revenue_author_share_rate();
 $settlement_table = willow_settlement_request_table();
 $author_rows = willow_revenue_author_balance_rows();
 $requests = array();
@@ -39,7 +40,7 @@ require_once './admin.head.php';
 </style>
 
 <div class="local_desc01 local_desc">
-    <p>구독료 결제 시 작가에게 70%가 포인트로 적립됩니다. 정산완료 처리 시 작가 포인트에서 정산금만큼 차감됩니다.</p>
+    <p>구독료 결제 시 작가에게 <?php echo (int) $author_share_rate; ?>%가 포인트로 적립됩니다. 정산완료 처리 시 작가 포인트에서 정산금만큼 차감됩니다.</p>
 </div>
 <div class="btn_fixed_top">
     <a href="./willow_revenue.php" class="btn btn_02">수익 대시보드</a>

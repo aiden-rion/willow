@@ -24,6 +24,12 @@ if (!empty($member['mb_3'])) {
 }
 
 $willow_bank_options = array('국민은행', '신한은행', '우리은행', '하나은행', '농협은행', '기업은행', '카카오뱅크', '토스뱅크');
+$willow_account_bank = $member['mb_8'];
+$willow_account_holder = $member['mb_9'];
+if (!in_array($willow_account_bank, $willow_bank_options, true) && in_array($member['mb_9'], $willow_bank_options, true)) {
+    $willow_account_bank = $member['mb_9'];
+    $willow_account_holder = $member['mb_8'];
+}
 ?>
 
 <script>document.body.classList.add('willow_profile_edit_body');</script>
@@ -41,7 +47,9 @@ $willow_bank_options = array('국민은행', '신한은행', '우리은행', '�
         <input type="hidden" name="agree2" value="<?php echo $agree2 ?>">
         <input type="hidden" name="cert_type" value="<?php echo $member['mb_certify']; ?>">
         <input type="hidden" name="cert_no" value="">
+        <input type="hidden" name="token" value="<?php echo $token; ?>">
         <input type="hidden" name="willow_profile_edit" value="1">
+        <input type="hidden" name="willow_account_verified" value="0">
         <input type="hidden" name="mb_id" value="<?php echo get_text($member['mb_id']); ?>">
         <input type="hidden" name="mb_name" value="<?php echo get_text($member['mb_name']); ?>">
         <input type="hidden" name="old_email" value="<?php echo get_text($member['mb_email']); ?>">
@@ -122,23 +130,24 @@ $willow_bank_options = array('국민은행', '신한은행', '우리은행', '�
         <section class="willow_profile_section">
             <h2>정산 계좌정보</h2>
             <div class="willow_profile_field">
-                <label for="reg_mb_8">예금주</label>
-                <input type="text" name="mb_8" value="<?php echo get_text($member['mb_8'] ? $member['mb_8'] : $member['mb_name']); ?>" id="reg_mb_8">
-                <p>* 예금통장의 예금주명을 정확하게 입력해주세요</p>
-            </div>
-            <div class="willow_profile_field">
-                <label for="reg_mb_9">은행명</label>
-                <select name="mb_9" id="reg_mb_9">
+                <label for="reg_mb_8">은행명</label>
+                <select name="mb_8" id="reg_mb_8" data-account-bank>
                     <?php foreach ($willow_bank_options as $bank) { ?>
-                    <option value="<?php echo get_text($bank); ?>" <?php echo get_selected($member['mb_9'], $bank); ?>><?php echo get_text($bank); ?></option>
+                    <option value="<?php echo get_text($bank); ?>" <?php echo get_selected($willow_account_bank, $bank); ?>><?php echo get_text($bank); ?></option>
                     <?php } ?>
                 </select>
             </div>
             <div class="willow_profile_field">
-                <label for="reg_mb_10">계좌번호</label>
-                <input type="text" name="mb_10" value="<?php echo get_text($member['mb_10']); ?>" id="reg_mb_10" inputmode="numeric">
+                <label for="reg_mb_9">예금주</label>
+                <input type="text" name="mb_9" value="<?php echo get_text($willow_account_holder ? $willow_account_holder : $member['mb_name']); ?>" id="reg_mb_9" data-account-holder>
+                <p>* 예금통장의 예금주명을 정확하게 입력해주세요</p>
             </div>
-            <button type="button" class="willow_profile_sub_button">계좌정보 변경</button>
+            <div class="willow_profile_field">
+                <label for="reg_mb_10">계좌번호</label>
+                <input type="text" name="mb_10" value="<?php echo get_text($member['mb_10']); ?>" id="reg_mb_10" inputmode="numeric" data-account-number>
+            </div>
+            <button type="button" class="willow_profile_sub_button" data-account-check>계좌 인증</button>
+            <p class="willow_account_check_message" data-account-message>* 계좌정보 변경 시 계좌 인증이 필요합니다.</p>
         </section>
 
         <section class="willow_profile_section">
@@ -173,6 +182,12 @@ document.querySelectorAll('[data-willow-safe-back]').forEach(function(link) {
 
 function fregisterform_submit(f)
 {
+    var accountRequired = f.querySelector('[data-account-check]');
+    if (accountRequired && typeof window.willowAccountNeedsVerification === 'function' && window.willowAccountNeedsVerification()) {
+        alert('계좌 인증을 먼저 완료해주세요.');
+        return false;
+    }
+
     if (f.mb_nick && f.mb_nick.defaultValue != f.mb_nick.value) {
         var nickMsg = reg_mb_nick_check();
         if (nickMsg) {
@@ -212,5 +227,86 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!this.files || !this.files[0]) return;
         preview.src = URL.createObjectURL(this.files[0]);
     });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('fregisterform');
+    if (!form) return;
+
+    var bank = form.querySelector('[data-account-bank]');
+    var holder = form.querySelector('[data-account-holder]');
+    var number = form.querySelector('[data-account-number]');
+    var button = form.querySelector('[data-account-check]');
+    var message = form.querySelector('[data-account-message]');
+    var verified = form.querySelector('input[name="willow_account_verified"]');
+    if (!bank || !holder || !number || !button || !message || !verified) return;
+
+    var initial = {
+        bank: bank.value,
+        holder: holder.value,
+        number: number.value.replace(/[^0-9]/g, '')
+    };
+
+    function accountChanged() {
+        return bank.value !== initial.bank || holder.value !== initial.holder || number.value.replace(/[^0-9]/g, '') !== initial.number;
+    }
+
+    window.willowAccountNeedsVerification = function() {
+        return accountChanged() && verified.value !== '1';
+    };
+
+    function setMessage(text, state) {
+        message.textContent = text;
+        message.classList.remove('is_success', 'is_error');
+        if (state) message.classList.add(state);
+    }
+
+    function markDirty() {
+        verified.value = accountChanged() ? '0' : '1';
+        setMessage(accountChanged() ? '* 계좌정보 변경 시 계좌 인증이 필요합니다.' : '* 기존 인증 계좌정보입니다.', '');
+    }
+
+    [bank, holder, number].forEach(function(input) {
+        input.addEventListener('input', markDirty);
+        input.addEventListener('change', markDirty);
+    });
+
+    button.addEventListener('click', function() {
+        var params = new FormData();
+        params.append('token', form.querySelector('input[name="token"]').value);
+        params.append('mb_8', bank.value);
+        params.append('mb_9', holder.value);
+        params.append('mb_10', number.value);
+
+        button.disabled = true;
+        setMessage('계좌정보를 확인하고 있습니다.', '');
+
+        fetch('<?php echo G5_URL; ?>/willow/account_check.php', {
+            method: 'POST',
+            body: params,
+            credentials: 'same-origin',
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        }).then(function(response) {
+            return response.json();
+        }).then(function(data) {
+            if (data && data.success) {
+                verified.value = '1';
+                initial.bank = bank.value;
+                initial.holder = holder.value;
+                initial.number = number.value.replace(/[^0-9]/g, '');
+                setMessage(data.message || '계좌 인증이 완료되었습니다.', 'is_success');
+            } else {
+                verified.value = '0';
+                setMessage((data && data.message) ? data.message : '계좌 인증에 실패했습니다.', 'is_error');
+            }
+        }).catch(function() {
+            verified.value = '0';
+            setMessage('계좌 인증 중 오류가 발생했습니다.', 'is_error');
+        }).finally(function() {
+            button.disabled = false;
+        });
+    });
+
+    markDirty();
 });
 </script>

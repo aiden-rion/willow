@@ -22,6 +22,11 @@ function willow_settlement_request_table()
     return willow_revenue_prefix_table('willow_settlement_request');
 }
 
+function willow_revenue_config_table()
+{
+    return willow_revenue_prefix_table('willow_revenue_config');
+}
+
 function willow_revenue_install()
 {
     static $installed = false;
@@ -44,6 +49,10 @@ function willow_revenue_install()
         wsp_platform_amount int unsigned not null default 0,
         wsp_rate tinyint unsigned not null default 70,
         wsp_status varchar(20) not null default 'paid',
+        wsp_pg_service varchar(30) not null default '',
+        wsp_order_id varchar(80) not null default '',
+        wsp_transaction_key varchar(150) not null default '',
+        ci_id int unsigned not null default 0,
         wsp_memo varchar(255) not null default '',
         wsp_paid_datetime datetime not null,
         wsp_datetime datetime not null,
@@ -53,6 +62,26 @@ function willow_revenue_install()
         key subscriber_status (subscriber_mb_id, wsp_status),
         key paid_datetime (wsp_paid_datetime)
     ) ", false);
+
+    $columns = array();
+    $result = sql_query(" show columns from `{$payment_table}` ", false);
+    if ($result) {
+        while ($row = sql_fetch_array($result)) {
+            $columns[$row['Field']] = true;
+        }
+    }
+    if (empty($columns['wsp_pg_service'])) {
+        sql_query(" alter table `{$payment_table}` add wsp_pg_service varchar(30) not null default '' after wsp_status ", false);
+    }
+    if (empty($columns['wsp_order_id'])) {
+        sql_query(" alter table `{$payment_table}` add wsp_order_id varchar(80) not null default '' after wsp_pg_service ", false);
+    }
+    if (empty($columns['wsp_transaction_key'])) {
+        sql_query(" alter table `{$payment_table}` add wsp_transaction_key varchar(150) not null default '' after wsp_order_id ", false);
+    }
+    if (empty($columns['ci_id'])) {
+        sql_query(" alter table `{$payment_table}` add ci_id int unsigned not null default 0 after wsp_transaction_key ", false);
+    }
 
     $settlement_table = willow_settlement_request_table();
     sql_query(" create table if not exists `{$settlement_table}` (
@@ -74,7 +103,55 @@ function willow_revenue_install()
         key wsr_datetime (wsr_datetime)
     ) ", false);
 
+    $config_table = willow_revenue_config_table();
+    sql_query(" create table if not exists `{$config_table}` (
+        config_key varchar(50) not null default '',
+        config_value varchar(255) not null default '',
+        updated_mb_id varchar(20) not null default '',
+        updated_datetime datetime not null,
+        primary key (config_key)
+    ) ", false);
+
     $installed = true;
+}
+
+function willow_revenue_config($key, $default = '')
+{
+    willow_revenue_install();
+
+    $table = willow_revenue_config_table();
+    $row = sql_fetch(" select config_value from `{$table}` where config_key = '".sql_escape_string($key)."' ", false);
+
+    return isset($row['config_value']) && $row['config_value'] !== '' ? $row['config_value'] : $default;
+}
+
+function willow_revenue_set_config($key, $value, $mb_id = '')
+{
+    willow_revenue_install();
+
+    $table = willow_revenue_config_table();
+    sql_query(" insert into `{$table}`
+            set config_key = '".sql_escape_string($key)."',
+                config_value = '".sql_escape_string($value)."',
+                updated_mb_id = '".sql_escape_string($mb_id)."',
+                updated_datetime = '".G5_TIME_YMDHIS."'
+        on duplicate key update
+                config_value = values(config_value),
+                updated_mb_id = values(updated_mb_id),
+                updated_datetime = values(updated_datetime) ", false);
+}
+
+function willow_revenue_author_share_rate()
+{
+    $rate = (int) willow_revenue_config('author_share_rate', 70);
+    if ($rate < 0) {
+        $rate = 0;
+    }
+    if ($rate > 100) {
+        $rate = 100;
+    }
+
+    return $rate;
 }
 
 function willow_revenue_author_price($author_mb_id)
@@ -85,7 +162,7 @@ function willow_revenue_author_price($author_mb_id)
     return $price > 0 ? $price : 8800;
 }
 
-function willow_revenue_record_subscription_payment($subscription, $amount = 0, $paid_datetime = '')
+function willow_revenue_record_subscription_payment($subscription, $amount = 0, $paid_datetime = '', $pg_data = array())
 {
     if (empty($subscription['ws_id']) || empty($subscription['author_mb_id']) || empty($subscription['subscriber_mb_id'])) {
         return 0;
@@ -98,7 +175,8 @@ function willow_revenue_record_subscription_payment($subscription, $amount = 0, 
     $paid_datetime = $paid_datetime ? $paid_datetime : (!empty($subscription['ws_datetime']) ? $subscription['ws_datetime'] : G5_TIME_YMDHIS);
     $month = substr($paid_datetime, 0, 7);
     $amount = $amount > 0 ? (int) $amount : willow_revenue_author_price($subscription['author_mb_id']);
-    $author_amount = (int) floor($amount * 0.7);
+    $rate = willow_revenue_author_share_rate();
+    $author_amount = (int) floor($amount * ($rate / 100));
     $platform_amount = max(0, $amount - $author_amount);
 
     $existing = sql_fetch(" select * from `{$payment_table}` where ws_id = '{$ws_id}' and wsp_month = '".sql_escape_string($month)."' ", false);
@@ -114,9 +192,13 @@ function willow_revenue_record_subscription_payment($subscription, $amount = 0, 
             wsp_amount = '{$amount}',
             wsp_author_amount = '{$author_amount}',
             wsp_platform_amount = '{$platform_amount}',
-            wsp_rate = '70',
+            wsp_rate = '{$rate}',
             wsp_status = 'paid',
-            wsp_memo = '구독료 결제',
+            wsp_pg_service = '".sql_escape_string(isset($pg_data['pg_service']) ? $pg_data['pg_service'] : '')."',
+            wsp_order_id = '".sql_escape_string(isset($pg_data['order_id']) ? $pg_data['order_id'] : '')."',
+            wsp_transaction_key = '".sql_escape_string(isset($pg_data['transaction_key']) ? $pg_data['transaction_key'] : '')."',
+            ci_id = '".(int) (isset($pg_data['ci_id']) ? $pg_data['ci_id'] : 0)."',
+            wsp_memo = '".sql_escape_string(isset($pg_data['memo']) && $pg_data['memo'] !== '' ? $pg_data['memo'] : '구독료 결제')."',
             wsp_paid_datetime = '".sql_escape_string($paid_datetime)."',
             wsp_datetime = '".G5_TIME_YMDHIS."' ", false);
 
@@ -125,7 +207,7 @@ function willow_revenue_record_subscription_payment($subscription, $amount = 0, 
         insert_point(
             $subscription['author_mb_id'],
             $author_amount,
-            'WILLOW 구독료 작가 배분 70%',
+            'WILLOW 구독료 작가 배분 '.$rate.'%',
             'willow_sub_pay',
             (string) $wsp_id,
             'author_share'

@@ -4,6 +4,7 @@ include_once(G5_CAPTCHA_PATH.'/captcha.lib.php');
 include_once(G5_LIB_PATH.'/register.lib.php');
 include_once(G5_LIB_PATH.'/mailer.lib.php');
 include_once(G5_LIB_PATH.'/thumbnail.lib.php');
+include_once(G5_PATH.'/willow/account_check.lib.php');
 
 // 리퍼러 체크
 referer_check();
@@ -62,7 +63,7 @@ $mb_6           = isset($_POST['mb_6'])             ? trim($_POST['mb_6'])      
 $mb_7           = isset($_POST['mb_7'])             ? trim($_POST['mb_7'])           : "";
 $mb_8           = isset($_POST['mb_8'])             ? trim($_POST['mb_8'])           : "";
 $mb_9           = isset($_POST['mb_9'])             ? trim($_POST['mb_9'])           : "";
-$mb_10          = isset($_POST['mb_10'])            ? trim($_POST['mb_10'])          : "";
+$mb_10          = isset($_POST['mb_10'])            ? preg_replace('/[^0-9]/', '', trim($_POST['mb_10'])) : "";
 $mb_name        = clean_xss_tags($mb_name, 1, 1);
 $mb_email       = get_email_address($mb_email);
 $mb_homepage    = clean_xss_tags($mb_homepage, 1, 1);
@@ -112,6 +113,20 @@ if ($w == 'u') {
         $mb_8 = $member['mb_8'];
         $mb_9 = $member['mb_9'];
         $mb_10 = $member['mb_10'];
+    } else {
+        $willow_account_changed = trim((string) $mb_8) !== trim((string) $member['mb_8'])
+            || trim((string) $mb_9) !== trim((string) $member['mb_9'])
+            || preg_replace('/[^0-9]/', '', (string) $mb_10) !== preg_replace('/[^0-9]/', '', (string) $member['mb_10']);
+
+        if ($willow_account_changed) {
+            if (!willow_account_is_verified($mb_id, $mb_8, $mb_9, $mb_10)) {
+                $willow_account_result = willow_account_verify($mb_8, $mb_9, $mb_10, $mb_id);
+                if (empty($willow_account_result['success'])) {
+                    alert(isset($willow_account_result['message']) ? $willow_account_result['message'] : '계좌 인증에 실패했습니다.');
+                }
+                willow_account_set_verified($mb_id, $mb_8, $mb_9, $mb_10);
+            }
+        }
     }
 }
 
@@ -567,10 +582,15 @@ if (isset($_FILES['mb_icon']) && is_uploaded_file($_FILES['mb_icon']['tmp_name']
 if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['cf_member_img_height'] ){
     $mb_tmp_dir = G5_DATA_PATH.'/member_image/';
     $mb_dir = $mb_tmp_dir.substr($mb_id,0,2);
+    $willow_member_img_upload_limit = 5 * 1024 * 1024;
     $willow_clear_member_avatar_url = false;
     if( !is_dir($mb_tmp_dir) ){
         @mkdir($mb_tmp_dir, G5_DIR_PERMISSION);
         @chmod($mb_tmp_dir, G5_DIR_PERMISSION);
+    }
+    if( !is_dir($mb_dir) ){
+        @mkdir($mb_dir, G5_DIR_PERMISSION);
+        @chmod($mb_dir, G5_DIR_PERMISSION);
     }
 
     // 아이콘 삭제
@@ -586,10 +606,7 @@ if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['
         $msg = $msg ? $msg."\\r\\n" : '';
 
         if (preg_match($image_regex, $_FILES['mb_img']['name'])) {
-            // 아이콘 용량이 설정값보다 이하만 업로드 가능
-            if ($_FILES['mb_img']['size'] <= $config['cf_member_img_size']) {
-                @mkdir($mb_dir, G5_DIR_PERMISSION);
-                @chmod($mb_dir, G5_DIR_PERMISSION);
+            if ($_FILES['mb_img']['size'] <= $willow_member_img_upload_limit) {
                 $dest_path = $mb_dir.'/'.$mb_icon_img;
                 move_uploaded_file($_FILES['mb_img']['tmp_name'], $dest_path);
                 chmod($dest_path, G5_FILE_PERMISSION);
@@ -597,18 +614,16 @@ if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['
                     $size = @getimagesize($dest_path);
                     if (!($size[2] === 1 || $size[2] === 2 || $size[2] === 3)) { // gif jpg png 파일이 아니면 올라간 이미지를 삭제한다.
                         @unlink($dest_path);
-                    } else if ($size[0] > $config['cf_member_img_width'] || $size[1] > $config['cf_member_img_height']) {
+                    } else {
                         $thumb = null;
                         if($size[2] === 2 || $size[2] === 3) {
-                            //jpg 또는 png 파일 적용
                             $thumb = thumbnail($mb_icon_img, $mb_dir, $mb_dir, $config['cf_member_img_width'], $config['cf_member_img_height'], true, true);
                             if($thumb) {
                                 @unlink($dest_path);
                                 rename($mb_dir.'/'.$thumb, $dest_path);
                             }
                         }
-                        if( !$thumb ){
-                            // 아이콘의 폭 또는 높이가 설정값 보다 크다면 이미 업로드 된 아이콘 삭제
+                        if(!$thumb && ($size[0] > $config['cf_member_img_width'] || $size[1] > $config['cf_member_img_height'])) {
                             @unlink($dest_path);
                         }
                     }
@@ -618,7 +633,7 @@ if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['
                     //=================================================================\
                 }
             } else {
-                $msg .= '회원이미지을 '.number_format($config['cf_member_img_size']).'바이트 이하로 업로드 해주십시오.';
+                $msg .= '회원이미지를 5MB 이하로 업로드 해주십시오.';
             }
 
         } else {
