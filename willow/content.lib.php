@@ -2158,7 +2158,7 @@ function willow_get_author_board_posts($mb_id, $author_name = '', $access_group 
     return $posts;
 }
 
-function willow_get_author_topic_posts($mb_id, $author_name = '', $exclude_wp_id = 0, $limit = 3)
+function willow_get_author_topic_posts($mb_id, $author_name = '', $exclude_wp_id = 0, $limit = 3, $access_group = 'all')
 {
     if (!function_exists('willow_topic_tables')) {
         include_once(G5_PATH.'/willow/topic.lib.php');
@@ -2181,6 +2181,12 @@ function willow_get_author_topic_posts($mb_id, $author_name = '', $exclude_wp_id
 
     if ($exclude_wp_id) {
         $where .= " and wp_id <> '{$exclude_wp_id}' ";
+    }
+
+    if ($access_group === 'free') {
+        $where .= " and (wp_access = '' or wp_access = 'free' or wp_access = 'public') ";
+    } else if ($access_group === 'paid') {
+        $where .= " and wp_access in ('subscriber', 'paid') ";
     }
 
     $posts = array();
@@ -2220,16 +2226,29 @@ function willow_get_author_other_posts($mb_id, $author_name, $exclude_type, $exc
     );
 }
 
-function willow_get_author_posts($mb_id, $author_name = '', $offset = 0, $limit = 10)
+function willow_get_author_posts($mb_id, $author_name = '', $offset = 0, $limit = 10, $access_filter = 'all')
 {
     $offset = max(0, (int) $offset);
     $limit = max(1, (int) $limit);
     $fetch_limit = $offset + $limit + 1;
-    $items = array_merge(
-        willow_get_author_board_posts($mb_id, $author_name, 'free', 0, $fetch_limit),
-        willow_get_author_board_posts($mb_id, $author_name, 'paid', 0, $fetch_limit),
-        willow_get_author_topic_posts($mb_id, $author_name, 0, $fetch_limit)
-    );
+    $access_filter = in_array($access_filter, array('free', 'paid'), true) ? $access_filter : 'all';
+    $items = array();
+
+    if ($access_filter === 'all' || $access_filter === 'free') {
+        $items = array_merge(
+            $items,
+            willow_get_author_board_posts($mb_id, $author_name, 'free', 0, $fetch_limit),
+            willow_get_author_topic_posts($mb_id, $author_name, 0, $fetch_limit, 'free')
+        );
+    }
+
+    if ($access_filter === 'all' || $access_filter === 'paid') {
+        $items = array_merge(
+            $items,
+            willow_get_author_board_posts($mb_id, $author_name, 'paid', 0, $fetch_limit),
+            willow_get_author_topic_posts($mb_id, $author_name, 0, $fetch_limit, 'paid')
+        );
+    }
 
     usort($items, function($a, $b) {
         $a_time = !empty($a['sort_datetime']) ? $a['sort_datetime'] : str_replace('.', '-', $a['date']);

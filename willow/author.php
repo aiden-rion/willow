@@ -116,10 +116,19 @@ $subscriber_avatars = willow_author_recent_subscriber_avatars($author_id, 3);
 $is_subscribed = willow_author_is_subscribed($author_id);
 $is_self = !empty($member['mb_id']) && $member['mb_id'] === $author_id;
 $page_limit = 6;
+$access_filter = isset($_GET['access']) ? preg_replace('/[^a-z]/', '', $_GET['access']) : 'all';
+if (!in_array($access_filter, array('all', 'free', 'paid'), true)) {
+    $access_filter = 'all';
+}
+$access_tabs = array(
+    'all' => '전체',
+    'free' => '무료',
+    'paid' => '유료',
+);
 
 if (isset($_GET['ajax']) && $_GET['ajax'] === 'posts') {
     $offset = isset($_GET['offset']) ? (int) $_GET['offset'] : 0;
-    $posts = willow_get_author_posts($author_id, $author_name, $offset, $page_limit + 1);
+    $posts = willow_get_author_posts($author_id, $author_name, $offset, $page_limit + 1, $access_filter);
     $has_more = count($posts) > $page_limit;
     $posts = array_slice($posts, 0, $page_limit);
 
@@ -138,7 +147,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] === 'posts') {
     exit;
 }
 
-$posts = willow_get_author_posts($author_id, $author_name, 0, $page_limit + 1);
+$posts = willow_get_author_posts($author_id, $author_name, 0, $page_limit + 1, $access_filter);
 $has_more = count($posts) > $page_limit;
 $posts = array_slice($posts, 0, $page_limit);
 $subscribe_href = G5_URL.'/willow/subscribe.php?author='.urlencode($author_id);
@@ -184,11 +193,16 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
     </section>
 
     <section class="willow_author_posts" aria-label="작가 최근 글">
+        <nav class="willow_author_access_tabs" aria-label="글 유형 선택">
+            <?php foreach ($access_tabs as $tab_key => $tab_label) { ?>
+            <a class="<?php echo $access_filter === $tab_key ? 'is_active' : ''; ?>" href="<?php echo G5_URL; ?>/willow/author.php?author=<?php echo urlencode($author_id); ?>&amp;access=<?php echo $tab_key; ?>" <?php echo $access_filter === $tab_key ? 'aria-current="page"' : ''; ?>><?php echo $tab_label; ?></a>
+            <?php } ?>
+        </nav>
         <div class="willow_author_posts_list">
             <?php foreach ($posts as $post) { echo willow_author_post_card($post); } ?>
         </div>
         <?php if (!$posts) { ?>
-        <p class="willow_author_posts_empty">아직 등록된 글이 없습니다.</p>
+        <p class="willow_author_posts_empty">아직 <?php echo get_text($access_tabs[$access_filter]); ?> 글이 없습니다.</p>
         <?php } ?>
         <button type="button" class="willow_author_posts_more" data-offset="<?php echo count($posts); ?>" <?php echo $has_more ? '' : 'hidden'; ?>>더보기</button>
     </section>
@@ -228,7 +242,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             loading = true;
             more.textContent = '불러오는 중';
             var offset = parseInt(more.getAttribute('data-offset') || '0', 10);
-            fetch('<?php echo G5_URL; ?>/willow/author.php?ajax=posts&author=<?php echo urlencode($author_id); ?>&offset=' + offset, {
+            fetch('<?php echo G5_URL; ?>/willow/author.php?ajax=posts&author=<?php echo urlencode($author_id); ?>&access=<?php echo urlencode($access_filter); ?>&offset=' + offset, {
                 credentials: 'same-origin'
             }).then(function(response) {
                 return response.json();

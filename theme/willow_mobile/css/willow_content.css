@@ -3599,6 +3599,33 @@ html.willow_pull_active body {
   padding: 0 8px;
 }
 
+.willow_author_access_tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0 0 14px;
+  padding: 4px;
+  border-radius: 999px;
+  background: #f2f2f2;
+}
+
+.willow_author_access_tabs a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border-radius: 999px;
+  color: #777777;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.willow_author_access_tabs a.is_active {
+  background: #111111;
+  color: #ffffff;
+}
+
 .willow_author_posts_list {
   display: grid;
   gap: 12px;
