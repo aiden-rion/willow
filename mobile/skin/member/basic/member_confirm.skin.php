@@ -57,6 +57,7 @@ var willowConfirmSent = document.getElementById('auth_sent');
 var willowConfirmCode = document.getElementById('confirm_auth_code');
 var willowConfirmTimerEl = document.getElementById('confirm_auth_timer');
 var willowConfirmSendBtn = document.getElementById('btn_auth_send');
+var willowConfirmSendUrl = '<?php echo G5_BBS_URL; ?>/member_confirm_phone_send.php';
 
 function willowUpdateConfirmTimer()
 {
@@ -65,10 +66,10 @@ function willowUpdateConfirmTimer()
     willowConfirmTimerEl.textContent = minute + ':' + second;
 }
 
-function willowStartConfirmTimer()
+function willowStartConfirmTimer(seconds)
 {
     clearInterval(willowConfirmTimer);
-    willowConfirmRemain = 180;
+    willowConfirmRemain = parseInt(seconds || 240, 10);
     willowUpdateConfirmTimer();
     willowConfirmTimer = setInterval(function () {
         willowConfirmRemain -= 1;
@@ -87,11 +88,33 @@ willowConfirmSendBtn.addEventListener('click', function () {
         alert('회원정보에 등록된 휴대폰번호가 없습니다.');
         return;
     }
-    willowConfirmSent.value = '1';
-    willowConfirmCode.disabled = false;
-    willowConfirmCode.focus();
-    willowStartConfirmTimer();
-    alert('인증번호가 발송되었습니다.');
+
+    willowConfirmSendBtn.disabled = true;
+    willowConfirmSendBtn.textContent = '발송 중';
+
+    fetch(willowConfirmSendUrl, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+        body: 'send=1'
+    }).then(function (response) {
+        return response.json();
+    }).then(function (data) {
+        if (!data || !data.success) {
+            alert(data && data.message ? data.message : '인증번호 발송에 실패했습니다.');
+            return;
+        }
+        willowConfirmSent.value = '1';
+        willowConfirmCode.disabled = false;
+        willowConfirmCode.focus();
+        willowStartConfirmTimer(data.expires_in || 240);
+        alert(data.message || '인증번호가 발송되었습니다.');
+    }).catch(function () {
+        alert('인증번호 발송 중 오류가 발생했습니다.');
+    }).finally(function () {
+        willowConfirmSendBtn.disabled = false;
+        willowConfirmSendBtn.textContent = '인증번호 받기';
+    });
 });
 
 function fmemberconfirm_submit(f)

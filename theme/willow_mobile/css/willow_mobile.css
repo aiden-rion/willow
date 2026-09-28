@@ -508,6 +508,15 @@ body.willow_menu_body .willow_menu_support a i {
   font-size: 16px;
 }
 
+body.willow_menu_body .willow_menu_copyright {
+  flex: 0 0 auto;
+  margin: 12px 0 0;
+  color: #b3b3b3;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
+}
+
 .willow_list_page {
   padding: 16px 16px 98px;
 }

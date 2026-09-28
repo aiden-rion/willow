@@ -87,6 +87,8 @@ $member_avatar = $is_logged_in ? willow_member_avatar($member) : $menu_img_url.'
             <a href="<?php echo $logout_href; ?>"><span><?php echo $is_logged_in ? '로그아웃' : '로그인'; ?></span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
         </div>
     </section>
+
+    <p class="willow_menu_copyright">Copyright &copy; WILLOW. All rights reserved.</p>
 </main>
 
 <?php

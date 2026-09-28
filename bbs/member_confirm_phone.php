@@ -24,6 +24,11 @@ if (!$member_hp) {
     alert('회원정보에 등록된 휴대폰번호가 없습니다. 고객센터로 문의해 주세요.');
 }
 
+include_once(G5_PATH.'/willow/sms.lib.php');
+if (!willow_auth_verify_code($member_hp, $auth_code)) {
+    alert('인증번호가 올바르지 않거나 인증 시간이 만료되었습니다. 다시 인증해주세요.', G5_BBS_URL.'/member_confirm.php?url='.urlencode(isset($_POST['url']) ? $_POST['url'] : 'register_form.php'));
+}
+
 $url = isset($_POST['url']) ? trim($_POST['url']) : 'register_form.php';
 while (1) {
     $tmp = preg_replace('/&#[^;]+;/', '', $url);
