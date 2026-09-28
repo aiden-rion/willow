@@ -14,7 +14,7 @@ function willow_author_page_row($author_id, $author_name = '')
     if ($author_id !== '') {
         $row = get_member($author_id);
         if (!empty($row['mb_id'])) {
-            if ((int) $row['mb_level'] >= 3 || $row['mb_2'] === 'author') {
+            if (willow_author_is_escapee($row)) {
                 return $row;
             }
 
@@ -23,9 +23,7 @@ function willow_author_page_row($author_id, $author_name = '')
                 $name_sql = sql_escape_string($fallback_name);
                 $author_row = sql_fetch(" select *
                     from {$g5['member_table']}
-                    where mb_leave_date = ''
-                        and mb_level < 10
-                        and (mb_level >= 3 or mb_2 = 'author')
+                    where ".willow_author_where()."
                         and (mb_nick = '{$name_sql}' or mb_name = '{$name_sql}')
                     order by mb_level desc, mb_datetime desc
                     limit 1 ", false);
@@ -34,7 +32,7 @@ function willow_author_page_row($author_id, $author_name = '')
                 }
             }
 
-            return $row;
+            return array();
         }
     }
 
@@ -42,9 +40,7 @@ function willow_author_page_row($author_id, $author_name = '')
         $name_sql = sql_escape_string($author_name);
         return sql_fetch(" select *
             from {$g5['member_table']}
-            where mb_leave_date = ''
-                and mb_level < 10
-                and (mb_level >= 3 or mb_2 = 'author')
+            where ".willow_author_where()."
                 and (mb_nick = '{$name_sql}' or mb_name = '{$name_sql}')
             order by mb_level desc, mb_datetime desc
             limit 1 ", false);

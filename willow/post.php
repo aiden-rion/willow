@@ -36,6 +36,7 @@ $article_author_subscriber_count = 0;
 $article_author_href = '';
 $article_author_subscribed = false;
 $article_author_member = array();
+$article_author_is_certified = false;
 $article_category = '';
 $article_tags = array();
 
@@ -105,7 +106,8 @@ function willow_article_author_subscriber_count($mb_id)
 function willow_article_author_meta($mb_id, $author_name)
 {
     $member_row = $mb_id !== '' ? get_member($mb_id) : array();
-    $profile = !empty($member_row['mb_profile']) ? get_text($member_row['mb_profile']) : '윌로우에서 새로운 이야기를 전하는 작가입니다.';
+    $default_profile = willow_author_is_escapee($member_row) ? '윌로우에서 새로운 이야기를 전하는 작가입니다.' : '윌로우에서 새로운 이야기를 전하는 회원입니다.';
+    $profile = !empty($member_row['mb_profile']) ? get_text($member_row['mb_profile']) : $default_profile;
 
     return array(
         'profile' => $profile,
@@ -179,13 +181,11 @@ if ($wp_id) {
 
 if ($article_author_id !== '') {
     $article_author_member = get_member($article_author_id);
-    if (!empty($article_author_member['mb_id']) && !((int) $article_author_member['mb_level'] >= 3 || $article_author_member['mb_2'] === 'author') && $article_author !== '') {
+    if (!empty($article_author_member['mb_id']) && !willow_author_is_escapee($article_author_member) && $article_author !== '') {
         $article_author_sql = sql_escape_string($article_author);
         $resolved_author = sql_fetch(" select *
             from {$g5['member_table']}
-            where mb_leave_date = ''
-                and mb_level < 10
-                and (mb_level >= 3 or mb_2 = 'author')
+            where ".willow_author_where()."
                 and (mb_nick = '{$article_author_sql}' or mb_name = '{$article_author_sql}')
             order by mb_level desc, mb_datetime desc
             limit 1 ", false);
@@ -247,6 +247,12 @@ if ($article_author_id !== '') {
 }
 
 $article_author_name_html = !empty($article_author_member['mb_id']) ? willow_author_name_html($article_author_member) : get_text($article_author);
+$article_author_is_certified = !empty($article_author_member['mb_id']) && willow_author_is_escapee($article_author_member);
+$article_author_label = $article_author_is_certified ? '작가 ' : '';
+if (!$article_author_is_certified) {
+    $article_requires_subscription = false;
+    $article_locked = false;
+}
 
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.G5_CSS_VER.'">', 10);
@@ -276,13 +282,13 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
         <?php if (!empty($topic_post) && (!empty($topic_post['wp_topic_mode']) && $topic_post['wp_topic_mode'] === 'today')) { ?><p class="willow_article_kicker">오늘의 주제<?php if (!empty($topic['wt_subject'])) { ?> · <?php echo get_text($topic['wt_subject']); ?><?php } ?></p><?php } ?>
 
-        <a class="willow_article_byline" href="<?php echo $article_author_href ? $article_author_href : $article_subscribe_href; ?>">
+        <<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?> class="willow_article_byline" <?php if ($article_author_href && $article_author_is_certified) { ?>href="<?php echo $article_author_href; ?>"<?php } ?>>
             <div>
-                <strong>작가 <?php echo $article_author_name_html; ?></strong>
+                <strong><?php echo $article_author_label; ?><?php echo $article_author_name_html; ?></strong>
                 <span><?php echo get_text($article_date); ?> | 조회 <?php echo number_format($article_view_count); ?></span>
             </div>
             <img src="<?php echo $article_author_avatar; ?>" alt="">
-        </a>
+        </<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?>>
 
         <?php if ($willow_target_id) { ?>
         <div class="willow_article_like">
@@ -327,7 +333,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             <?php } ?>
         </div>
 
-        <?php if ($article_locked) { ?>
+        <?php if ($article_locked && $article_author_is_certified) { ?>
         <section class="willow_paid_gate" aria-label="구독 안내">
             <h2>구독자 전용 글 입니다.</h2>
             <p>구독 후 이용이 가능합니다.</p>
@@ -336,7 +342,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <?php } else { ?>
 
         <section class="willow_author_intro">
-            <h2>작가소개</h2>
+            <h2><?php echo $article_author_is_certified ? '작가소개' : '작성자 소개'; ?></h2>
             <p><?php echo nl2br($article_author_profile); ?></p>
         </section>
 
@@ -344,14 +350,16 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             <div class="willow_author_box">
                 <img src="<?php echo $article_author_avatar; ?>" alt="">
                 <div>
-                    <strong>작가 <?php echo $article_author_name_html; ?></strong>
-                    <span>작성 글 : <?php echo number_format($article_author_post_count); ?>개, 구독자 : <?php echo number_format($article_author_subscriber_count); ?>명</span>
+                    <strong><?php echo $article_author_label; ?><?php echo $article_author_name_html; ?></strong>
+                    <span>작성 글 : <?php echo number_format($article_author_post_count); ?>개<?php if ($article_author_is_certified) { ?>, 구독자 : <?php echo number_format($article_author_subscriber_count); ?>명<?php } ?></span>
                 </div>
             </div>
+            <?php if ($article_author_is_certified) { ?>
             <?php if ($article_author_subscribed) { ?>
             <span class="willow_subscribe_button is_subscribed" aria-disabled="true">구독중</span>
             <?php } else { ?>
             <a class="willow_subscribe_button" href="<?php echo $article_subscribe_href; ?>">작가 구독하기</a>
+            <?php } ?>
             <?php } ?>
         </section>
 
@@ -384,7 +392,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <?php } ?>
 
         <section class="willow_other_posts">
-            <h2>작가의 다른 글<?php echo $is_general ? '들' : ''; ?></h2>
+            <h2><?php echo $article_author_is_certified ? '작가의 다른 글' : '작성자의 다른 글'; ?><?php echo $is_general ? '들' : ''; ?></h2>
             <?php if (!empty($willow_author_other_posts['items'])) { ?>
             <?php foreach ($willow_author_other_posts['items'] as $item) { ?>
             <?php
@@ -394,7 +402,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                 <a class="willow_other_post_link" href="<?php echo !empty($item['href']) ? $item['href'] : '#'; ?>">
                     <div>
                         <p><?php echo get_text(willow_content_excerpt($item['excerpt'], 46)); ?></p>
-                        <span><?php echo !empty($item['author']) ? '작가 '.$item['author'] : '작가 '.$article_author; ?> · <?php echo $item['date']; ?> · <?php echo $item_access_label; ?></span>
+                        <span><?php echo ($article_author_is_certified ? '작가 ' : '').(!empty($item['author']) ? $item['author'] : $article_author); ?> · <?php echo $item['date']; ?> · <?php echo $item_access_label; ?></span>
                     </div>
                     <?php if (!empty($item['image'])) { ?>
                     <img src="<?php echo $item['image']; ?>" alt="">

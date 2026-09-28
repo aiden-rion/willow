@@ -4,13 +4,8 @@ if (!defined('_GNUBOARD_')) exit;
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_register_profile.css?ver='.G5_CSS_VER.'">', 20);
 include_once(G5_PATH.'/willow/content.lib.php');
 
-$willow_is_author = ((int) $member['mb_level'] >= 3) || (!empty($member['mb_2']) && $member['mb_2'] === 'author');
-$willow_profile_img = G5_IMG_URL.'/no_profile.gif';
-if ($w == 'u' && file_exists($mb_img_path)) {
-    $willow_profile_img = $mb_img_url;
-} else if (!empty($member['mb_6'])) {
-    $willow_profile_img = $member['mb_6'];
-}
+$willow_is_author = willow_author_is_escapee($member);
+$willow_profile_img = willow_member_avatar($member);
 
 $willow_categories = willow_get_categories(true);
 $willow_selected_categories = array();

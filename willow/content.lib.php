@@ -434,6 +434,11 @@ function willow_author_is_escapee($member_row)
     return !empty($member_row['mb_7']) && $member_row['mb_7'] === 'nk_migrant';
 }
 
+function willow_author_where()
+{
+    return " mb_leave_date = '' and mb_level < 10 and mb_7 = 'nk_migrant' ";
+}
+
 function willow_author_cert_badge($member_row)
 {
     if (!willow_author_is_escapee($member_row)) {
@@ -756,7 +761,7 @@ function willow_member_avatar($member_row)
     if (!empty($member_row['mb_id'])) {
         $image_path = G5_DATA_PATH.'/member_image/'.substr($member_row['mb_id'], 0, 2).'/'.get_mb_icon_name($member_row['mb_id']).'.gif';
         if (file_exists($image_path)) {
-            $filetime = (defined('G5_USE_MEMBER_IMAGE_FILETIME') && G5_USE_MEMBER_IMAGE_FILETIME) ? '?'.filemtime($image_path) : '';
+            $filetime = '?'.filemtime($image_path);
             return G5_DATA_URL.'/member_image/'.substr($member_row['mb_id'], 0, 2).'/'.get_mb_icon_name($member_row['mb_id']).'.gif'.$filetime;
         }
     }
@@ -918,7 +923,7 @@ function willow_get_authors($keyword = '', $limit = 3)
 {
     global $g5;
 
-    $where = " where mb_leave_date = '' and mb_level < 10 and (mb_level >= 3 or mb_2 = 'author') ";
+    $where = " where ".willow_author_where();
     if ($keyword !== '') {
         $keyword = sql_escape_string($keyword);
         $where .= " and (mb_nick like '%{$keyword}%' or mb_name like '%{$keyword}%' or mb_profile like '%{$keyword}%' or mb_3 like '%{$keyword}%') ";
@@ -2008,9 +2013,7 @@ function willow_get_recommended_authors($limit = 0, $days = 0)
     $authors = array();
     $result = sql_query(" select *
         from {$g5['member_table']}
-        where mb_leave_date = ''
-            and mb_level < 10
-            and (mb_level >= 3 or mb_2 = 'author')
+        where ".willow_author_where()."
         order by mb_level desc, mb_datetime desc
         limit {$candidate_limit} ", false);
 

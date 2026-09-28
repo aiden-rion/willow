@@ -5,6 +5,7 @@ include_once(G5_LIB_PATH.'/register.lib.php');
 include_once(G5_LIB_PATH.'/mailer.lib.php');
 include_once(G5_LIB_PATH.'/thumbnail.lib.php');
 include_once(G5_PATH.'/willow/account_check.lib.php');
+include_once(G5_PATH.'/willow/content.lib.php');
 
 // 리퍼러 체크
 referer_check();
@@ -81,7 +82,7 @@ $mb_thirdparty_agree    = isset($_POST['mb_thirdparty_agree'])  ? trim($_POST['m
 run_event('register_form_update_before', $mb_id, $w);
 
 if ($w == 'u') {
-    $willow_update_is_author = ((int) $member['mb_level'] >= 3) || (!empty($member['mb_2']) && $member['mb_2'] === 'author');
+    $willow_update_is_author = willow_author_is_escapee($member);
 
     $mb_name = $member['mb_name'];
     $mb_email = $member['mb_email'];

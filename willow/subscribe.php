@@ -40,7 +40,7 @@ function willow_subscribe_author_row($mb_id = '')
 {
     global $g5;
 
-    $where = " where mb_leave_date = '' and mb_level < 10 and (mb_level >= 3 or mb_2 = 'author') ";
+    $where = " where ".willow_author_where();
     if ($mb_id !== '') {
         $where .= " and mb_id = '".sql_escape_string($mb_id)."' ";
     }
