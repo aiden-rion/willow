@@ -181,19 +181,6 @@ if ($wp_id) {
 
 if ($article_author_id !== '') {
     $article_author_member = get_member($article_author_id);
-    if (!empty($article_author_member['mb_id']) && !willow_author_is_escapee($article_author_member) && $article_author !== '') {
-        $article_author_sql = sql_escape_string($article_author);
-        $resolved_author = sql_fetch(" select *
-            from {$g5['member_table']}
-            where ".willow_author_where()."
-                and (mb_nick = '{$article_author_sql}' or mb_name = '{$article_author_sql}')
-            order by mb_level desc, mb_datetime desc
-            limit 1 ", false);
-        if (!empty($resolved_author['mb_id'])) {
-            $article_author_id = $resolved_author['mb_id'];
-            $article_author_avatar = willow_member_avatar($resolved_author);
-        }
-    }
 }
 
 if ($willow_target_id) {

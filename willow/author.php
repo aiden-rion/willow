@@ -18,20 +18,6 @@ function willow_author_page_row($author_id, $author_name = '')
                 return $row;
             }
 
-            $fallback_name = $row['mb_nick'] ? $row['mb_nick'] : $row['mb_name'];
-            if ($fallback_name !== '') {
-                $name_sql = sql_escape_string($fallback_name);
-                $author_row = sql_fetch(" select *
-                    from {$g5['member_table']}
-                    where ".willow_author_where()."
-                        and (mb_nick = '{$name_sql}' or mb_name = '{$name_sql}')
-                    order by mb_level desc, mb_datetime desc
-                    limit 1 ", false);
-                if (!empty($author_row['mb_id'])) {
-                    return $author_row;
-                }
-            }
-
             return array();
         }
     }
