@@ -195,7 +195,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
     <section class="willow_author_posts" aria-label="작가 최근 글">
         <nav class="willow_author_access_tabs" aria-label="글 유형 선택">
             <?php foreach ($access_tabs as $tab_key => $tab_label) { ?>
-            <a class="<?php echo $access_filter === $tab_key ? 'is_active' : ''; ?>" href="<?php echo G5_URL; ?>/willow/author.php?author=<?php echo urlencode($author_id); ?>&amp;access=<?php echo $tab_key; ?>" <?php echo $access_filter === $tab_key ? 'aria-current="page"' : ''; ?>><?php echo $tab_label; ?></a>
+            <a class="<?php echo $access_filter === $tab_key ? 'is_active' : ''; ?>" href="<?php echo G5_URL; ?>/willow/author.php?author=<?php echo urlencode($author_id); ?>&amp;access=<?php echo $tab_key; ?>" data-author-access-tab <?php echo $access_filter === $tab_key ? 'aria-current="page"' : ''; ?>><?php echo $tab_label; ?></a>
             <?php } ?>
         </nav>
         <div class="willow_author_posts_list">
@@ -223,6 +223,14 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         }
 
         document.addEventListener('click', function(event) {
+            var accessTab = event.target.closest('[data-author-access-tab]');
+            if (accessTab) {
+                event.preventDefault();
+                if (accessTab.getAttribute('aria-current') === 'page') return;
+                window.location.replace(accessTab.href);
+                return;
+            }
+
             var moreButton = event.target.closest('.willow_more_button');
             document.querySelectorAll('.willow_more.is_open').forEach(function(menu) {
                 if (!moreButton || !menu.contains(moreButton)) menu.classList.remove('is_open');
