@@ -1439,7 +1439,7 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 
 .willow_notification_setting_page {
   min-height: calc(100vh - 58px);
-  padding: 48px 24px 118px;
+  padding: 48px 24px 104px;
   background: #f4f6f8;
   color: #151515;
 }
@@ -1672,10 +1672,11 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
 .willow_notification_setting_submit {
   position: fixed;
   right: 0;
-  bottom: 78px;
+  bottom: 0;
   left: 0;
   z-index: 35;
-  height: 58px;
+  height: calc(58px + env(safe-area-inset-bottom));
+  padding: 0 0 env(safe-area-inset-bottom);
   border: 0;
   background: #151515;
   color: #ffffff;

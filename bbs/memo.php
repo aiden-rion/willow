@@ -43,9 +43,6 @@ foreach ($definitions as $setting_key => $definition) {
         $enabled_setting_count++;
     }
 }
-$setting_total_count = count($definitions);
-$is_all_enabled = $setting_total_count > 0 && $enabled_setting_count === $setting_total_count;
-$is_all_disabled = $enabled_setting_count === 0;
 $has_notification_consent = $enabled_setting_count > 0;
 $token = get_token();
 $is_saved = isset($_GET['saved']) && $_GET['saved'] === '1';
@@ -56,7 +53,7 @@ include_once('./_head.php');
 
 <script>document.body.classList.add('willow_inner_title_body','willow_notification_setting_body');var willowAutoTitle=document.querySelector('.willow_page_title');if(willowAutoTitle)willowAutoTitle.style.display='none';var willowShellHeader=document.querySelector('#hd.willow_shell_header');if(willowShellHeader)willowShellHeader.style.display='none';</script>
 <header class="willow_member_confirm_header">
-    <a href="javascript:history.back();" aria-label="뒤로가기"></a>
+    <a href="<?php echo G5_URL; ?>/willow/menu.php" aria-label="뒤로가기"></a>
     <h1>알림센터</h1>
 </header>
 
@@ -66,18 +63,6 @@ include_once('./_head.php');
 
         <section class="willow_notification_setting_intro">
             <h2>알림설정변경</h2>
-
-            <div class="willow_notification_segment" role="group" aria-label="알림 전체 수신 설정">
-                <label class="<?php echo $is_all_enabled ? 'is_active' : ''; ?>">
-                    <input type="radio" name="willow_receive_mode" value="all_on" <?php echo $is_all_enabled ? 'checked' : ''; ?>>
-                    <span>모두수신</span>
-                </label>
-                <label class="<?php echo $is_all_disabled ? 'is_active' : ''; ?>">
-                    <input type="radio" name="willow_receive_mode" value="all_off" <?php echo $is_all_disabled ? 'checked' : ''; ?>>
-                    <span>수신안함</span>
-                </label>
-            </div>
-
             <p>* 구독 중인 작가의 신규 게시물 및 활동 소식을 받아볼 수 있습니다.</p>
             <p>* 서비스 운영 및 결제 관련 중요 안내는 수신 설정과 관계없이 발송될 수 있습니다.</p>
         </section>
@@ -134,53 +119,20 @@ include_once('./_head.php');
     var form = document.querySelector('.willow_notification_setting_form');
     if (!form) return;
 
-    var segmentLabels = form.querySelectorAll('.willow_notification_segment label');
-    var allOn = form.querySelector('input[name="willow_receive_mode"][value="all_on"]');
-    var allOff = form.querySelector('input[name="willow_receive_mode"][value="all_off"]');
     var itemChecks = form.querySelectorAll('.willow_notification_setting_item input[type="checkbox"]');
     var consentCheck = form.querySelector('input[name="willow_notification_consent"]');
 
-    function refreshSegment() {
-        for (var i = 0; i < segmentLabels.length; i++) {
-            var input = segmentLabels[i].querySelector('input');
-            segmentLabels[i].classList.toggle('is_active', !!input.checked);
-        }
-    }
-
     function syncSegmentWithItems() {
-        if (!allOn || !allOff) return;
         var checkedCount = 0;
         for (var i = 0; i < itemChecks.length; i++) {
             if (itemChecks[i].checked) checkedCount++;
         }
-        allOn.checked = itemChecks.length > 0 && checkedCount === itemChecks.length;
-        allOff.checked = checkedCount === 0;
         if (consentCheck) consentCheck.checked = checkedCount > 0;
-        refreshSegment();
-    }
-
-    if (allOn && allOff) {
-        allOn.addEventListener('change', function () {
-            if (!allOn.checked) return;
-            for (var i = 0; i < itemChecks.length; i++) itemChecks[i].checked = true;
-            if (consentCheck) consentCheck.checked = true;
-            refreshSegment();
-        });
-        allOff.addEventListener('change', function () {
-            if (!allOff.checked) return;
-            allOn.checked = false;
-            for (var i = 0; i < itemChecks.length; i++) itemChecks[i].checked = false;
-            if (consentCheck) consentCheck.checked = false;
-            refreshSegment();
-        });
     }
 
     if (consentCheck) {
         consentCheck.addEventListener('change', function () {
             for (var i = 0; i < itemChecks.length; i++) itemChecks[i].checked = consentCheck.checked;
-            if (allOn) allOn.checked = consentCheck.checked;
-            if (allOff) allOff.checked = !consentCheck.checked;
-            refreshSegment();
         });
     }
 

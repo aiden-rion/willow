@@ -5193,6 +5193,141 @@ body.willow_report_modal_open {
   line-height: 1.5;
 }
 
+.willow_policy_page {
+  min-height: 100vh;
+  padding: 0 24px 42px;
+  background: #f4f6f8;
+  color: #151515;
+}
+
+.willow_policy_header {
+  margin-right: -24px;
+  margin-left: -24px;
+  background: #ffffff;
+}
+
+.willow_policy_hero {
+  padding: 42px 0 26px;
+}
+
+.willow_policy_hero h2 {
+  margin: 0;
+  color: #111111;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: 0;
+}
+
+.willow_policy_hero p {
+  margin: 16px 0 0;
+  color: #6f6f6f;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.58;
+}
+
+.willow_policy_section {
+  margin-top: 14px;
+  padding: 22px 18px;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.willow_policy_section h3 {
+  margin: 0 0 14px;
+  color: #151515;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.willow_policy_section p,
+.willow_policy_section li,
+.willow_policy_section dd {
+  color: #555555;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.willow_policy_section p {
+  margin: 0;
+}
+
+.willow_policy_section ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.willow_policy_section li {
+  position: relative;
+  padding-left: 13px;
+}
+
+.willow_policy_section li::before {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #151515;
+  content: "";
+}
+
+.willow_policy_section dl {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+}
+
+.willow_policy_section dl div {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.willow_policy_section dt {
+  color: #151515;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.willow_policy_section dd {
+  margin: 0;
+}
+
+.willow_policy_actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.willow_policy_actions a {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #151515;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.willow_policy_actions a + a {
+  background: #ffffff;
+  color: #151515;
+}
+
 @supports (-webkit-touch-callout: none) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
   select,

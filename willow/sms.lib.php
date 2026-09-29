@@ -241,6 +241,22 @@ function willow_auth_issue_code($phone, $force = false)
         return array('success' => false, 'message' => '휴대폰번호 형식이 올바르지 않습니다.');
     }
 
+    if (willow_auth_is_test_phone($phone)) {
+        $code = willow_auth_test_code();
+        set_session('ss_willow_sms_phone', $phone);
+        set_session('ss_willow_sms_code_hash', password_hash($code, PASSWORD_DEFAULT));
+        set_session('ss_willow_sms_expires_at', G5_SERVER_TIME + 86400);
+        set_session('ss_willow_sms_sent_at', G5_SERVER_TIME);
+        set_session('ss_willow_sms_dry_run', 1);
+
+        return array(
+            'success' => true,
+            'dry_run' => true,
+            'dev_code' => '',
+            'message' => '테스트 계정 인증번호를 사용합니다.',
+        );
+    }
+
     $sent_at = (int) get_session('ss_willow_sms_sent_at');
     $sent_phone = get_session('ss_willow_sms_phone');
     if (!$force && $sent_phone === $phone && $sent_at > 0 && (G5_SERVER_TIME - $sent_at) < 50) {
@@ -281,6 +297,13 @@ function willow_auth_verify_code($phone, $code)
 {
     $phone = preg_replace('/[^0-9]/', '', $phone);
     $code = preg_replace('/[^0-9]/', '', $code);
+
+    if (willow_auth_is_test_phone($phone) && $code === willow_auth_test_code()) {
+        set_session('ss_willow_phone_verified', $phone);
+        set_session('ss_willow_phone_verified_at', G5_SERVER_TIME);
+        return true;
+    }
+
     $sent_phone = get_session('ss_willow_sms_phone');
     $hash = get_session('ss_willow_sms_code_hash');
     $expires_at = (int) get_session('ss_willow_sms_expires_at');
@@ -301,6 +324,16 @@ function willow_auth_verify_code($phone, $code)
     set_session('ss_willow_phone_verified_at', G5_SERVER_TIME);
 
     return true;
+}
+
+function willow_auth_is_test_phone($phone)
+{
+    return preg_replace('/[^0-9]/', '', $phone) === '01000000000';
+}
+
+function willow_auth_test_code()
+{
+    return '000000';
 }
 
 function willow_auth_is_phone_verified($phone)

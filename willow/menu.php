@@ -8,7 +8,7 @@ include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.G5_CSS_VER.'">', 10);
 
 $is_logged_in = !empty($member['mb_id']);
-$is_author = $is_logged_in && (((int) $member['mb_level'] >= 3) || (!empty($member['mb_2']) && $member['mb_2'] === 'author'));
+$is_author = $is_logged_in && willow_author_is_escapee($member);
 $member_name = $is_logged_in ? ($member['mb_nick'] ? $member['mb_nick'] : $member['mb_name']) : '방문자';
 $member_level = $is_author ? '작가회원' : '일반회원';
 $member_suffix = $is_author ? ' 작가님,' : ' 회원님,';
@@ -84,6 +84,7 @@ $member_avatar = $is_logged_in ? willow_member_avatar($member) : $menu_img_url.'
         <div>
             <a href="<?php echo get_pretty_url('notice'); ?>"><span>공지사항</span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
             <a href="<?php echo G5_BBS_URL; ?>/faq.php"><span>FAQ</span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+            <a href="<?php echo G5_URL; ?>/willow/refund_policy.php"><span>환불정책</span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
             <a href="<?php echo $logout_href; ?>"><span><?php echo $is_logged_in ? '로그아웃' : '로그인'; ?></span><i class="fa fa-angle-right" aria-hidden="true"></i></a>
         </div>
     </section>
