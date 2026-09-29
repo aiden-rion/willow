@@ -14,6 +14,7 @@ $willow_allowed_paths = array(
     '/willow/auth_login.php',
     '/willow/account_check.php',
     '/willow/menu.php',
+    '/willow/refund_policy.php',
     '/willow/splash.php',
     '/offline.php',
 );
