@@ -6,6 +6,10 @@ include_once('./notification.lib.php');
 include_once('./payment.lib.php');
 include_once('./revenue.lib.php');
 
+if ($is_guest) {
+    goto_url(G5_BBS_URL.'/login.php?url='.urlencode(G5_URL.'/willow/subscribe.php'.(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '')));
+}
+
 function willow_subscribe_price($value)
 {
     $price = (int) preg_replace('/[^0-9]/', '', (string) $value);
