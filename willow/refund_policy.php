@@ -62,7 +62,6 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
     </section>
 
     <nav class="willow_policy_actions">
-        <a href="<?php echo G5_URL; ?>/willow/subscribe.php">구독 상품 보기</a>
         <a href="<?php echo G5_URL; ?>">메인으로</a>
     </nav>
 </main>

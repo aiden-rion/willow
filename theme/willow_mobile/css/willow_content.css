@@ -5305,7 +5305,6 @@ body.willow_report_modal_open {
 
 .willow_policy_actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 20px;
 }
@@ -5321,11 +5320,6 @@ body.willow_report_modal_open {
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
-}
-
-.willow_policy_actions a + a {
-  background: #ffffff;
-  color: #151515;
 }
 
 @supports (-webkit-touch-callout: none) {
