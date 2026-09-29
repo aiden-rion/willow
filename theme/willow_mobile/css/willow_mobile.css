@@ -508,13 +508,31 @@ body.willow_menu_body .willow_menu_support a i {
   font-size: 16px;
 }
 
-body.willow_menu_body .willow_menu_copyright {
+body.willow_menu_body .willow_menu_company {
   flex: 0 0 auto;
   margin: 12px 0 0;
   color: #b3b3b3;
   font-size: 11px;
   line-height: 16px;
   text-align: center;
+}
+
+body.willow_menu_body .willow_menu_company strong,
+body.willow_menu_body .willow_menu_company span,
+body.willow_menu_body .willow_menu_company em {
+  display: block;
+  font-style: normal;
+  font-weight: 500;
+}
+
+body.willow_menu_body .willow_menu_company strong {
+  color: #888888;
+  font-weight: 700;
+}
+
+body.willow_menu_body .willow_menu_company i {
+  color: #d0d0d0;
+  font-style: normal;
 }
 
 .willow_list_page {
