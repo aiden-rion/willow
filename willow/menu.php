@@ -9,6 +9,8 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.
 
 $is_logged_in = !empty($member['mb_id']);
 $is_author = $is_logged_in && willow_author_is_escapee($member);
+$is_registered_author = $is_logged_in && ($is_author || $member['mb_2'] === 'author' || (int) $member['mb_level'] >= 3 || in_array($member['mb_7'], array('nk_migrant', 'general_author'), true));
+$show_author_register = $is_logged_in && !$is_registered_author;
 $member_name = $is_logged_in ? ($member['mb_nick'] ? $member['mb_nick'] : $member['mb_name']) : '방문자';
 $member_level = $is_author ? '작가회원' : '일반회원';
 $member_suffix = $is_author ? ' 작가님,' : ' 회원님,';
@@ -63,6 +65,12 @@ $member_avatar = $is_logged_in ? willow_member_avatar($member) : $menu_img_url.'
             <img src="<?php echo $menu_img_url; ?>/ico_menu_bookmark.png" alt="">
             <span>결제수단 등록/변경</span>
         </a>
+        <?php if ($show_author_register) { ?>
+        <a href="<?php echo G5_URL; ?>/willow/author_register.php">
+            <img src="<?php echo $menu_img_url; ?>/ico_menu_document.png" alt="">
+            <span>작가등록하기 (탈북이주민)</span>
+        </a>
+        <?php } ?>
         <?php if ($is_author) { ?>
         <a href="<?php echo G5_URL; ?>/willow/my_subscribers.php">
             <img src="<?php echo $menu_img_url; ?>/ico_menu_bell.png" alt="">
