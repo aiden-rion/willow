@@ -118,10 +118,20 @@ $recommended_authors = willow_get_recommended_authors(); /* 추천 작가 */
         var feedMore = document.getElementById('willow_home_feed_more');
         var loadingText = document.querySelector('[data-feed-loading]');
         var endText = document.querySelector('[data-feed-end]');
+        var homeBanner = document.querySelector('.willow_home_main_banner');
 
         function setFeedState() {
             if (loadingText) loadingText.hidden = !feedLoading;
             if (endText) endText.hidden = !feedEnded;
+        }
+
+        function placeHomeBanner() {
+            if (!homeBanner) return;
+            var items = Array.prototype.slice.call(document.querySelectorAll('[data-feed-item]'));
+            var target = items[9];
+            if (!target || target.nextElementSibling === homeBanner) return;
+            target.insertAdjacentElement('afterend', homeBanner);
+            homeBanner.classList.add('is_in_feed');
         }
 
         function loadMoreFeed() {
@@ -149,6 +159,7 @@ $recommended_authors = willow_get_recommended_authors(); /* 추천 작가 */
                             feedSeen.push(key);
                         }
                     });
+                    placeHomeBanner();
                 }
                 feedOffset += parseInt(data.count || 0, 10);
                 feedEnded = !data.has_more || parseInt(data.count || 0, 10) < feedLimit;
@@ -159,6 +170,8 @@ $recommended_authors = willow_get_recommended_authors(); /* 추천 작가 */
                 setFeedState();
             });
         }
+
+        placeHomeBanner();
 
         if ('IntersectionObserver' in window && feedMore) {
             var sentinel = document.createElement('div');

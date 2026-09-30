@@ -1349,6 +1349,10 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
   margin-top: 18px;
 }
 
+.willow_home_main_banner.is_in_feed {
+  margin-top: 0;
+}
+
 .willow_writer_banner_track {
   display: flex;
   width: 100%;
