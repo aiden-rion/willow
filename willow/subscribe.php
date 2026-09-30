@@ -413,7 +413,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         </dl>
     </section>
 
-    <section class="willow_subscribe_card_box <?php echo $card ? '' : 'is_empty'; ?>">
+    <section class="willow_subscribe_card_box <?php echo $card ? (!$is_subscribed ? 'has_refund_agree' : '') : 'is_empty'; ?>">
         <?php if ($card) { ?>
         <?php $card_expiry = willow_payment_card_expiry($card['ci_id']); ?>
         <div class="willow_subscribe_card_headline">
@@ -435,7 +435,16 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
     </section>
 
     <?php if ($card && !$is_subscribed) { ?>
-    <form class="willow_subscribe_bottom" method="post" action="<?php echo G5_URL; ?>/willow/subscribe_update.php">
+    <section class="willow_subscribe_refund_agree">
+        <label>
+            <input type="checkbox" name="refund_agree" value="1" form="willow_subscribe_confirm_form" required>
+            <span aria-hidden="true"></span>
+            <em><strong>[필수]</strong> 환불정책 및 정기결제 안내에 동의합니다.</em>
+        </label>
+        <a href="<?php echo G5_URL; ?>/willow/refund_policy.php" target="_blank" rel="noopener">환불정책 보기</a>
+        <p>구독 상품은 결제일로부터 1개월 동안 제공되며, 매월 같은 결제일에 등록된 기본카드로 자동 결제됩니다.</p>
+    </section>
+    <form id="willow_subscribe_confirm_form" class="willow_subscribe_bottom" method="post" action="<?php echo G5_URL; ?>/willow/subscribe_update.php">
         <input type="hidden" name="author" value="<?php echo get_text($author_id); ?>">
         <button type="submit">구독 등록하기</button>
     </form>

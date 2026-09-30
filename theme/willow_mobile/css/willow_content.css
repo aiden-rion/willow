@@ -2546,6 +2546,10 @@ html.willow_pull_active body {
   background: #ffffff;
 }
 
+.willow_subscribe_card_box.has_refund_agree {
+  margin-bottom: 16px;
+}
+
 .willow_subscribe_card_headline {
   display: flex;
   align-items: center;
@@ -2622,6 +2626,91 @@ html.willow_pull_active body {
   color: #ffffff;
   font-size: 14px;
   font-weight: 700;
+}
+
+.willow_subscribe_refund_agree {
+  display: grid;
+  gap: 10px;
+  margin: 0 26px 104px;
+  padding: 16px;
+  border: 1px solid #e6e6e6;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.willow_subscribe_refund_agree label {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.willow_subscribe_refund_agree input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+}
+
+.willow_subscribe_refund_agree label span {
+  position: relative;
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #cfcfcf;
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.willow_subscribe_refund_agree input:checked + span {
+  border-color: #1a1a1a;
+  background: #1a1a1a;
+}
+
+.willow_subscribe_refund_agree input:checked + span::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  width: 5px;
+  height: 9px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.willow_subscribe_refund_agree em {
+  min-width: 0;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 20px;
+  word-break: keep-all;
+}
+
+.willow_subscribe_refund_agree em strong {
+  color: #ff4053;
+}
+
+.willow_subscribe_refund_agree a {
+  width: fit-content;
+  color: #4b87ff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 18px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.willow_subscribe_refund_agree p {
+  margin: 0;
+  color: #777777;
+  font-size: 12px;
+  line-height: 18px;
+  word-break: keep-all;
 }
 
 .willow_subscribe_complete {

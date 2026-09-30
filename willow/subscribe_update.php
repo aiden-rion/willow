@@ -16,6 +16,10 @@ if ($author_id === '') {
     alert('구독할 작가를 찾을 수 없습니다.', G5_URL);
 }
 
+if (empty($_POST['refund_agree']) || $_POST['refund_agree'] !== '1') {
+    alert('환불정책 및 정기결제 안내에 동의해주세요.', G5_URL.'/willow/subscribe.php?author='.urlencode($author_id).'&step=confirm');
+}
+
 $author = get_member($author_id);
 if (empty($author['mb_id']) || !((int) $author['mb_level'] >= 3 || $author['mb_2'] === 'author')) {
     alert('구독할 작가를 찾을 수 없습니다.', G5_URL);
