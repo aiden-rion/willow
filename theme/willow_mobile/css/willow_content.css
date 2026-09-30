@@ -4479,20 +4479,164 @@ html.willow_pull_active body {
   border-top: 1px solid #e6e6e6;
 }
 
-.willow_author_agree_sub .willow_author_agree {
+.willow_author_agree_row {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 12px;
+}
+
+.willow_author_agree_sub .willow_author_agree {
+  flex: 1 1 auto;
 }
 
 .willow_author_agree_sub .willow_author_agree span {
   flex: 1 1 auto;
 }
 
-.willow_author_agree_sub .willow_author_agree i {
+.willow_author_terms_open {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.willow_author_terms_open i {
   width: 16px;
   height: 16px;
   border-top: 1.5px solid #999999;
   border-right: 1.5px solid #999999;
   transform: rotate(45deg);
+}
+
+.willow_author_terms_open:active {
+  background: #f3f3f3;
+}
+
+.willow_author_terms_open[disabled] {
+  opacity: 0.35;
+}
+
+.willow_author_terms_modal[hidden] {
+  display: none;
+}
+
+.willow_author_terms_open,
+.willow_author_terms_backdrop,
+.willow_author_terms_panel button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.willow_author_terms_open,
+html.willow_author_terms_open body {
+  overflow: hidden;
+}
+
+.willow_author_terms_modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.willow_author_terms_backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.46);
+}
+
+.willow_author_terms_panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  max-height: min(78vh, 680px);
+  overflow: hidden;
+  border-radius: 22px 22px 0 0;
+  background: #ffffff;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.14);
+}
+
+.willow_author_terms_panel header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 22px 14px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.willow_author_terms_panel h2 {
+  margin: 0;
+  color: #111111;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.willow_author_terms_panel header button {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: #f5f5f5;
+}
+
+.willow_author_terms_panel header button::before,
+.willow_author_terms_panel header button::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #1a1a1a;
+  content: "";
+}
+
+.willow_author_terms_panel header button::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.willow_author_terms_panel header button::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.willow_author_terms_content {
+  min-height: 180px;
+  overflow-y: auto;
+  padding: 18px 22px calc(24px + env(safe-area-inset-bottom));
+  color: #333333;
+  font-size: 14px;
+  line-height: 1.65;
+  -webkit-overflow-scrolling: touch;
+  word-break: keep-all;
+}
+
+.willow_author_terms_content p {
+  margin: 0 0 12px;
+}
+
+.willow_author_terms_content table {
+  width: 100% !important;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.willow_author_terms_content th,
+.willow_author_terms_content td {
+  padding: 8px;
+  border: 1px solid #dddddd;
+  vertical-align: top;
 }
 
 .willow_author_apply_state {

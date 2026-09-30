@@ -25,6 +25,36 @@ if (!$categories) {
 $banks = array('국민은행', '신한은행', '하나은행', '우리은행', '농협은행', '카카오뱅크', '토스뱅크', '기업은행');
 $g5['title'] = $step === 'form' ? '작가등록' : '작가등록 안내';
 
+function willow_author_register_term($co_id, $fallback_title, $fallback_content)
+{
+    global $g5, $config;
+
+    $term = array(
+        'title' => $fallback_title,
+        'content' => nl2br(get_text((string) $fallback_content, 0)),
+    );
+
+    if (isset($g5['content_table']) && function_exists('get_content_db')) {
+        $content = get_content_db($co_id);
+        if (!empty($content['co_id'])) {
+            $content['co_tag_filter_use'] = 1;
+            $term['title'] = !empty($content['co_subject']) ? get_text($content['co_subject']) : $fallback_title;
+            $term['content'] = conv_content($content['co_content'], $content['co_html'], $content['co_tag_filter_use']);
+        }
+    }
+
+    if (trim(strip_tags($term['content'])) === '') {
+        $term['content'] = '<p>등록된 약관 내용이 없습니다. 관리자 약관 설정을 확인해주세요.</p>';
+    }
+
+    return $term;
+}
+
+$author_terms = array(
+    'privacy' => willow_author_register_term('privacy', '개인정보처리방침', isset($config['cf_privacy']) ? $config['cf_privacy'] : ''),
+    'service' => willow_author_register_term('provision', '서비스 이용약관', isset($config['cf_stipulation']) ? $config['cf_stipulation'] : ''),
+);
+
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.G5_CSS_VER.'">', 10);
 ?>
@@ -186,8 +216,14 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             <h2>정보 수집동의</h2>
             <label class="willow_author_agree willow_author_agree_all"><input type="checkbox" name="agree_terms" value="1" required data-agree-all><span>약관 전체동의</span></label>
             <div class="willow_author_agree_sub">
-                <label class="willow_author_agree"><input type="checkbox" name="agree_privacy" value="1" required data-agree-item><span><em>[필수]</em> 선택적 정보 제공 동의</span><i aria-hidden="true"></i></label>
-                <label class="willow_author_agree"><input type="checkbox" name="agree_service" value="1" required data-agree-item><span><em>[필수]</em> 선택적 동의 정보 수집·이용 동의</span><i aria-hidden="true"></i></label>
+                <div class="willow_author_agree_row">
+                    <label class="willow_author_agree"><input type="checkbox" name="agree_privacy" value="1" required data-agree-item><span><em>[필수]</em> 선택적 정보 제공 동의</span></label>
+                    <button type="button" class="willow_author_terms_open" data-author-terms="privacy" aria-label="선택적 정보 제공 동의 약관 보기"><i aria-hidden="true"></i></button>
+                </div>
+                <div class="willow_author_agree_row">
+                    <label class="willow_author_agree"><input type="checkbox" name="agree_service" value="1" required data-agree-item><span><em>[필수]</em> 선택적 동의 정보 수집·이용 동의</span></label>
+                    <button type="button" class="willow_author_terms_open" data-author-terms="service" aria-label="선택적 동의 정보 수집·이용 동의 약관 보기"><i aria-hidden="true"></i></button>
+                </div>
             </div>
         </section>
 
@@ -196,11 +232,22 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             <button type="submit">신청하기</button>
         </nav>
     </form>
+    <div class="willow_author_terms_modal" data-author-terms-modal hidden>
+        <button type="button" class="willow_author_terms_backdrop" data-author-terms-close aria-label="약관 닫기"></button>
+        <section class="willow_author_terms_panel" role="dialog" aria-modal="true" aria-labelledby="willow_author_terms_title">
+            <header>
+                <h2 id="willow_author_terms_title">약관</h2>
+                <button type="button" data-author-terms-close aria-label="닫기"></button>
+            </header>
+            <div class="willow_author_terms_content" id="willow_author_terms_content"></div>
+        </section>
+    </div>
     <?php } ?>
 </main>
 <?php if ($step === 'form') { ?>
 <script>
 (function() {
+    var authorTerms = <?php echo json_encode($author_terms, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
     document.querySelectorAll('.willow_author_file_field input[type="file"], .willow_author_photo_upload input[type="file"]').forEach(function(input) {
         input.addEventListener('change', function() {
             var filename = input.files && input.files[0] ? input.files[0].name : '';
@@ -254,6 +301,36 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             });
         });
     }
+
+    var termsModal = document.querySelector('[data-author-terms-modal]');
+    var termsTitle = document.getElementById('willow_author_terms_title');
+    var termsContent = document.getElementById('willow_author_terms_content');
+
+    function closeTerms() {
+        if (!termsModal) return;
+        termsModal.hidden = true;
+        document.documentElement.classList.remove('willow_author_terms_open');
+    }
+
+    document.querySelectorAll('[data-author-terms]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var key = button.getAttribute('data-author-terms');
+            var term = authorTerms[key];
+            if (!termsModal || !termsTitle || !termsContent || !term) return;
+            termsTitle.textContent = term.title || '약관';
+            termsContent.innerHTML = term.content || '<p>등록된 약관 내용이 없습니다.</p>';
+            termsModal.hidden = false;
+            document.documentElement.classList.add('willow_author_terms_open');
+        });
+    });
+
+    document.querySelectorAll('[data-author-terms-close]').forEach(function(button) {
+        button.addEventListener('click', closeTerms);
+    });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && termsModal && !termsModal.hidden) closeTerms();
+    });
 })();
 </script>
 <?php } ?>
