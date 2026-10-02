@@ -328,7 +328,28 @@ function willow_auth_verify_code($phone, $code)
 
 function willow_auth_is_test_phone($phone)
 {
-    return preg_replace('/[^0-9]/', '', $phone) === '01000000000';
+    global $g5;
+
+    $phone = preg_replace('/[^0-9]/', '', $phone);
+    if ($phone === '01000000000') {
+        return true;
+    }
+
+    if ($phone === '' || !isset($g5['member_table'])) {
+        return false;
+    }
+
+    $phone_sql = sql_escape_string($phone);
+    $row = sql_fetch(" select mb_id
+        from {$g5['member_table']}
+        where mb_leave_date = ''
+            and mb_intercept_date = ''
+            and mb_2 = 'author'
+            and mb_7 = 'nk_migrant'
+            and replace(replace(replace(mb_hp, '-', ''), ' ', ''), '.', '') = '{$phone_sql}'
+        limit 1 ", false);
+
+    return !empty($row['mb_id']);
 }
 
 function willow_auth_test_code()
