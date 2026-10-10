@@ -15,6 +15,7 @@ if ($is_member) {
 
 $login_url = G5_BBS_URL.'/login.php?url='.urlencode($return_url);
 $g5['title'] = 'WILLOW';
+$willow_splash_count = 8;
 
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.css?ver='.G5_CSS_VER.'">', 10);
@@ -22,7 +23,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
 
 <main class="willow_splash" data-login-url="<?php echo $login_url; ?>">
     <div class="willow_splash_track">
-        <?php for ($i = 1; $i <= 3; $i++) { ?>
+        <?php for ($i = 1; $i <= $willow_splash_count; $i++) { ?>
         <?php $image = sprintf('splash_%03d.png', $i); ?>
         <section class="willow_splash_slide" aria-label="WILLOW 소개 <?php echo $i; ?>">
             <img src="<?php echo G5_IMG_URL; ?>/<?php echo $image; ?>" alt="">
@@ -31,10 +32,10 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
     </div>
 
     <div class="willow_splash_controls" aria-label="스플래시 이동">
-        <div class="willow_splash_progress" aria-hidden="true">
-            <span class="is_active"></span>
-            <span></span>
-            <span></span>
+        <div class="willow_splash_progress" style="--willow-splash-count: <?php echo (int) $willow_splash_count; ?>;" aria-hidden="true">
+            <?php for ($i = 1; $i <= $willow_splash_count; $i++) { ?>
+            <span class="<?php echo $i === 1 ? 'is_active' : ''; ?>"></span>
+            <?php } ?>
         </div>
         <button type="button" class="willow_splash_skip">건너뛰기</button>
     </div>

@@ -26,7 +26,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/img/willow_splash3.png",
+      "src": "/img/splash_008.png",
       "sizes": "780x1689",
       "type": "image/png",
       "purpose": "any"
@@ -34,7 +34,7 @@
   ],
   "screenshots": [
     {
-      "src": "/img/willow_splash_1.png",
+      "src": "/img/splash_001.png",
       "sizes": "780x1689",
       "type": "image/png",
       "form_factor": "narrow",

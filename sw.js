@@ -1,4 +1,4 @@
-const WILLOW_CACHE = "willow-app-shell-v2";
+const WILLOW_CACHE = "willow-app-shell-v3";
 const WILLOW_APP_SHELL = [
   "/",
   "/offline.php",
@@ -9,7 +9,14 @@ const WILLOW_APP_SHELL = [
   "/img/ico_menu.png",
   "/img/willow_app_icon.svg",
   "/img/willow_app_icon.png",
-  "/img/willow_splash2.png"
+  "/img/splash_001.png",
+  "/img/splash_002.png",
+  "/img/splash_003.png",
+  "/img/splash_004.png",
+  "/img/splash_005.png",
+  "/img/splash_006.png",
+  "/img/splash_007.png",
+  "/img/splash_008.png"
 ];
 
 self.addEventListener("install", (event) => {

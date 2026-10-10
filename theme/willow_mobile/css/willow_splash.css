@@ -56,8 +56,8 @@ body {
 
 .willow_splash_progress {
   display: grid;
-  grid-template-columns: repeat(3, 44px);
-  width: 132px;
+  grid-template-columns: repeat(var(--willow-splash-count, 3), minmax(0, 1fr));
+  width: min(168px, calc(100% - 48px));
   height: 4px;
   overflow: hidden;
   border-radius: 999px;
