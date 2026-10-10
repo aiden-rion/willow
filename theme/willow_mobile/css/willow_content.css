@@ -201,6 +201,7 @@ body.willow_has_bottom_nav .willow_today_app {
 .willow_topic_date_button strong {
   display: inline-block;
   color: #111111;
+  font-size: 15px;
   font-weight: 700;
 }
 
