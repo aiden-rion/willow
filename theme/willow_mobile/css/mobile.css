@@ -38,6 +38,112 @@ ul {list-style:none}
 .mobile-only { display: block; }
 @media (min-width: 769px) { .mobile-only { display: none !important; }}
 
+.willow_desktop_brand {
+  display: none;
+}
+
+@media (min-width: 1180px) {
+  .willow_desktop_brand {
+    position: fixed;
+    top: 12vh;
+    right: calc(50% + 10px);
+    z-index: 0;
+    display: block;
+    width: 420px;
+    color: #241915;
+  }
+
+  .willow_desktop_brand img {
+    display: block;
+    width: 178px;
+    height: auto;
+    margin-bottom: 36px;
+  }
+
+  .willow_desktop_brand strong {
+    display: block;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: 0;
+  }
+
+  .willow_desktop_brand p {
+    margin: 28px 0 0;
+    color: #7b756f;
+    font-size: 18px;
+    line-height: 1.58;
+    word-break: keep-all;
+  }
+
+  .willow_desktop_search {
+    display: flex;
+    align-items: center;
+    width: 360px;
+    height: 58px;
+    margin-top: 34px;
+    overflow: hidden;
+    border: 1px solid rgba(36, 25, 21, 0.1);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 14px 34px rgba(34, 28, 22, 0.08);
+  }
+
+  .willow_desktop_search input[type="search"] {
+    min-width: 0;
+    flex: 1;
+    height: 100%;
+    padding: 0 0 0 24px;
+    border: 0;
+    background: transparent;
+    color: #241915;
+    font-size: 16px;
+    outline: none;
+  }
+
+  .willow_desktop_search input[type="search"]::placeholder {
+    color: #9b928b;
+  }
+
+  .willow_desktop_search button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 92px;
+    height: 44px;
+    margin-right: 7px;
+    border: 0;
+    border-radius: 999px;
+    background: #111111;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+
+  .willow_desktop_keywords {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 8px;
+    width: 370px;
+    margin-top: 18px;
+  }
+
+  .willow_desktop_keywords a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 15px;
+    border: 1px solid rgba(36, 25, 21, 0.1);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.58);
+    color: #4f4842;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+}
+
 .willow_today_write_prompt {
   position: fixed;
   inset: 0;
