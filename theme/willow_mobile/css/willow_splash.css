@@ -13,6 +13,7 @@ body {
   overflow: hidden;
   background: #f7edde;
   color: #6b786c;
+  cursor: grab;
   touch-action: pan-y;
 }
 
@@ -29,6 +30,7 @@ body {
 }
 
 .willow_splash_track.is_dragging {
+  cursor: grabbing;
   transition: none;
 }
 

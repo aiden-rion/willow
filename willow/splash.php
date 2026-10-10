@@ -76,6 +76,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
     var startX = 0;
     var currentX = 0;
     var dragging = false;
+    var pointerId = null;
 
     function setSplashSeen() {
         document.cookie = '<?php echo md5('willow_splash_seen'); ?>=' + btoa('1') + '; path=/; max-age=' + (86400 * 30);
@@ -104,23 +105,23 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
         skip.addEventListener('click', finishSplash);
     }
 
-    splash.addEventListener('touchstart', function(event) {
-        if (!event.touches || !event.touches[0]) return;
+    function beginDrag(x) {
         dragging = true;
-        startX = event.touches[0].clientX;
-        currentX = startX;
+        startX = x;
+        currentX = x;
         track.classList.add('is_dragging');
-    }, { passive: true });
+    }
 
-    splash.addEventListener('touchmove', function(event) {
-        if (!dragging || !event.touches || !event.touches[0]) return;
-        currentX = event.touches[0].clientX;
-    }, { passive: true });
+    function moveDrag(x) {
+        if (!dragging) return;
+        currentX = x;
+    }
 
-    splash.addEventListener('touchend', function() {
+    function endDrag() {
         if (!dragging) return;
         var deltaX = currentX - startX;
         dragging = false;
+        pointerId = null;
         track.classList.remove('is_dragging');
         if (Math.abs(deltaX) > 44) {
             if (deltaX < 0 && current === slides.length - 1) {
@@ -129,7 +130,50 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
             }
             updateSlide(current + (deltaX < 0 ? 1 : -1));
         }
+    }
+
+    splash.addEventListener('touchstart', function(event) {
+        if (!event.touches || !event.touches[0]) return;
+        beginDrag(event.touches[0].clientX);
     }, { passive: true });
+
+    splash.addEventListener('touchmove', function(event) {
+        if (!dragging || !event.touches || !event.touches[0]) return;
+        moveDrag(event.touches[0].clientX);
+    }, { passive: true });
+
+    splash.addEventListener('touchend', function() {
+        endDrag();
+    }, { passive: true });
+
+    splash.addEventListener('pointerdown', function(event) {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        if (event.target.closest('button, a, input, textarea, select')) return;
+        pointerId = event.pointerId;
+        if (splash.setPointerCapture) {
+            try {
+                splash.setPointerCapture(pointerId);
+            } catch (e) {}
+        }
+        beginDrag(event.clientX);
+    });
+
+    splash.addEventListener('pointermove', function(event) {
+        if (pointerId !== event.pointerId) return;
+        moveDrag(event.clientX);
+    });
+
+    splash.addEventListener('pointerup', function(event) {
+        if (pointerId !== event.pointerId) return;
+        endDrag();
+    });
+
+    splash.addEventListener('pointercancel', function(event) {
+        if (pointerId !== event.pointerId) return;
+        dragging = false;
+        pointerId = null;
+        track.classList.remove('is_dragging');
+    });
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'ArrowRight') {
