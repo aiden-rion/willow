@@ -2266,9 +2266,9 @@ html.willow_pull_active body {
   .willow_desktop_brand strong {
     display: block;
     font-size: 48px;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.18;
-    letter-spacing: 0;
+    letter-spacing: -3px;
   }
 
   .willow_desktop_brand p {

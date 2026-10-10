@@ -1970,9 +1970,8 @@ function willow_render_post_card($post)
                 <?php } ?>
                 <?php if (!empty($post['category'])) { ?>
                 <span class="willow_post_badge"><?php echo get_text($post['category']); ?></span>
-                <?php } ?>
-                <?php foreach ($post_tags as $tag) { ?>
-                <span class="willow_post_badge is_tag">#<?php echo get_text($tag); ?></span>
+                <?php } elseif (!empty($post_tags)) { ?>
+                <span class="willow_post_badge is_tag">#<?php echo get_text($post_tags[0]); ?></span>
                 <?php } ?>
             </div>
         </div>

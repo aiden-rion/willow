@@ -67,7 +67,8 @@ $willow_author_results = $willow_has_query ? willow_get_authors($willow_keyword,
                 </li>
                 <?php } ?>
             </ul>
-            <button type="button" class="willow_recent_clear" data-recent-clear>검색어 전체삭제 <i class="fa fa-angle-right" aria-hidden="true"></i></button>
+            <p class="willow_recent_empty" data-recent-empty<?php echo !empty($willow_recent_searches) ? ' hidden' : ''; ?>>최근 검색어가 없습니다.</p>
+            <button type="button" class="willow_recent_clear" data-recent-clear<?php echo empty($willow_recent_searches) ? ' hidden' : ''; ?>>검색어 전체삭제 <i class="fa fa-angle-right" aria-hidden="true"></i></button>
         </section>
     </section>
 
@@ -166,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var suggestEmpty = document.querySelector('[data-suggest-empty]');
     var recentList = document.querySelector('[data-recent-list]');
     var recentClear = document.querySelector('[data-recent-clear]');
+    var recentEmpty = document.querySelector('[data-recent-empty]');
     var tagToggle = document.querySelector('[data-search-tag-toggle]');
     var tagPanel = document.querySelector('[data-search-tag-panel]');
 
@@ -218,6 +220,15 @@ document.addEventListener('DOMContentLoaded', function () {
         page.classList.toggle('is-typing', input.value.trim().length > 0);
     }
 
+    function syncRecentSearchState() {
+        if (!recentList) {
+            return;
+        }
+        var hasRecentSearches = recentList.querySelector('[data-recent-id]') !== null;
+        if (recentEmpty) recentEmpty.hidden = hasRecentSearches;
+        if (recentClear) recentClear.hidden = !hasRecentSearches;
+    }
+
     input.addEventListener('input', syncTypingState);
     clearBtn.addEventListener('click', function () {
         input.value = '';
@@ -241,6 +252,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 credentials: 'same-origin'
             });
             if (item) item.remove();
+            syncRecentSearchState();
         });
     }
 
@@ -257,6 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (recentList) {
                 recentList.innerHTML = '';
             }
+            syncRecentSearchState();
         });
     }
 
