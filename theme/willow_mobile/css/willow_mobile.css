@@ -2110,6 +2110,116 @@ html.willow_pull_active body {
   }
 }
 
+@media (min-width: 900px) {
+  html,
+  body {
+    background: #f5f3ee;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .willow_shell_header,
+  .willow_shell,
+  .willow_bottom_nav {
+    width: 390px;
+    max-width: 390px;
+  }
+
+  #hd.willow_shell_header {
+    top: 0;
+    box-shadow: 0 1px 0 rgba(17, 17, 17, 0.04);
+  }
+
+  .willow_shell {
+    min-height: 100vh;
+    min-height: 100dvh;
+    box-shadow: 0 18px 55px rgba(34, 28, 22, 0.13);
+  }
+
+  .willow_bottom_nav {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 -1px 0 rgba(17, 17, 17, 0.06);
+  }
+
+  .willow_pull_refresh {
+    left: 50%;
+    transform: translate(-50%, -18px);
+  }
+
+  .willow_pull_visible .willow_pull_refresh {
+    transform: translate(-50%, 0);
+  }
+
+  .willow_desktop_brand,
+  .willow_desktop_copy {
+    position: fixed;
+    z-index: 0;
+    display: block;
+    pointer-events: none;
+  }
+
+  .willow_desktop_brand {
+    top: 15vh;
+    right: calc(50% + 265px);
+    width: 300px;
+    color: #241915;
+  }
+
+  .willow_desktop_brand img {
+    display: block;
+    width: 178px;
+    height: auto;
+    margin-bottom: 34px;
+  }
+
+  .willow_desktop_brand strong,
+  .willow_desktop_copy strong {
+    display: block;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.16;
+    letter-spacing: 0;
+  }
+
+  .willow_desktop_brand p,
+  .willow_desktop_copy p {
+    margin: 18px 0 0;
+    color: #7b756f;
+    font-size: 17px;
+    line-height: 1.65;
+  }
+
+  .willow_desktop_copy {
+    top: 21vh;
+    left: calc(50% + 265px);
+    width: 270px;
+  }
+
+  .willow_desktop_copy span {
+    display: inline-flex;
+    margin-bottom: 18px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: #fff585;
+    color: #241915;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1080px) {
+  .willow_desktop_brand,
+  .willow_desktop_copy {
+    display: none;
+  }
+}
+
 @media (max-width: 360px) {
   .willow_topbar {
     padding-right: 20px;

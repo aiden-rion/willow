@@ -21,6 +21,21 @@ include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.css?ver='.G5_CSS_VER.'">', 10);
 ?>
 
+<?php if (!G5_IS_MOBILE) { ?>
+<aside class="willow_splash_desktop_brand" aria-hidden="true">
+    <a href="<?php echo G5_URL; ?>" tabindex="-1">
+        <img src="<?php echo G5_IMG_URL; ?>/logo.png" alt="">
+    </a>
+    <strong>이야기를 잇다,<br>willow</strong>
+    <p>Where voices take root,<br>and stories become strength.</p>
+</aside>
+<aside class="willow_splash_desktop_copy" aria-hidden="true">
+    <span>WILLOW APP</span>
+    <strong>모바일 화면 그대로<br>윌로우를 만나보세요</strong>
+    <p>오늘의 주제부터 작가 구독까지, 한 사람의 이야기가 오래 머무는 공간입니다.</p>
+</aside>
+<?php } ?>
+
 <main class="willow_splash" data-login-url="<?php echo $login_url; ?>">
     <div class="willow_splash_track">
         <?php for ($i = 1; $i <= $willow_splash_count; $i++) { ?>
