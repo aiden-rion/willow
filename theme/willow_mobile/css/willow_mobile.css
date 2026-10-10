@@ -184,6 +184,11 @@ textarea {
   background: #f1f1f1;
 }
 
+.willow_desktop_brand,
+.willow_desktop_copy {
+  display: none;
+}
+
 .willow_container {
   width: 100%;
 }

@@ -16,6 +16,11 @@ body {
   touch-action: pan-y;
 }
 
+.willow_splash_desktop_brand,
+.willow_splash_desktop_copy {
+  display: none;
+}
+
 .willow_splash_track {
   display: flex;
   width: 100%;

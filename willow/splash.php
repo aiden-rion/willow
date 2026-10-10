@@ -21,7 +21,6 @@ include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.css?ver='.G5_CSS_VER.'">', 10);
 ?>
 
-<?php if (!G5_IS_MOBILE) { ?>
 <aside class="willow_splash_desktop_brand" aria-hidden="true">
     <a href="<?php echo G5_URL; ?>" tabindex="-1">
         <img src="<?php echo G5_IMG_URL; ?>/logo.png" alt="">
@@ -39,7 +38,6 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
         <img src="<?php echo G5_IMG_URL; ?>/splash_008.png" alt="">
     </div>
 </aside>
-<?php } ?>
 
 <main class="willow_splash" data-login-url="<?php echo $login_url; ?>">
     <div class="willow_splash_track">
