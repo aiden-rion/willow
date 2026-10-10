@@ -110,7 +110,7 @@ if (!in_array($willow_account_bank, $willow_bank_options, true) && in_array($mem
             <h2>주요 카테고리</h2>
             <p class="willow_profile_help">* 주로 작성하는 글 카테고리를 선택하세요</p>
             <input type="hidden" name="mb_3" id="willow_mb_3" value="<?php echo get_text($member['mb_3']); ?>">
-            <div class="willow_category_group">
+            <div class="willow_category_group" data-category-collapsible>
                 <?php foreach ($willow_categories as $category) { ?>
                 <?php if ($category['keyword'] === '') continue; ?>
                 <?php $checked = in_array($category['keyword'], $willow_selected_categories) ? 'checked' : ''; ?>
@@ -120,6 +120,7 @@ if (!in_array($willow_account_bank, $willow_bank_options, true) && in_array($mem
                 </label>
                 <?php } ?>
             </div>
+            <button type="button" class="willow_category_toggle" data-category-toggle aria-expanded="false">카테고리 전체보기</button>
         </section>
 
         <section class="willow_profile_section">
@@ -214,6 +215,32 @@ function fregisterform_submit(f)
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    var categoryGroup = document.querySelector('[data-category-collapsible]');
+    var categoryToggle = document.querySelector('[data-category-toggle]');
+    if (categoryGroup && categoryToggle) {
+        var categoryLabels = Array.prototype.slice.call(categoryGroup.querySelectorAll('label'));
+        var visibleLimit = 6;
+
+        function updateCategories(expanded) {
+            categoryGroup.classList.toggle('is_expanded', expanded);
+            categoryToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            categoryToggle.textContent = expanded ? '카테고리 접기' : '카테고리 전체보기';
+            categoryLabels.forEach(function(label, index) {
+                var checked = !!label.querySelector('input:checked');
+                label.hidden = !expanded && !checked && index >= visibleLimit;
+            });
+        }
+
+        if (categoryLabels.length <= visibleLimit) {
+            categoryToggle.hidden = true;
+        } else {
+            updateCategories(false);
+            categoryToggle.addEventListener('click', function() {
+                updateCategories(!categoryGroup.classList.contains('is_expanded'));
+            });
+        }
+    }
+
     var imageInput = document.getElementById('reg_mb_img');
     var preview = document.querySelector('.willow_profile_photo img');
     if (!imageInput || !preview) return;

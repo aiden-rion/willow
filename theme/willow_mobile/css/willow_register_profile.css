@@ -207,6 +207,25 @@ body.willow_profile_edit_body .willow_shell {
   color: #ffffff;
 }
 
+.willow_category_toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  margin-top: 12px;
+  padding: 0 12px;
+  border: 1px solid #eeeeee;
+  border-radius: 17px;
+  background: #f8f8f8;
+  color: #666666;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.willow_category_toggle[hidden] {
+  display: none;
+}
+
 .willow_profile_sub_button {
   width: 100%;
   height: 56px;
