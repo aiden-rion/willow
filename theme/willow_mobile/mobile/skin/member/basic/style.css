@@ -470,6 +470,25 @@ body.willow_member_confirm_body .willow_shell {
   transform: translateY(-50%);
 }
 
+@media (min-width: 1180px) {
+  body.willow_member_confirm_body #container.willow_container {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  body.willow_member_confirm_body .willow_shell,
+  body.willow_member_confirm_body .willow_member_confirm,
+  .register {
+    overflow-x: hidden;
+  }
+
+  .register *,
+  .willow_member_confirm * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 /* 비밀글 비밀번호 확인 */
 #pw_confirm fieldset {position:relative;margin:0 0 5px;padding:15px 0;border-top:1px solid #fffefe}
 #pw_wr_password {width:100%}
