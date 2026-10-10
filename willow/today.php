@@ -57,7 +57,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                     <?php } ?>
                 </span>
                 <?php } ?>
-                <p><?php echo willow_topic_participants($willow_topic_participant_count); ?></p>
+                <p><span class="willow_topic_participant_number"><?php echo number_format((int) $willow_topic_participant_count); ?>명</span> 참여하고 있어요</p>
             </div>
             <a href="<?php echo $write_href; ?>">나도 글쓰기</a>
         </div>
