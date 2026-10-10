@@ -406,8 +406,10 @@ body.willow_inner_title_body .willow_shell {
 }
 
 body.willow_menu_body {
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #ffffff;
 }
 
@@ -419,10 +421,12 @@ body.willow_menu_body #hd.willow_shell_header {
 body.willow_menu_body .willow_menu_page {
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  height: calc(100vh - 70px);
-  padding: 0 24px 18px;
-  overflow: hidden;
+  min-height: calc(100vh - 70px);
+  min-height: calc(100dvh - 70px);
+  height: auto;
+  padding: 0 24px calc(24px + env(safe-area-inset-bottom));
+  overflow: visible;
+  -webkit-overflow-scrolling: touch;
 }
 
 body.willow_menu_body .willow_menu_member_card {
@@ -450,10 +454,10 @@ body.willow_menu_body .willow_menu_point {
 }
 
 body.willow_menu_body .willow_menu_nav {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   gap: 7px;
   margin-top: 18px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 body.willow_menu_body .willow_menu_nav a {
