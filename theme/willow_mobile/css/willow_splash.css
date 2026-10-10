@@ -150,7 +150,7 @@ body {
   .willow_splash_desktop_copy strong {
     display: block;
     color: #241915;
-    font-size: 42px;
+    font-size: 39px;
     font-weight: 700;
     line-height: 1.16;
     letter-spacing: 0;
@@ -167,7 +167,7 @@ body {
   .willow_splash_desktop_copy {
     top: 13vh;
     left: calc(50% + 285px);
-    width: 320px;
+    width: 360px;
   }
 
   .willow_splash_desktop_copy span {
