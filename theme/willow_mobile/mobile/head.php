@@ -11,22 +11,26 @@ include_once(G5_THEME_PATH.'/head.sub.php');
 include_once(G5_LIB_PATH.'/latest.lib.php');
 ?>
 
-<aside class="willow_desktop_brand" aria-hidden="true">
-    <a href="<?php echo G5_URL; ?>" tabindex="-1">
+<aside class="willow_desktop_brand">
+    <a href="<?php echo G5_URL; ?>">
         <img src="<?php echo G5_IMG_URL; ?>/logo.png" alt="">
     </a>
-    <strong>이야기를 잇다,<br>willow</strong>
-    <p>Where voices take root,<br>and stories become strength.</p>
-</aside>
-<aside class="willow_desktop_copy" aria-hidden="true">
-    <span>WILLOW</span>
     <strong>작은 기록이<br>서로의 힘이 되는 곳</strong>
-    <p>오늘의 주제, 작가 구독, 댓글과 공감까지 모바일 앱 화면 그대로 경험하세요.</p>
-    <div class="willow_desktop_preview">
-        <img src="<?php echo G5_IMG_URL; ?>/splash_005.png" alt="">
-        <img src="<?php echo G5_IMG_URL; ?>/splash_001.png" alt="">
-        <img src="<?php echo G5_IMG_URL; ?>/splash_008.png" alt="">
-    </div>
+    <p>윌로우에 쌓인 글과 작가의 이야기를 검색해보세요.</p>
+    <form class="willow_desktop_search" action="<?php echo G5_BBS_URL; ?>/search.php" method="get">
+        <input type="hidden" name="sfl" value="wr_subject||wr_content">
+        <input type="hidden" name="sop" value="and">
+        <label for="willow_desktop_search_keyword" class="sound_only">글 검색</label>
+        <input id="willow_desktop_search_keyword" type="search" name="stx" maxlength="20" placeholder="글 검색">
+        <button type="submit">검색</button>
+    </form>
+    <nav class="willow_desktop_keywords" aria-label="주요 키워드">
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('북한생활'); ?>">#북한생활</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('정착상식'); ?>">#정착상식</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('마음돌봄'); ?>">#마음돌봄</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('가족'); ?>">#가족</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('인권'); ?>">#인권</a>
+    </nav>
 </aside>
 
 <header id="hd" class="willow_shell_header">

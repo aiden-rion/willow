@@ -21,22 +21,26 @@ include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.css?ver='.G5_CSS_VER.'">', 10);
 ?>
 
-<aside class="willow_splash_desktop_brand" aria-hidden="true">
-    <a href="<?php echo G5_URL; ?>" tabindex="-1">
+<aside class="willow_splash_desktop_brand">
+    <a href="<?php echo G5_URL; ?>">
         <img src="<?php echo G5_IMG_URL; ?>/logo.png" alt="">
     </a>
-    <strong>이야기를 잇다,<br>willow</strong>
-    <p>Where voices take root,<br>and stories become strength.</p>
-</aside>
-<aside class="willow_splash_desktop_copy" aria-hidden="true">
-    <span>WILLOW APP</span>
-    <strong>모바일 화면 그대로<br>윌로우를 만나보세요</strong>
-    <p>오늘의 주제부터 작가 구독까지, 한 사람의 이야기가 오래 머무는 공간입니다.</p>
-    <div class="willow_splash_desktop_preview">
-        <img src="<?php echo G5_IMG_URL; ?>/splash_005.png" alt="">
-        <img src="<?php echo G5_IMG_URL; ?>/splash_001.png" alt="">
-        <img src="<?php echo G5_IMG_URL; ?>/splash_008.png" alt="">
-    </div>
+    <strong>작은 기록이<br>서로의 힘이 되는 곳</strong>
+    <p>윌로우에 쌓인 글과 작가의 이야기를 검색해보세요.</p>
+    <form class="willow_splash_desktop_search" action="<?php echo G5_BBS_URL; ?>/search.php" method="get">
+        <input type="hidden" name="sfl" value="wr_subject||wr_content">
+        <input type="hidden" name="sop" value="and">
+        <label for="willow_splash_desktop_search_keyword" class="sound_only">글 검색</label>
+        <input id="willow_splash_desktop_search_keyword" type="search" name="stx" maxlength="20" placeholder="글 검색">
+        <button type="submit">검색</button>
+    </form>
+    <nav class="willow_splash_desktop_keywords" aria-label="주요 키워드">
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('북한생활'); ?>">#북한생활</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('정착상식'); ?>">#정착상식</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('마음돌봄'); ?>">#마음돌봄</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('가족'); ?>">#가족</a>
+        <a href="<?php echo G5_BBS_URL; ?>/search.php?sfl=wr_subject%7C%7Cwr_content&amp;sop=and&amp;stx=<?php echo urlencode('인권'); ?>">#인권</a>
+    </nav>
 </aside>
 
 <main class="willow_splash" data-login-url="<?php echo $login_url; ?>">
