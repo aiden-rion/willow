@@ -33,6 +33,11 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
     <span>WILLOW APP</span>
     <strong>모바일 화면 그대로<br>윌로우를 만나보세요</strong>
     <p>오늘의 주제부터 작가 구독까지, 한 사람의 이야기가 오래 머무는 공간입니다.</p>
+    <div class="willow_splash_desktop_preview">
+        <img src="<?php echo G5_IMG_URL; ?>/splash_005.png" alt="">
+        <img src="<?php echo G5_IMG_URL; ?>/splash_001.png" alt="">
+        <img src="<?php echo G5_IMG_URL; ?>/splash_008.png" alt="">
+    </div>
 </aside>
 <?php } ?>
 

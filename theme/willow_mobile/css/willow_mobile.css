@@ -2113,12 +2113,34 @@ html.willow_pull_active body {
 @media (min-width: 900px) {
   html,
   body {
-    background: #f5f3ee;
+    background:
+      linear-gradient(90deg, rgba(255, 245, 133, 0.18) 0 1px, transparent 1px 100%),
+      linear-gradient(180deg, #f7f3ea 0%, #f4f1ec 52%, #efebe4 100%);
+    background-size: 74px 100%, 100% 100%;
   }
 
   body {
     min-height: 100vh;
     min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  #hd.willow_shell_header,
+  #wrapper.willow_shell,
+  #container.willow_container {
+    float: none;
+    min-width: 0;
+    width: 390px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  #container.willow_container {
+    position: relative;
+    min-height: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: 1em;
   }
 
   .willow_shell_header,
@@ -2129,11 +2151,15 @@ html.willow_pull_active body {
   }
 
   #hd.willow_shell_header {
+    position: sticky;
     top: 0;
+    z-index: 20;
     box-shadow: 0 1px 0 rgba(17, 17, 17, 0.04);
   }
 
   .willow_shell {
+    position: relative;
+    z-index: 2;
     min-height: 100vh;
     min-height: 100dvh;
     box-shadow: 0 18px 55px rgba(34, 28, 22, 0.13);
@@ -2142,6 +2168,7 @@ html.willow_pull_active body {
   .willow_bottom_nav {
     right: auto;
     left: 50%;
+    z-index: 30;
     transform: translateX(-50%);
     box-shadow: 0 -1px 0 rgba(17, 17, 17, 0.06);
   }
@@ -2164,9 +2191,9 @@ html.willow_pull_active body {
   }
 
   .willow_desktop_brand {
-    top: 15vh;
-    right: calc(50% + 265px);
-    width: 300px;
+    top: 12vh;
+    right: calc(50% + 300px);
+    width: 330px;
     color: #241915;
   }
 
@@ -2195,9 +2222,9 @@ html.willow_pull_active body {
   }
 
   .willow_desktop_copy {
-    top: 21vh;
-    left: calc(50% + 265px);
-    width: 270px;
+    top: 13vh;
+    left: calc(50% + 285px);
+    width: 320px;
   }
 
   .willow_desktop_copy span {
@@ -2210,6 +2237,53 @@ html.willow_pull_active body {
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0;
+  }
+
+  .willow_desktop_preview {
+    position: relative;
+    width: 282px;
+    height: 320px;
+    margin-top: 34px;
+  }
+
+  .willow_desktop_preview::before {
+    position: absolute;
+    inset: 30px 0 auto 34px;
+    width: 210px;
+    height: 246px;
+    border: 1px solid rgba(36, 25, 21, 0.08);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.52);
+    content: "";
+  }
+
+  .willow_desktop_preview img {
+    position: absolute;
+    display: block;
+    width: 118px;
+    height: 256px;
+    border: 6px solid rgba(255, 255, 255, 0.88);
+    border-radius: 22px;
+    object-fit: cover;
+    box-shadow: 0 18px 34px rgba(34, 28, 22, 0.16);
+  }
+
+  .willow_desktop_preview img:nth-child(1) {
+    top: 32px;
+    left: 0;
+    transform: rotate(-7deg);
+  }
+
+  .willow_desktop_preview img:nth-child(2) {
+    top: 0;
+    left: 82px;
+    z-index: 2;
+  }
+
+  .willow_desktop_preview img:nth-child(3) {
+    top: 38px;
+    right: 0;
+    transform: rotate(7deg);
   }
 }
 

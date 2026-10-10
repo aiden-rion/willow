@@ -23,6 +23,11 @@ include_once(G5_LIB_PATH.'/latest.lib.php');
     <span>WILLOW</span>
     <strong>작은 기록이<br>서로의 힘이 되는 곳</strong>
     <p>오늘의 주제, 작가 구독, 댓글과 공감까지 모바일 앱 화면 그대로 경험하세요.</p>
+    <div class="willow_desktop_preview">
+        <img src="<?php echo G5_IMG_URL; ?>/splash_005.png" alt="">
+        <img src="<?php echo G5_IMG_URL; ?>/splash_001.png" alt="">
+        <img src="<?php echo G5_IMG_URL; ?>/splash_008.png" alt="">
+    </div>
 </aside>
 <?php } ?>
 
