@@ -539,9 +539,6 @@ if (isset($_SESSION['ss_mb_id']) && $_SESSION['ss_mb_id']) { // 로그인중이�
     } else {
         // 오늘 처음 로그인 이라면
         if (substr($member['mb_today_login'], 0, 10) != G5_TIME_YMD) {
-            // 첫 로그인 포인트 지급
-            insert_point($member['mb_id'], $config['cf_login_point'], G5_TIME_YMD.' 첫로그인', '@login', $member['mb_id'], G5_TIME_YMD);
-
             // 오늘의 로그인이 될 수도 있으며 마지막 로그인일 수도 있음
             // 해당 회원의 접근일시와 IP 를 저장
             $sql = " update {$g5['member_table']} set mb_today_login = '".G5_TIME_YMDHIS."', mb_login_ip = '{$_SERVER['REMOTE_ADDR']}' where mb_id = '{$member['mb_id']}' ";

@@ -184,7 +184,7 @@ if ($g5_install || $is_install === false) {
                     cf_admin_email_name = '".G5_VERSION."',
                     cf_use_point = '1',
                     cf_use_copy_log = '1',
-                    cf_login_point = '100',
+                    cf_login_point = '0',
                     cf_memo_send_point = '500',
                     cf_cut_name = '15',
                     cf_nick_modify = '60',
