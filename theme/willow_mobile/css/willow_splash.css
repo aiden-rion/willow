@@ -286,3 +286,14 @@ body {
     display: none;
   }
 }
+
+@media (min-width: 1081px) {
+  .willow_splash,
+  .willow_splash_controls {
+    left: calc(50% + 235px);
+  }
+
+  .willow_splash_desktop_brand {
+    right: calc(50% + 10px);
+  }
+}

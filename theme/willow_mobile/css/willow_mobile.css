@@ -2403,6 +2403,27 @@ html.willow_pull_active body {
   }
 }
 
+@media (min-width: 1081px) {
+  #hd.willow_shell_header,
+  #wrapper.willow_shell,
+  #container.willow_container {
+    margin-right: auto;
+    margin-left: calc(50% + 40px);
+  }
+
+  .willow_bottom_nav {
+    left: calc(50% + 235px);
+  }
+
+  .willow_pull_refresh {
+    left: calc(50% + 235px);
+  }
+
+  .willow_desktop_brand {
+    right: calc(50% + 10px);
+  }
+}
+
 @media (max-width: 360px) {
   .willow_topbar {
     padding-right: 20px;
