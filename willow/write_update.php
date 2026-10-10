@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 willow_topic_install();
 
 $tables = willow_topic_tables();
+$today_write_point = 100;
 $wt_id = isset($_POST['wt_id']) ? (int) $_POST['wt_id'] : 0;
 $wd_id = isset($_POST['wd_id']) ? (int) $_POST['wd_id'] : 0;
 $topic = sql_fetch(" select * from `{$tables['topic']}` where wt_id = '{$wt_id}' ");
@@ -124,6 +125,25 @@ $wp_id = sql_insert_id();
 
 if ($topic_mode === 'today') {
     sql_query(" update `{$tables['topic']}` set wt_participants = wt_participants + 1 where wt_id = '{$wt_id}' ");
+}
+
+if ($wp_id && $topic_mode === 'today' && !empty($member['mb_id']) && !empty($member['mb_2']) && $member['mb_2'] === 'author' && !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant') {
+    $point_date = date('Y-m-d', G5_SERVER_TIME);
+    $point_start = $point_date.' 00:00:00';
+    $point_end = $point_date.' 23:59:59';
+    $point_row = sql_fetch(" select COALESCE(sum(po_point), 0) as point_total
+        from {$g5['point_table']}
+        where mb_id = '".sql_escape_string($member['mb_id'])."'
+            and po_rel_table = 'willow_topic'
+            and po_rel_action = 'today_write'
+            and po_datetime between '{$point_start}' and '{$point_end}'
+            and po_point > 0 ", false);
+    $earned_today = isset($point_row['point_total']) ? (int) $point_row['point_total'] : 0;
+    $remaining_point = max(0, $today_write_point - $earned_today);
+
+    if ($remaining_point > 0) {
+        insert_point($member['mb_id'], min($today_write_point, $remaining_point), '오늘의 주제 작성 포인트', 'willow_topic', $wp_id, 'today_write');
+    }
 }
 
 if ($wd_id && !empty($member['mb_id'])) {
