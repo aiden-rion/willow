@@ -470,6 +470,43 @@ body.willow_member_confirm_body .willow_shell {
   transform: translateY(-50%);
 }
 
+@media (min-width: 1180px) {
+  body.willow_member_confirm_body {
+    overflow-x: hidden;
+    background:
+      linear-gradient(90deg, rgba(255, 245, 133, 0.18) 0 1px, transparent 1px 100%),
+      linear-gradient(180deg, #f7f3ea 0%, #f4f1ec 52%, #efebe4 100%);
+    background-size: 74px 100%, 100% 100%;
+  }
+
+  body.willow_member_confirm_body #container.willow_container {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  body.willow_member_confirm_body .willow_member_confirm {
+    width: 390px;
+    max-width: 390px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin-right: auto;
+    margin-left: calc(50% + 40px);
+    box-shadow: 0 18px 55px rgba(34, 28, 22, 0.13);
+  }
+
+  body.willow_member_confirm_body .willow_shell,
+  body.willow_member_confirm_body .willow_member_confirm,
+  .register {
+    overflow-x: hidden;
+  }
+
+  .register *,
+  .willow_member_confirm * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 /* 비밀글 비밀번호 확인 */
 #pw_confirm fieldset {position:relative;margin:0 0 5px;padding:15px 0;border-top:1px solid #fffefe}
 #pw_wr_password {width:100%}
