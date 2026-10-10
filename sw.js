@@ -1,4 +1,4 @@
-const WILLOW_CACHE = "willow-app-shell-v1";
+const WILLOW_CACHE = "willow-app-shell-v2";
 const WILLOW_APP_SHELL = [
   "/",
   "/offline.php",
