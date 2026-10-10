@@ -2167,7 +2167,62 @@ html.willow_pull_active body {
     z-index: 2;
     min-height: 100vh;
     min-height: 100dvh;
+    overflow-x: hidden;
     box-shadow: 0 18px 55px rgba(34, 28, 22, 0.13);
+  }
+
+  .willow_app,
+  .willow_user_home,
+  .willow_user_home > *,
+  .willow_topic_card,
+  .willow_chip_nav,
+  .willow_feed,
+  .willow_post_card,
+  .willow_post_card > a,
+  .willow_recommend,
+  .willow_author_recommend,
+  .willow_writer_banner,
+  .willow_home_main_banner {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .willow_app {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .willow_topic_card,
+  .willow_feed,
+  .willow_post_card {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .willow_post_card *,
+  .willow_topic_card *,
+  .willow_recommend *,
+  .willow_author_recommend * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .willow_writer_banner {
+    left: auto;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .willow_recommend,
+  .willow_author_recommend {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .willow_author_recommend_grid {
+    margin-right: -16px;
+    padding-right: 16px;
   }
 
   .willow_bottom_nav {
