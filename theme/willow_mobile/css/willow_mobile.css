@@ -2115,7 +2115,7 @@ html.willow_pull_active body {
   }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1180px) {
   html,
   body {
     background:
@@ -2396,14 +2396,14 @@ html.willow_pull_active body {
   }
 }
 
-@media (min-width: 900px) and (max-width: 1080px) {
+@media (min-width: 900px) and (max-width: 1179px) {
   .willow_desktop_brand,
   .willow_desktop_copy {
     display: none;
   }
 }
 
-@media (min-width: 1081px) {
+@media (min-width: 1180px) {
   #hd.willow_shell_header,
   #wrapper.willow_shell,
   #container.willow_container {
