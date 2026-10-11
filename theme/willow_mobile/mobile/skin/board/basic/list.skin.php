@@ -14,7 +14,7 @@ if ($bo_table === 'notice') {
 ?>
 <script>document.body.classList.add('willow_inner_title_body','willow_notice_body');var willowAutoTitle=document.querySelector('.willow_page_title');if(willowAutoTitle)willowAutoTitle.style.display='none';</script>
 <header class="willow_member_confirm_header">
-    <a href="javascript:history.back();" aria-label="뒤로가기"></a>
+    <a href="<?php echo G5_URL; ?>/willow/menu.php" aria-label="뒤로가기"></a>
     <h1>공지사항</h1>
 </header>
 
