@@ -6,6 +6,8 @@ if (defined('G5_IS_ADMIN')) {
 }
 
 $willow_script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
+$willow_public_board = isset($bo_table) && $bo_table === 'notice';
+$willow_public_page = $willow_script === '/bbs/faq.php' || $willow_public_board;
 $willow_allowed_paths = array(
     '/bbs/login.php',
     '/bbs/login_check.php',
@@ -20,6 +22,7 @@ $willow_allowed_paths = array(
 );
 
 $willow_is_allowed = in_array($willow_script, $willow_allowed_paths, true)
+    || $willow_public_page
     || strpos($willow_script, '/adm/') === 0
     || strpos($willow_script, '/install/') === 0;
 
