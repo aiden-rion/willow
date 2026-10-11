@@ -9,7 +9,8 @@ if ($is_good) $colspan++;
 if ($is_nogood) $colspan++;
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0);
+$willow_board_css_ver = is_file($board_skin_path.'/style.css') ? filemtime($board_skin_path.'/style.css') : G5_CSS_VER;
+add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css?ver='.$willow_board_css_ver.'">', 0);
 
 if ($bo_table === 'notice') {
 ?>

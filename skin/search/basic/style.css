@@ -10,6 +10,7 @@ body.willow_search_body .willow_bottom_nav {
 
 body.willow_search_body .willow_shell {
   min-height: calc(100vh - 76px);
+  padding-bottom: 0;
   background: #ffffff;
 }
 
@@ -271,7 +272,7 @@ body.willow_search_body .willow_container {
 }
 
 .willow_search_results {
-  padding: 50px 17px 88px;
+  padding: 50px 17px 24px;
 }
 
 .willow_result_section + .willow_result_section {
@@ -410,12 +411,21 @@ body.willow_search_body .willow_container {
   color: inherit;
 }
 
-.willow_author_card img {
+.willow_author_card > a > img {
   display: block;
   width: 89px;
   height: 70px;
   border-radius: 6px;
   object-fit: cover;
+}
+
+.willow_author_card strong .willow_author_cert_mark {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+  vertical-align: -2px;
+  object-fit: contain;
 }
 
 .willow_author_card strong {

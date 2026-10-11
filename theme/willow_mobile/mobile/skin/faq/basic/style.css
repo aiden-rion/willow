@@ -263,3 +263,22 @@ body.willow_faq_body .willow_shell {
   margin: 20px 0 72px;
   text-align: center;
 }
+
+@media (min-width: 900px) and (max-width: 1179px) {
+  body.willow_faq_body #hd.willow_shell_header,
+  body.willow_faq_body #wrapper.willow_shell,
+  body.willow_faq_body #container.willow_container {
+    float: none;
+    min-width: 0;
+    width: 390px;
+    max-width: 390px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  body.willow_faq_body .willow_shell,
+  body.willow_faq_body .willow_bottom_nav {
+    width: 390px;
+    max-width: 390px;
+  }
+}

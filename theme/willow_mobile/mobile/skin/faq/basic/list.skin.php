@@ -2,7 +2,8 @@
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$faq_skin_url.'/style.css">', 0);
+$willow_faq_css_ver = is_file($faq_skin_path.'/style.css') ? filemtime($faq_skin_path.'/style.css') : G5_CSS_VER;
+add_stylesheet('<link rel="stylesheet" href="'.$faq_skin_url.'/style.css?ver='.$willow_faq_css_ver.'">', 0);
 ?>
 
 <!-- FAQ 시작 { -->
@@ -106,16 +107,6 @@ echo '<div id="faq_thtml">'.conv_content($fm['fm_mobile_tail_html'], 1).'</div>'
 <!-- } FAQ 끝 -->
 
 <script src="<?php echo G5_JS_URL; ?>/viewimageresize.js"></script>
-<script>
-document.addEventListener("click", function(event) {
-    var back = event.target.closest("[data-faq-back]");
-    if (!back) return;
-    if (window.history.length > 1) {
-        event.preventDefault();
-        window.history.back();
-    }
-});
-</script>
 <script>
 jQuery(function() {
     $(".closer_btn").on("click", function() {

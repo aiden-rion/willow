@@ -2,7 +2,8 @@
 if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가
 
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.G5_CSS_VER.'">', 0);
-add_stylesheet('<link rel="stylesheet" href="'.$search_skin_url.'/style.css">', 10);
+$willow_search_css_ver = is_file($search_skin_path.'/style.css') ? filemtime($search_skin_path.'/style.css') : G5_CSS_VER;
+add_stylesheet('<link rel="stylesheet" href="'.$search_skin_url.'/style.css?ver='.$willow_search_css_ver.'">', 10);
 include_once(G5_PATH.'/willow/content.lib.php');
 
 $willow_keyword = trim($text_stx);

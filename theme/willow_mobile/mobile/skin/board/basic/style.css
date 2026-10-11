@@ -1085,3 +1085,22 @@ body.willow_notice_body .willow_shell {
   font-size: 16px;
   font-weight: 700;
 }
+
+@media (min-width: 900px) and (max-width: 1179px) {
+  body.willow_notice_body #hd.willow_shell_header,
+  body.willow_notice_body #wrapper.willow_shell,
+  body.willow_notice_body #container.willow_container {
+    float: none;
+    min-width: 0;
+    width: 390px;
+    max-width: 390px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  body.willow_notice_body .willow_shell,
+  body.willow_notice_body .willow_bottom_nav {
+    width: 390px;
+    max-width: 390px;
+  }
+}

@@ -59,6 +59,7 @@ include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_CSS_PATH.'/willow_content.css').'">', 10);
 ?>
 
+<script>document.body.classList.add('willow_author_register_page');</script>
 <?php if ($step !== 'form') { ?>
 <main class="willow_content_app willow_author_apply_intro">
     <section class="willow_author_apply_hero">

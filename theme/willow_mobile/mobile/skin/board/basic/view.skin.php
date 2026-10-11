@@ -3,13 +3,14 @@ if (!defined("_GNUBOARD_")) exit; // 개별 페이지 접근 불가
 include_once(G5_LIB_PATH.'/thumbnail.lib.php');
 
 // add_stylesheet('css 구문', 출력순서); 숫자가 작을 수록 먼저 출력됨
-add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css">', 0);
+$willow_board_css_ver = is_file($board_skin_path.'/style.css') ? filemtime($board_skin_path.'/style.css') : G5_CSS_VER;
+add_stylesheet('<link rel="stylesheet" href="'.$board_skin_url.'/style.css?ver='.$willow_board_css_ver.'">', 0);
 
 if ($bo_table === 'notice') {
 ?>
 <script>document.body.classList.add('willow_inner_title_body','willow_notice_body');var willowAutoTitle=document.querySelector('.willow_page_title');if(willowAutoTitle)willowAutoTitle.style.display='none';</script>
 <header class="willow_member_confirm_header">
-    <a href="javascript:history.back();" aria-label="뒤로가기"></a>
+    <a href="<?php echo G5_URL; ?>/willow/menu.php" aria-label="뒤로가기"></a>
     <h1>공지사항</h1>
 </header>
 
