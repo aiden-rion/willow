@@ -1,7 +1,9 @@
 <?php
 if (!defined('_GNUBOARD_')) exit;
 
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_register_profile.css?ver='.G5_CSS_VER.'">', 20);
+$willow_profile_css_path = G5_THEME_CSS_PATH.'/willow_register_profile.css';
+$willow_profile_css_ver = is_file($willow_profile_css_path) ? filemtime($willow_profile_css_path) : G5_CSS_VER;
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_register_profile.css?ver='.$willow_profile_css_ver.'">', 20);
 include_once(G5_PATH.'/willow/content.lib.php');
 
 $willow_is_author = willow_author_is_escapee($member);
@@ -196,6 +198,11 @@ function fregisterform_submit(f)
     if (typeof f.mb_img != "undefined" && f.mb_img.value) {
         if (!f.mb_img.value.toLowerCase().match(/\.(gif|jpe?g|png)$/i)) {
             alert("회원이미지가 이미지 파일이 아닙니다.");
+            f.mb_img.focus();
+            return false;
+        }
+        if (f.mb_img.files && f.mb_img.files[0] && f.mb_img.files[0].size > 5 * 1024 * 1024) {
+            alert("회원이미지는 5MB 이하의 이미지로 선택해주세요.");
             f.mb_img.focus();
             return false;
         }

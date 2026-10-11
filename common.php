@@ -221,14 +221,14 @@ else
     @session_cache_limiter("no-cache, must-revalidate");
 
 ini_set("session.cache_expire", 180); // 세션 캐쉬 보관시간 (분)
-ini_set("session.gc_maxlifetime", 10800); // session data의 garbage collection 존재 기간을 지정 (초)
+ini_set("session.gc_maxlifetime", G5_LOGIN_PERSISTENT_LIFETIME); // 로그아웃 전까지 로그인 세션을 보존한다.
 ini_set("session.gc_probability", 1); // session.gc_probability는 session.gc_divisor와 연계하여 gc(쓰레기 수거) 루틴의 시작 확률을 관리합니다. 기본값은 1입니다. 자세한 내용은 session.gc_divisor를 참고하십시오.
 ini_set("session.gc_divisor", 100); // session.gc_divisor는 session.gc_probability와 결합하여 각 세션 초기화 시에 gc(쓰레기 수거) 프로세스를 시작할 확률을 정의합니다. 확률은 gc_probability/gc_divisor를 사용하여 계산합니다. 즉, 1/100은 각 요청시에 GC 프로세스를 시작할 확률이 1%입니다. session.gc_divisor의 기본값은 100입니다.
 
 if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
-    session_set_cookie_params(0, '/', null, true, true);
+    session_set_cookie_params(G5_LOGIN_PERSISTENT_LIFETIME, '/', null, true, true);
 } else {
-    session_set_cookie_params(0, '/', null, false, true);
+    session_set_cookie_params(G5_LOGIN_PERSISTENT_LIFETIME, '/', null, false, true);
 }
 
 ini_set("session.cookie_domain", G5_COOKIE_DOMAIN);
@@ -537,6 +537,14 @@ if (isset($_SESSION['ss_mb_id']) && $_SESSION['ss_mb_id']) { // 로그인중이�
         set_session('ss_mb_id', '');
         $member = array();
     } else {
+        // 일반 회원은 명시적 로그아웃 전까지 로그인 상태를 복구할 수 있도록
+        // 자동 로그인 쿠키를 발급하고, 방문할 때마다 만료 시점을 갱신한다.
+        if (strtolower($member['mb_id']) !== strtolower($config['cf_admin'])) {
+            $persistent_key = md5($_SERVER['SERVER_ADDR'] . $_SERVER['SERVER_SOFTWARE'] . $_SERVER['HTTP_USER_AGENT'] . $member['mb_password']);
+            set_cookie('ck_mb_id', $member['mb_id'], G5_LOGIN_PERSISTENT_LIFETIME);
+            set_cookie('ck_auto', $persistent_key, G5_LOGIN_PERSISTENT_LIFETIME);
+        }
+
         // 오늘 처음 로그인 이라면
         if (substr($member['mb_today_login'], 0, 10) != G5_TIME_YMD) {
             // 오늘의 로그인이 될 수도 있으며 마지막 로그인일 수도 있음

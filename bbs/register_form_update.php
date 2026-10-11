@@ -81,6 +81,21 @@ $mb_thirdparty_agree    = isset($_POST['mb_thirdparty_agree'])  ? trim($_POST['m
 
 run_event('register_form_update_before', $mb_id, $w);
 
+// PHP의 업로드 한도를 초과하면 임시 파일이 만들어지지 않는다. 기존에는 이
+// 경우를 무시해 회원정보만 저장되고 프로필 사진은 바뀌지 않았다.
+if (isset($_FILES['mb_img']) && isset($_FILES['mb_img']['error']) && $_FILES['mb_img']['error'] !== UPLOAD_ERR_NO_FILE && $_FILES['mb_img']['error'] !== UPLOAD_ERR_OK) {
+    $willow_upload_error_messages = array(
+        UPLOAD_ERR_INI_SIZE => '회원이미지의 용량이 서버 업로드 제한을 초과했습니다. 5MB 이하의 이미지를 선택해주세요.',
+        UPLOAD_ERR_FORM_SIZE => '회원이미지는 5MB 이하의 이미지만 업로드할 수 있습니다.',
+        UPLOAD_ERR_PARTIAL => '회원이미지 업로드가 완료되지 않았습니다. 다시 시도해주세요.',
+        UPLOAD_ERR_NO_TMP_DIR => '회원이미지를 저장할 임시 폴더를 찾을 수 없습니다.',
+        UPLOAD_ERR_CANT_WRITE => '회원이미지를 서버에 저장할 수 없습니다. 관리자에게 문의해주세요.',
+        UPLOAD_ERR_EXTENSION => '서버 확장 기능이 회원이미지 업로드를 중단했습니다.',
+    );
+    $willow_upload_error = (int) $_FILES['mb_img']['error'];
+    alert(isset($willow_upload_error_messages[$willow_upload_error]) ? $willow_upload_error_messages[$willow_upload_error] : '회원이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+}
+
 if ($w == 'u') {
     $willow_update_is_author = willow_author_is_escapee($member);
 
@@ -609,9 +624,12 @@ if( $config['cf_member_img_size'] && $config['cf_member_img_width'] && $config['
         if (preg_match($image_regex, $_FILES['mb_img']['name'])) {
             if ($_FILES['mb_img']['size'] <= $willow_member_img_upload_limit) {
                 $dest_path = $mb_dir.'/'.$mb_icon_img;
-                move_uploaded_file($_FILES['mb_img']['tmp_name'], $dest_path);
-                chmod($dest_path, G5_FILE_PERMISSION);
-                if (file_exists($dest_path)) {
+                if (!is_dir($mb_dir) || !is_writable($mb_dir)) {
+                    $msg .= '회원이미지를 저장할 수 없습니다. 서버의 data/member_image 폴더 권한을 확인해주세요.';
+                } elseif (!move_uploaded_file($_FILES['mb_img']['tmp_name'], $dest_path)) {
+                    $msg .= '회원이미지를 서버에 저장하지 못했습니다. 다시 시도해주세요.';
+                } else {
+                    @chmod($dest_path, G5_FILE_PERMISSION);
                     $size = @getimagesize($dest_path);
                     if (!($size[2] === 1 || $size[2] === 2 || $size[2] === 3)) { // gif jpg png 파일이 아니면 올라간 이미지를 삭제한다.
                         @unlink($dest_path);

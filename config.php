@@ -171,6 +171,7 @@ define('G5_SEO_TITLE_WORD_CUT', 8);        // SEO TITLE 문단 길이
 // 퍼미션
 define('G5_DIR_PERMISSION',  0755); // 디렉토리 생성시 퍼미션
 define('G5_FILE_PERMISSION', 0644); // 파일 생성시 퍼미션
+define('G5_LOGIN_PERSISTENT_LIFETIME', 60 * 60 * 24 * 365 * 10); // 로그인 유지 기간 (10년)
 
 // 모바일 인지 결정 $_SERVER['HTTP_USER_AGENT']
 define('G5_MOBILE_AGENT',   'phone|samsung|lgtel|mobile|[^A]skt|nokia|blackberry|BB10|android|sony');

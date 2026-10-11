@@ -1,7 +1,13 @@
 <?php
 if (!defined('_GNUBOARD_')) exit; // 개별 페이지 접근 불가
 
-if (G5_IS_MOBILE) {
+$willow_script_name = isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME']) : '';
+$willow_use_app_shell = G5_IS_MOBILE
+    || (!empty($bo_table) && $bo_table === 'notice')
+    || $willow_script_name === 'faq.php'
+    || $willow_script_name === 'memo.php';
+
+if ($willow_use_app_shell) {
     include_once(G5_THEME_MOBILE_PATH.'/tail.php');
     return;
 }

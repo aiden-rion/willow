@@ -161,8 +161,8 @@ if ($wp_id) {
     $is_general = !$article_requires_subscription;
     $article_title = $topic_post['wp_subject'];
     $article_author = $topic_post['wp_author'] ? $topic_post['wp_author'] : '윌로우 회원';
-    $member = $topic_post['mb_id'] ? get_member($topic_post['mb_id']) : array();
-    $article_author_avatar = willow_member_avatar($member);
+    $topic_author_member = $topic_post['mb_id'] ? get_member($topic_post['mb_id']) : array();
+    $article_author_avatar = willow_member_avatar($topic_author_member);
     $article_date = !empty($topic_post['wp_datetime']) ? get_text(substr($topic_post['wp_datetime'], 0, 10)) : '2026-01-01';
     $article_like = number_format(willow_like_count('topic', (int) $topic_post['wp_id']));
     $article_comment = number_format(willow_comment_count('topic', (int) $topic_post['wp_id']));

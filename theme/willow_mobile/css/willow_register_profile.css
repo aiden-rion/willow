@@ -288,8 +288,30 @@ body.willow_profile_edit_body .willow_shell {
   }
 
   .willow_profile_submit_bar {
+    right: auto;
     left: 50%;
     width: 390px;
     transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 1180px) {
+  body.willow_profile_edit_body {
+    background: transparent;
+  }
+
+  body.willow_profile_edit_body .willow_profile_edit {
+    width: 390px;
+    max-width: 390px;
+    margin-right: auto;
+    margin-left: calc(50% + 40px);
+    box-shadow: 0 18px 55px rgba(34, 28, 22, 0.13);
+  }
+
+  .willow_profile_submit_bar {
+    right: auto;
+    left: calc(50% + 235px);
+    width: 390px;
+    max-width: 390px;
   }
 }

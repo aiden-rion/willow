@@ -56,7 +56,7 @@ $author_terms = array(
 );
 
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.G5_CSS_VER.'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_CSS_PATH.'/willow_content.css').'">', 10);
 ?>
 
 <?php if ($step !== 'form') { ?>

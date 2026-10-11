@@ -5575,6 +5575,11 @@ body.willow_report_modal_open {
     box-shadow: 0 18px 55px rgba(34, 28, 22, 0.13);
   }
 
+  .willow_subscribe_app.is_intro {
+    background: #1b1b1b;
+    color: #ffffff;
+  }
+
   .willow_content_app *,
   .willow_subscribe_app * {
     max-width: 100%;
@@ -5588,6 +5593,30 @@ body.willow_report_modal_open {
     max-width: 390px;
     transform: translateX(-50%);
     box-shadow: 0 -1px 0 rgba(17, 17, 17, 0.06);
+  }
+
+  .willow_subscribe_bottom {
+    right: auto;
+    left: calc(50% + 235px);
+    width: 390px;
+    max-width: 390px;
+    transform: translateX(-50%);
+  }
+
+  .willow_payment_app .willow_subscribe_bottom {
+    right: auto;
+    left: calc(50% + 235px);
+    width: 390px;
+    max-width: 390px;
+    transform: translateX(-50%);
+  }
+
+  .willow_author_apply_bottom {
+    right: auto;
+    left: calc(50% + 235px);
+    width: 390px;
+    max-width: 390px;
+    transform: translateX(-50%);
   }
 }
 

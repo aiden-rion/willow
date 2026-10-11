@@ -85,19 +85,11 @@ if($config['cf_use_point']) {
     sql_query($sql);
 }
 
-// 3.26
-// 아이디 쿠키에 한달간 저장
-if (isset($auto_login) && $auto_login) {
-    // 3.27
-    // 자동로그인 ---------------------------
-    // 쿠키 한달간 저장
+// 일반 회원은 명시적 로그아웃 전까지 로그인 상태가 유지되도록 복구 쿠키를 저장한다.
+if (strtolower($mb['mb_id']) !== strtolower($config['cf_admin'])) {
     $key = md5($_SERVER['SERVER_ADDR'] . $_SERVER['SERVER_SOFTWARE'] . $_SERVER['HTTP_USER_AGENT'] . $mb['mb_password']);
-    set_cookie('ck_mb_id', $mb['mb_id'], 86400 * 31);
-    set_cookie('ck_auto', $key, 86400 * 31);
-    // 자동로그인 end ---------------------------
-} else {
-    set_cookie('ck_mb_id', '', 0);
-    set_cookie('ck_auto', '', 0);
+    set_cookie('ck_mb_id', $mb['mb_id'], G5_LOGIN_PERSISTENT_LIFETIME);
+    set_cookie('ck_auto', $key, G5_LOGIN_PERSISTENT_LIFETIME);
 }
 
 if ($url) {

@@ -1715,6 +1715,16 @@ body.willow_scrap_body .willow_liked_page .willow_list_intro h2 {
   font-weight: 800;
 }
 
+@media (min-width: 1180px) {
+  .willow_notification_setting_submit {
+    right: auto;
+    left: calc(50% + 235px);
+    width: 390px;
+    max-width: 390px;
+    transform: translateX(-50%);
+  }
+}
+
 .willow_notification_consent_modal[hidden] {
   display: none;
 }
@@ -2404,6 +2414,13 @@ html.willow_pull_active body {
 }
 
 @media (min-width: 1180px) {
+  body.willow_menu_body {
+    background:
+      linear-gradient(90deg, rgba(255, 245, 133, 0.18) 0 1px, transparent 1px 100%),
+      linear-gradient(180deg, #f7f3ea 0%, #f4f1ec 52%, #efebe4 100%);
+    background-size: 74px 100%, 100% 100%;
+  }
+
   #hd.willow_shell_header,
   #wrapper.willow_shell {
     margin-right: auto;

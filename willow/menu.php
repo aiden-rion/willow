@@ -5,7 +5,9 @@ include_once('./content.lib.php');
 $g5['title'] = '전체메뉴';
 $g5['body_script'] = ' class="willow_menu_body"';
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.G5_CSS_VER.'">', 10);
+$willow_menu_css_path = G5_THEME_PATH.'/css/willow_mobile.css';
+$willow_menu_css_ver = is_file($willow_menu_css_path) ? filemtime($willow_menu_css_path) : G5_CSS_VER;
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.$willow_menu_css_ver.'">', 10);
 
 $is_logged_in = !empty($member['mb_id']);
 $is_author = $is_logged_in && willow_author_is_escapee($member);
