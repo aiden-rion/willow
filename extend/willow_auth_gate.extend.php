@@ -15,9 +15,12 @@ $willow_allowed_paths = array(
     '/bbs/search.php',
     '/willow/auth_login.php',
     '/willow/account_check.php',
+    '/willow/author_register.php',
     '/willow/menu.php',
+    '/willow/payment.php',
     '/willow/refund_policy.php',
     '/willow/splash.php',
+    '/willow/subscribe.php',
     '/offline.php',
 );
 
@@ -39,7 +42,8 @@ if (!$is_member && !$willow_is_allowed) {
     if (strpos($willow_return_url, '/bbs/write.php') !== false && strpos($willow_return_url, 'bo_table=free') !== false) {
         $willow_return_url = '/willow/write.php';
     }
-    if (get_cookie('willow_splash_seen') !== '1') {
+    $willow_splash_seen = get_cookie('willow_splash_seen') === '1' || get_cookie(md5('willow_splash_seen')) === '1';
+    if (!$willow_splash_seen) {
         goto_url(G5_URL.'/willow/splash.php?url='.urlencode($willow_return_url));
     }
 
