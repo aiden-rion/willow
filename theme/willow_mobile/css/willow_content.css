@@ -5580,6 +5580,25 @@ body.willow_report_modal_open {
     color: #ffffff;
   }
 
+  .willow_write_app .willow_detail_header,
+  .willow_write_app .willow_write_actions {
+    right: auto;
+    left: calc(50% + 40px);
+    width: 390px;
+    max-width: 390px;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .willow_write_toast {
+    right: auto;
+    left: calc(50% + 58px);
+    width: 354px;
+    max-width: 354px;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
   .willow_content_app *,
   .willow_subscribe_app * {
     max-width: 100%;
