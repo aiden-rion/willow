@@ -48,7 +48,7 @@ $title = $step === 'list' ? '결제수단 변경' : '카드 등록하기';
 $g5['title'] = $title;
 $g5['body_script'] = ' class="willow_payment_page"';
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_CSS_PATH.'/willow_content.css').'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
 ?>
 
 <main class="willow_subscribe_app is_light willow_payment_app is_<?php echo $step; ?>">

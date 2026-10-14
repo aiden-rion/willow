@@ -20,7 +20,7 @@ if (empty($topic['wt_id']) || !willow_topic_is_visible($topic)) {
 
 $g5['title'] = '오늘의 주제 글쓰기';
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_CSS_PATH.'/willow_content.css').'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
 
 $willow_topic_title = get_text($topic['wt_subject']);
 $willow_topic_description = !empty($topic['wt_description']) ? nl2br(get_text($topic['wt_description'])) : '';

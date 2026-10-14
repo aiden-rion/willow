@@ -47,7 +47,7 @@ $has_notification_consent = $enabled_setting_count > 0;
 $token = get_token();
 $is_saved = isset($_GET['saved']) && $_GET['saved'] === '1';
 
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.filemtime(G5_THEME_CSS_PATH.'/willow_mobile.css').'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_mobile.css').'">', 10);
 include_once('./_head.php');
 ?>
 

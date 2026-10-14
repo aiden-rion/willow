@@ -1,7 +1,7 @@
 <?php
 if (!defined('_GNUBOARD_')) exit;
 
-$willow_profile_css_path = G5_THEME_CSS_PATH.'/willow_register_profile.css';
+$willow_profile_css_path = G5_THEME_PATH.'/css/willow_register_profile.css';
 $willow_profile_css_ver = is_file($willow_profile_css_path) ? filemtime($willow_profile_css_path) : G5_CSS_VER;
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_register_profile.css?ver='.$willow_profile_css_ver.'">', 20);
 include_once(G5_PATH.'/willow/content.lib.php');

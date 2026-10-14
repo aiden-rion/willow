@@ -248,7 +248,7 @@ $confirm = $step === 'confirm';
 
 $g5['title'] = $mode === 'my' ? '나의 구독' : '구독하기';
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_CSS_PATH.'/willow_content.css').'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
 ?>
 
 <main class="willow_subscribe_app <?php echo $confirm || $complete || $mode === 'my' ? 'is_light' : 'is_intro'; ?> <?php echo $my_subscription_detail ? 'is_my_detail' : ''; ?>">
