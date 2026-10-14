@@ -29,8 +29,12 @@ if (empty($topic['wt_id']) || !willow_topic_is_visible($topic)) {
 $topic_mode = isset($_POST['topic_mode']) && $_POST['topic_mode'] === 'free' ? 'free' : 'today';
 $subject = isset($_POST['wp_subject']) ? trim(strip_tags($_POST['wp_subject'])) : '';
 $content = isset($_POST['wp_content']) ? trim(strip_tags($_POST['wp_content'])) : '';
-$category = $topic_mode === 'free' ? willow_story_normalize_category(isset($_POST['wp_category']) ? $_POST['wp_category'] : '') : '';
-$tags = $topic_mode === 'free' ? willow_story_normalize_tags($category, isset($_POST['wp_tags']) ? $_POST['wp_tags'] : '', 1) : '';
+$category = '';
+$tags = $topic_mode === 'free' ? willow_free_keyword(isset($_POST['wp_tags']) ? $_POST['wp_tags'] : '') : '';
+if ($topic_mode === 'free' && !empty($_POST['wp_tags']) && $tags === '') {
+    echo json_encode(array('success' => false, 'message' => '키워드는 쉼표 없이 30자 이내로 입력해주세요.'));
+    exit;
+}
 $can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';
 $access = $can_subscriber_access && isset($_POST['wp_access']) && $_POST['wp_access'] === 'subscriber' ? 'subscriber' : 'public';
 $mb_id = sql_escape_string($member['mb_id']);

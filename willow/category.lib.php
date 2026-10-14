@@ -167,3 +167,22 @@ function willow_story_flat_search_categories()
 
     return $items;
 }
+
+function willow_free_keyword($value)
+{
+    if (!is_scalar($value)) return '';
+    $value = preg_replace('/^[#\\s]+|[# ,\\r\\n]+$/u', '', strip_tags((string) $value));
+    $value = preg_replace('/\\s+/u', ' ', $value);
+    if (strpos($value, ',') !== false || mb_strlen($value, 'UTF-8') > 30) {
+        return '';
+    }
+    return $value;
+}
+
+function willow_register_keyword($keyword)
+{
+    if ($keyword === '') return;
+    $table = G5_TABLE_PREFIX.'willow_keyword';
+    sql_query(" insert into `{$table}` (keyword) values ('".sql_escape_string($keyword)."')
+        on duplicate key update keyword = keyword ");
+}

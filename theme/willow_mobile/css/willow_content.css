@@ -956,6 +956,16 @@ body.willow_write_body {
   padding-bottom: 24px;
 }
 
+.willow_write_taxonomy input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid #dedede;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
 .willow_write_taxonomy {
   display: grid;
   gap: 8px;

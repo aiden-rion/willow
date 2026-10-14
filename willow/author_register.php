@@ -175,13 +175,11 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         </section>
 
         <section>
-            <h2>주요 카테고리</h2>
-            <p class="willow_author_apply_note">* 주로 작성하는 글 카테고리를 선택하세요.</p>
-            <div class="willow_author_category_chips">
-                <?php foreach ($categories as $category) { ?>
-                <label><input type="checkbox" name="categories[]" value="<?php echo $category; ?>"><span>#<?php echo $category; ?></span></label>
-                <?php } ?>
-            </div>
+            <h2>주요 키워드</h2>
+            <label class="willow_author_field"><span>키워드</span>
+                <input type="text" name="keywords" maxlength="154" placeholder="예: 일상, 정착, 가족" required>
+            </label>
+            <p class="willow_author_apply_note">쉼표로 구분하여 최대 5개, 각각 30자까지 입력해주세요.</p>
         </section>
 
         <section>

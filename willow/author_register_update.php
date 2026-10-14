@@ -21,7 +21,16 @@ if (!empty($latest['war_status']) && $latest['war_status'] === 'pending') {
 
 $intro = isset($_POST['intro']) ? trim(strip_tags($_POST['intro'])) : '';
 $is_escapee = isset($_POST['is_escapee']) ? trim($_POST['is_escapee']) : '';
-$categories = isset($_POST['categories']) && is_array($_POST['categories']) ? $_POST['categories'] : array();
+$raw_keywords = isset($_POST['keywords']) && is_string($_POST['keywords']) ? $_POST['keywords'] : '';
+$categories = array();
+foreach (explode(',', $raw_keywords) as $keyword) {
+    if (trim($keyword) === '') continue;
+    $normalized = willow_free_keyword($keyword);
+    if ($normalized === '') alert('키워드는 각각 30자 이내로 입력해주세요.');
+    $categories[] = $normalized;
+}
+$categories = array_values(array_unique($categories));
+if (count($categories) > 5) alert('키워드는 최대 5개까지 입력할 수 있습니다.');
 $bank_name = isset($_POST['bank_name']) ? trim(strip_tags($_POST['bank_name'])) : '';
 $account_holder = isset($_POST['account_holder']) ? trim(strip_tags($_POST['account_holder'])) : '';
 $account_number = isset($_POST['account_number']) ? preg_replace('/[^0-9]/', '', $_POST['account_number']) : '';
@@ -38,7 +47,7 @@ if (!in_array($is_escapee, array('yes', 'no'), true)) {
 }
 
 if (!$categories) {
-    alert('주요 카테고리를 하나 이상 선택해주세요.');
+    alert('주요 키워드를 하나 이상 입력해주세요.');
 }
 
 if ($bank_name === '' || $account_holder === '' || $account_number === '') {
@@ -131,5 +140,7 @@ sql_query(" insert into `{$table}`
         war_admin_memo = '',
         war_datetime = '{$now}',
         war_update_datetime = '{$now}' ");
+
+foreach ($categories as $keyword) willow_register_keyword($keyword);
 
 alert('작가등록 요청이 접수되었습니다. 관리자 승인 후 작가회원으로 전환됩니다.', G5_URL.'/willow/author_register.php');

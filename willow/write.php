@@ -93,34 +93,9 @@ if (!$can_subscriber_access) {
             <textarea id="wp_content" name="wp_content" placeholder="오늘의 주제에 대한 생각을&#10;자유롭게 작성해주세요" required><?php echo $draft_content; ?></textarea>
         </div>
 
-        <section class="willow_write_taxonomy" aria-label="글 분류 선택" <?php echo $draft_topic_mode === 'today' ? 'hidden' : ''; ?>>
-            <div class="willow_write_taxonomy_head">
-                <strong>잇다</strong>
-                <span>글의 큰 갈래를 먼저 선택해주세요.</span>
-            </div>
-            <div class="willow_category_picker" role="listbox" aria-label="대분류 선택">
-                <?php foreach ($willow_story_categories as $category_key => $category) { ?>
-                <button type="button" class="willow_category_option <?php echo $draft_category === $category_key ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" role="option" aria-selected="<?php echo $draft_category === $category_key ? 'true' : 'false'; ?>">
-                    <strong><?php echo get_text($category['label']); ?></strong>
-                    <span><?php echo get_text($category['description']); ?></span>
-                </button>
-                <?php } ?>
-            </div>
-            <div class="willow_keyword_panels">
-                <?php foreach ($willow_story_categories as $category_key => $category) { ?>
-                <div class="willow_keyword_panel" data-keyword-panel="<?php echo get_text($category_key); ?>" <?php echo $draft_category === $category_key ? '' : 'hidden'; ?>>
-                    <div class="willow_write_taxonomy_head is_compact">
-                        <strong>키워드</strong>
-                        <span>1개만 선택할 수 있습니다.</span>
-                    </div>
-                    <div class="willow_tag_chips" role="group" aria-label="<?php echo get_text($category['label']); ?> 키워드">
-                        <?php foreach ($category['tags'] as $tag) { ?>
-                        <button type="button" class="willow_tag_chip <?php echo in_array($tag, $draft_tags, true) ? 'is_selected' : ''; ?>" data-category="<?php echo get_text($category_key); ?>" data-tag="<?php echo get_text($tag); ?>">#<?php echo get_text($tag); ?></button>
-                        <?php } ?>
-                    </div>
-                </div>
-                <?php } ?>
-            </div>
+        <section class="willow_write_taxonomy" aria-label="키워드 입력" <?php echo $draft_topic_mode === 'today' ? 'hidden' : ''; ?>>
+            <label for="willow_keyword_input">키워드</label>
+            <input type="text" id="willow_keyword_input" maxlength="30" placeholder="키워드 입력" value="<?php echo get_text(!empty($draft['wd_tags']) ? $draft['wd_tags'] : ''); ?>">
         </section>
 
         <div class="willow_write_attach" aria-label="이미지 첨부">
@@ -266,16 +241,8 @@ if (!$can_subscriber_access) {
         if (title) title.textContent = isFree ? '' : topicTitle;
         if (description) description.innerHTML = isFree ? '' : topicDescription;
         if (subject) subject.value = isFree ? '자유주제' : topicTitle;
-        if (categoryField && isFree && !categoryField.value) {
-            selectCategory(defaultCategory);
-        }
-        if (!isFree) {
-            if (categoryField) categoryField.value = '';
-            document.querySelectorAll('.willow_tag_chip.is_selected').forEach(function(chip) {
-                chip.classList.remove('is_selected');
-            });
-            syncTags();
-        }
+        if (categoryField) categoryField.value = '';
+        syncTags();
         if (topicModeField) topicModeField.value = topicMode;
         content.placeholder = isFree ? '자유롭게 글을 작성해주세요' : '오늘의 주제에 대한 생각을\n자유롭게 작성해주세요';
         if (actions) {
@@ -296,34 +263,11 @@ if (!$can_subscriber_access) {
     }
 
     function syncTags() {
-        var selected = [];
-        var currentCategory = categoryField ? categoryField.value : '';
-        document.querySelectorAll('.willow_tag_chip.is_selected').forEach(function(chip) {
-            if (currentCategory && chip.getAttribute('data-category') !== currentCategory) {
-                return;
-            }
-            selected.push(chip.getAttribute('data-tag'));
-        });
-        tags.value = selected.join(',');
+        var input = document.getElementById('willow_keyword_input');
+        tags.value = topicMode === 'free' && input ? input.value.trim().replace(/^#+/, '').replace(/\s+/g, ' ') : '';
     }
 
-    function selectCategory(category) {
-        if (categoryField) categoryField.value = category;
-        document.querySelectorAll('.willow_category_option').forEach(function(button) {
-            var isSelected = button.getAttribute('data-category') === category;
-            button.classList.toggle('is_selected', isSelected);
-            button.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-        });
-        document.querySelectorAll('.willow_keyword_panel').forEach(function(panel) {
-            panel.hidden = panel.getAttribute('data-keyword-panel') !== category;
-        });
-        document.querySelectorAll('.willow_tag_chip.is_selected').forEach(function(chip) {
-            if (chip.getAttribute('data-category') !== category) {
-                chip.classList.remove('is_selected');
-            }
-        });
-        syncTags();
-    }
+    document.getElementById('willow_keyword_input').addEventListener('input', syncTags);
 
     function syncAttachVisibility() {
         var items = Array.prototype.slice.call(document.querySelectorAll('.willow_attach_item'));
@@ -347,25 +291,6 @@ if (!$can_subscriber_access) {
     });
 
     content.addEventListener('input', syncContentLimit);
-
-    document.querySelectorAll('.willow_tag_chip').forEach(function(chip) {
-        chip.addEventListener('click', function() {
-            var selectedInCategory = Array.prototype.slice.call(document.querySelectorAll('.willow_tag_chip.is_selected')).filter(function(item) {
-                return item.getAttribute('data-category') === chip.getAttribute('data-category');
-            });
-            selectedInCategory.forEach(function(item) {
-                if (item !== chip) item.classList.remove('is_selected');
-            });
-            chip.classList.toggle('is_selected');
-            syncTags();
-        });
-    });
-
-    document.querySelectorAll('.willow_category_option').forEach(function(button) {
-        button.addEventListener('click', function() {
-            selectCategory(button.getAttribute('data-category'));
-        });
-    });
 
     var alignButton = document.querySelector('[data-align-cycle]');
     if (alignButton) {
