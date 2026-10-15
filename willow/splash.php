@@ -18,7 +18,7 @@ $g5['title'] = 'WILLOW';
 $willow_splash_count = 8;
 
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.css?ver='.G5_CSS_VER.'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_splash.css').'">', 10);
 ?>
 
 <main class="willow_splash" data-login-url="<?php echo $login_url; ?>">
@@ -26,7 +26,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
         <?php for ($i = 1; $i <= $willow_splash_count; $i++) { ?>
         <?php $image = sprintf('splash_%03d.png', $i); ?>
         <section class="willow_splash_slide" aria-label="WILLOW 소개 <?php echo $i; ?>">
-            <img src="<?php echo G5_IMG_URL; ?>/<?php echo $image; ?>" alt="">
+            <img src="<?php echo G5_IMG_URL; ?>/<?php echo $image; ?>" alt="" draggable="false">
         </section>
         <?php } ?>
     </div>
@@ -93,6 +93,9 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
     function moveDrag(x) {
         if (!dragging) return;
         currentX = x;
+        var delta = currentX - startX;
+        if ((current === 0 && delta > 0) || (current === slides.length - 1 && delta < 0)) delta *= 0.25;
+        track.style.transform = 'translate3d(' + (-current * splash.clientWidth + delta) + 'px, 0, 0)';
     }
 
     function endDrag() {
@@ -108,25 +111,30 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
             }
             updateSlide(current + (deltaX < 0 ? 1 : -1));
         }
+        else updateSlide(current);
     }
 
     splash.addEventListener('touchstart', function(event) {
+        if (window.PointerEvent) return;
         if (!event.touches || !event.touches[0]) return;
         beginDrag(event.touches[0].clientX);
     }, { passive: true });
 
     splash.addEventListener('touchmove', function(event) {
+        if (window.PointerEvent) return;
         if (!dragging || !event.touches || !event.touches[0]) return;
         moveDrag(event.touches[0].clientX);
     }, { passive: true });
 
     splash.addEventListener('touchend', function() {
+        if (window.PointerEvent) return;
         endDrag();
     }, { passive: true });
 
     splash.addEventListener('pointerdown', function(event) {
         if (event.pointerType === 'mouse' && event.button !== 0) return;
         if (event.target.closest('button, a, input, textarea, select')) return;
+        if (event.pointerType === 'mouse') event.preventDefault();
         pointerId = event.pointerId;
         if (splash.setPointerCapture) {
             try {
@@ -151,7 +159,10 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
         dragging = false;
         pointerId = null;
         track.classList.remove('is_dragging');
+        updateSlide(current);
     });
+
+    splash.addEventListener('dragstart', function(event) { event.preventDefault(); });
 
     document.addEventListener('keydown', function(event) {
         if (event.key === 'ArrowRight') {
