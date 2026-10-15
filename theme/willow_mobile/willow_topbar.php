@@ -17,6 +17,7 @@ if ($willow_topbar_open) {
     <div class="willow_top_actions">
         <a href="<?php echo G5_BBS_URL; ?>/new.php" aria-label="알림">
             <img class="willow_header_icon_img" src="<?php echo G5_IMG_URL; ?>/ico_alert.png" alt="">
+            <?php include G5_PATH.'/willow/notification_badge.inc.php'; ?>
         </a>
         <a class="<?php echo $willow_topbar_menu_class; ?>" href="<?php echo $willow_topbar_menu_href; ?>" aria-label="<?php echo $willow_topbar_menu_label; ?>">
             <?php if (!$willow_topbar_open) { ?>

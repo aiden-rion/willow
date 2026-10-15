@@ -252,6 +252,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <div class="willow_detail_actions">
             <a href="<?php echo G5_BBS_URL; ?>/new.php" aria-label="알림">
                 <img src="<?php echo G5_IMG_URL; ?>/ico_alert.png" alt="">
+                <?php include G5_PATH.'/willow/notification_badge.inc.php'; ?>
             </a>
             <a href="<?php echo G5_URL; ?>/willow/menu.php" aria-label="메뉴">
                 <img src="<?php echo G5_IMG_URL; ?>/ico_menu.png" alt="">

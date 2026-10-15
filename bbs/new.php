@@ -8,6 +8,7 @@ $willow_notification_policies = willow_notification_policies();
 
 if ($is_member) {
     $willow_notifications = willow_get_notifications($member['mb_id'], 50);
+    willow_notification_mark_seen($member['mb_id']);
 }
 
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.css?ver='.G5_CSS_VER.'">', 10);

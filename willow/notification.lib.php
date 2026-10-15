@@ -4,6 +4,26 @@ if (!defined('_GNUBOARD_')) exit;
 include_once(G5_PATH.'/willow/topic.lib.php');
 include_once(G5_PATH.'/willow/content.lib.php');
 
+function willow_notification_mark_seen($mb_id)
+{
+    $table = willow_notification_setting_table();
+    $id = sql_escape_string($mb_id);
+    sql_query("insert into `{$table}` (mb_id, setting_key, is_enabled, ws_datetime)
+        values ('{$id}', '_last_seen', 1, '".G5_TIME_YMDHIS."')
+        on duplicate key update ws_datetime = values(ws_datetime)");
+}
+
+function willow_notification_has_new($mb_id)
+{
+    static $cache = array();
+    if (!$mb_id) return false;
+    if (isset($cache[$mb_id])) return $cache[$mb_id];
+    $items = willow_get_notifications($mb_id, 1);
+    $table = willow_notification_setting_table();
+    $row = sql_fetch("select ws_datetime from `{$table}` where mb_id = '".sql_escape_string($mb_id)."' and setting_key = '_last_seen'", false);
+    return $cache[$mb_id] = !empty($items) && (empty($row['ws_datetime']) || $items[0]['datetime'] > $row['ws_datetime']);
+}
+
 function willow_subscription_table()
 {
     global $g5;

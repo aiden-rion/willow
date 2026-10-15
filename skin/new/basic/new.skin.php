@@ -16,7 +16,7 @@ $willow_notification_icons = array(
 
 <script>document.body.classList.add('willow_inner_title_body');var willowAutoTitle=document.querySelector('.willow_page_title');if(willowAutoTitle)willowAutoTitle.style.display='none';var willowShellHeader=document.querySelector('#hd.willow_shell_header');if(willowShellHeader)willowShellHeader.style.display='none';</script>
 <header class="willow_member_confirm_header">
-    <a href="javascript:history.back();" aria-label="뒤로가기"></a>
+    <a href="<?php echo G5_URL; ?>/willow/menu.php" aria-label="뒤로가기"></a>
     <h1>알림</h1>
 </header>
 
