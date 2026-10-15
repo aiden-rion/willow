@@ -49,10 +49,14 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 /* These source images contain 151px/152px white bands. */
+.willow_splash_slide:nth-child(1) { background: rgb(230, 236, 222); }
+.willow_splash_slide:nth-child(2),
+.willow_splash_slide:nth-child(5) { background: rgb(248, 246, 225); }
+.willow_splash_slide:nth-child(4) { background: rgb(228, 234, 220); }
 .willow_splash_slide:nth-child(3) { background: rgb(244, 244, 244); }
 .willow_splash_slide:nth-child(6),
 .willow_splash_slide:nth-child(8) { background: rgb(246, 245, 246); }
@@ -71,7 +75,7 @@ body {
 }
 
 .willow_splash_controls {
-  position: fixed;
+  position: absolute;
   right: 0;
   bottom: max(38px, env(safe-area-inset-bottom));
   left: 0;
@@ -133,11 +137,11 @@ body {
   }
 
   .willow_splash_controls {
-    right: auto;
-    left: 50%;
-    width: 390px;
+    right: 0;
+    left: 0;
+    width: 100%;
     max-width: 100%;
-    transform: translateX(-50%);
+    transform: none;
   }
 }
 
@@ -310,8 +314,7 @@ body {
 }
 
 @media (min-width: 1180px) {
-  .willow_splash,
-  .willow_splash_controls {
+  .willow_splash {
     left: calc(50% + 235px);
   }
 
