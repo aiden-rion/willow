@@ -177,9 +177,9 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <section>
             <h2>주요 키워드</h2>
             <label class="willow_author_field"><span>키워드</span>
-                <input type="text" name="keywords" maxlength="154" placeholder="예: 일상, 정착, 가족" required>
+                <input type="text" name="keywords" data-keyword-input maxlength="160" placeholder="예: #일상 #정착 #가족" required>
             </label>
-            <p class="willow_author_apply_note">쉼표로 구분하여 최대 5개, 각각 30자까지 입력해주세요.</p>
+            <p class="willow_author_apply_note">띄어쓰기로 구분하여 최대 5개, 각각 30자까지 입력해주세요.</p>
         </section>
 
         <section>
@@ -336,4 +336,5 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 <?php } ?>
 
 <?php
+add_javascript('<script defer src="'.G5_URL.'/js/willow_keywords.js?ver='.filemtime(G5_PATH.'/js/willow_keywords.js').'"></script>', 20);
 include_once(G5_PATH.'/tail.sub.php');

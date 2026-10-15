@@ -179,6 +179,21 @@ function willow_free_keyword($value)
     return $value;
 }
 
+function willow_input_keywords($value)
+{
+    if (!is_string($value)) return false;
+    $words = preg_split('/[\s,#]+/u', trim($value), -1, PREG_SPLIT_NO_EMPTY);
+    if ($words === false) return false;
+    $result = array();
+    foreach ($words as $word) {
+        $keyword = willow_free_keyword($word);
+        if ($keyword === '') return false;
+        $result[] = $keyword;
+    }
+    $result = array_values(array_unique($result));
+    return count($result) <= 5 ? $result : false;
+}
+
 function willow_register_keyword($keyword)
 {
     if ($keyword === '') return;

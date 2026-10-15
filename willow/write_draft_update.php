@@ -30,9 +30,10 @@ $topic_mode = isset($_POST['topic_mode']) && $_POST['topic_mode'] === 'free' ? '
 $subject = isset($_POST['wp_subject']) ? trim(strip_tags($_POST['wp_subject'])) : '';
 $content = isset($_POST['wp_content']) ? trim(strip_tags($_POST['wp_content'])) : '';
 $category = '';
-$tags = $topic_mode === 'free' ? willow_free_keyword(isset($_POST['wp_tags']) ? $_POST['wp_tags'] : '') : '';
+$keyword_list = $topic_mode === 'free' ? willow_input_keywords(isset($_POST['wp_tags']) ? $_POST['wp_tags'] : '') : array();
+$tags = $keyword_list === false ? '' : implode(',', $keyword_list);
 if ($topic_mode === 'free' && !empty($_POST['wp_tags']) && $tags === '') {
-    echo json_encode(array('success' => false, 'message' => '키워드는 쉼표 없이 30자 이내로 입력해주세요.'));
+    echo json_encode(array('success' => false, 'message' => '키워드는 각각 30자 이내로 최대 5개까지 입력해주세요.'));
     exit;
 }
 $can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';

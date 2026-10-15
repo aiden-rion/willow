@@ -95,7 +95,7 @@ if (!$can_subscriber_access) {
 
         <section class="willow_write_taxonomy" aria-label="키워드 입력" <?php echo $draft_topic_mode === 'today' ? 'hidden' : ''; ?>>
             <label for="willow_keyword_input">키워드</label>
-            <input type="text" id="willow_keyword_input" maxlength="30" placeholder="키워드 입력" value="<?php echo get_text(!empty($draft['wd_tags']) ? $draft['wd_tags'] : ''); ?>">
+            <input type="text" id="willow_keyword_input" data-keyword-input maxlength="160" placeholder="키워드 입력" value="<?php echo get_text(!empty($draft['wd_tags']) ? $draft['wd_tags'] : ''); ?>">
         </section>
 
         <div class="willow_write_attach" aria-label="이미지 첨부">
@@ -514,4 +514,5 @@ if (!$can_subscriber_access) {
 </script>
 
 <?php
+add_javascript('<script defer src="'.G5_URL.'/js/willow_keywords.js?ver='.filemtime(G5_PATH.'/js/willow_keywords.js').'"></script>', 20);
 include_once(G5_PATH.'/tail.sub.php');

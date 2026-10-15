@@ -26,9 +26,10 @@ $wp_subject = isset($_POST['wp_subject']) ? trim(strip_tags($_POST['wp_subject']
 $wp_content = isset($_POST['wp_content']) ? trim(strip_tags($_POST['wp_content'])) : '';
 $topic_mode = isset($_POST['topic_mode']) && $_POST['topic_mode'] === 'free' ? 'free' : 'today';
 $wp_category = '';
-$wp_tags = $topic_mode === 'free' ? willow_free_keyword(isset($_POST['wp_tags']) ? $_POST['wp_tags'] : '') : '';
+$keyword_list = $topic_mode === 'free' ? willow_input_keywords(isset($_POST['wp_tags']) ? $_POST['wp_tags'] : '') : array();
+$wp_tags = $keyword_list === false ? '' : implode(',', $keyword_list);
 if ($topic_mode === 'free' && !empty($_POST['wp_tags']) && $wp_tags === '') {
-    alert('키워드는 쉼표 없이 30자 이내로 입력해주세요.');
+    alert('키워드는 각각 30자 이내로 최대 5개까지 입력해주세요.');
 }
 $can_subscriber_access = !empty($member['mb_7']) && $member['mb_7'] === 'nk_migrant';
 $wp_access = $can_subscriber_access && isset($_POST['wp_access']) && $_POST['wp_access'] === 'subscriber' ? 'subscriber' : 'public';
@@ -125,7 +126,7 @@ sql_query(" insert into `{$tables['post']}`
         wp_tags = '".sql_escape_string($wp_tags)."',
         wp_datetime = '{$now}' ");
 $wp_id = sql_insert_id();
-if ($wp_id) willow_register_keyword($wp_tags);
+if ($wp_id) foreach ($keyword_list as $keyword) willow_register_keyword($keyword);
 
 if ($topic_mode === 'today') {
     sql_query(" update `{$tables['topic']}` set wt_participants = wt_participants + 1 where wt_id = '{$wt_id}' ");
