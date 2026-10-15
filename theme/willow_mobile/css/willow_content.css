@@ -956,6 +956,58 @@ body.willow_write_body {
   padding-bottom: 24px;
 }
 
+.willow_keyword_editor {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  width: 100%;
+}
+.willow_keyword_tokens { display: contents; }
+.willow_keyword_editor .willow_keyword_token {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #dedede;
+  border-radius: 6px;
+  background: #fafafa;
+  font-size: 14px;
+  color: #333;
+}
+.willow_keyword_token > span { min-width: 0; overflow-wrap: anywhere; }
+.willow_keyword_token button {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #777;
+}
+.willow_keyword_editor input.willow_keyword_entry,
+.willow_keyword_editor input.willow_keyword_entry:focus {
+  flex: 1 1 110px;
+  width: 110px;
+  min-width: 0;
+  height: 38px;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  font-size: 16px;
+}
+.willow_keyword_editor .willow_keyword_feedback {
+  flex-basis: 100%;
+  color: #c33;
+  font-size: 12px;
+}
+.willow_keyword_feedback:empty { display: none; }
+
 .willow_author_field input[data-keyword-input],
 .willow_write_taxonomy input[data-keyword-input] {
   border: 0;
