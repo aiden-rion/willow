@@ -53,6 +53,7 @@ $phone_url = $base_login_url.'?auth_step=phone';
 $verify_url = $base_login_url.'?auth_step=verify'.$phone_query;
 $profile_url = $base_login_url.'?auth_step=profile'.$phone_query;
 $return_url = isset($login_url) && $login_url ? urldecode($login_url) : G5_URL;
+$splash_url = G5_URL.'/willow/splash.php?url='.rawurlencode($return_url);
 $code_value = isset($_GET['code']) ? preg_replace('/[^0-9]/', '', $_GET['code']) : '';
 $sms_send_result = array();
 
@@ -152,6 +153,9 @@ if ($auth_step === 'profile' && $phone_value) {
     <?php } ?>
 
     <?php if ($auth_step === 'phone') { ?>
+    <header class="willow_auth_header willow_auth_header_center">
+        <a class="willow_auth_close" href="<?php echo htmlspecialchars($splash_url, ENT_QUOTES, 'UTF-8'); ?>" aria-label="로그인 닫고 소개 화면으로"></a>
+    </header>
     <main class="willow_auth_body willow_auth_simple">
         <strong class="willow_auth_brand"><img src="<?php echo G5_IMG_URL; ?>/logo.png" alt="WILLOW"></strong>
         <h2>간편인증을 통해<br>이용이 가능합니다.</h2>
@@ -170,6 +174,7 @@ if ($auth_step === 'profile' && $phone_value) {
     <header class="willow_auth_header willow_auth_header_center">
         <a class="willow_auth_back" href="<?php echo $phone_url; ?>" aria-label="뒤로가기"></a>
         <h1>인증번호 입력</h1>
+        <a class="willow_auth_close" href="<?php echo htmlspecialchars($splash_url, ENT_QUOTES, 'UTF-8'); ?>" aria-label="로그인 닫고 소개 화면으로"></a>
     </header>
 
     <main class="willow_auth_body willow_auth_verify_body">
@@ -244,6 +249,7 @@ if ($auth_step === 'profile' && $phone_value) {
     <header class="willow_auth_header willow_auth_header_center">
         <a class="willow_auth_back" href="<?php echo $verify_url; ?>" aria-label="뒤로가기"></a>
         <h1>회원가입</h1>
+        <a class="willow_auth_close" href="<?php echo htmlspecialchars($splash_url, ENT_QUOTES, 'UTF-8'); ?>" aria-label="로그인 닫고 소개 화면으로"></a>
     </header>
 
     <main class="willow_auth_body willow_auth_profile_body">
