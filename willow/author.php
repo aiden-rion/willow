@@ -56,8 +56,7 @@ function willow_author_post_card($post)
                 <button type="button" class="willow_more_button" aria-label="더보기"><span></span></button>
                 <div class="willow_more_menu">
                     <?php if ($is_post_owner) { ?>
-                    <button type="button">수정하기</button>
-                    <button type="button">삭제하기</button>
+                    <?php echo willow_post_owner_menu($post); ?>
                     <?php } else { ?>
                     <button type="button" class="willow_report_button" data-willow-report-open data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
                     <?php } ?>

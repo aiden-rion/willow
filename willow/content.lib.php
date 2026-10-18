@@ -3,6 +3,30 @@ if (!defined('_GNUBOARD_')) exit;
 
 include_once(G5_PATH.'/willow/category.lib.php');
 
+function willow_post_owner_menu($post)
+{
+    global $member;
+    if (empty($member['mb_id']) || empty($post['mb_id']) || $member['mb_id'] !== $post['mb_id']) return '';
+    $id = (int) $post['id'];
+    $is_topic = $post['target_type'] === 'topic';
+    $edit_url = $is_topic ? G5_URL.'/willow/write.php?wp_id='.$id : G5_BBS_URL.'/write.php?w=u&bo_table='.urlencode(willow_content_board()).'&wr_id='.$id;
+    $delete_url = $is_topic ? G5_URL.'/willow/post_delete.php' : G5_BBS_URL.'/delete.php';
+    $token_key = $is_topic ? 'willow_post_token' : 'ss_delete_token';
+    if (!get_session($token_key)) set_session($token_key, bin2hex(random_bytes(32)));
+    add_stylesheet('<style>.willow_search_post{position:relative}.willow_search_owner_menu{position:absolute;right:12px;top:16px;z-index:2}.willow_search_owner_menu summary{list-style:none;cursor:pointer;padding:10px 14px}.willow_search_owner_menu summary::-webkit-details-marker{display:none}.willow_search_owner_menu>div{position:absolute;right:0;width:130px;background:#fff;border:1px solid #ddd;border-radius:6px;box-shadow:0 4px 16px #0002}.willow_search_owner_menu button{display:block;width:100%;padding:12px;border:0;background:transparent;text-align:left}.willow_search_owner_menu form button{color:#e53935}.willow_search_owner_menu+.willow_search_post_link .willow_post_head{padding-right:44px}</style>', 20);
+    ob_start();
+    ?>
+    <button type="button" role="menuitem" onclick="location.href=this.dataset.href" data-href="<?php echo htmlspecialchars($edit_url, ENT_QUOTES, 'UTF-8'); ?>">수정하기</button>
+    <form action="<?php echo $delete_url; ?>" method="post" onsubmit="return confirm('이 글을 삭제하시겠습니까?');">
+        <input type="hidden" name="<?php echo $is_topic ? 'wp_id' : 'wr_id'; ?>" value="<?php echo $id; ?>">
+        <?php if (!$is_topic) { ?><input type="hidden" name="bo_table" value="<?php echo get_text(willow_content_board()); ?>"><?php } ?>
+        <input type="hidden" name="token" value="<?php echo get_session($token_key); ?>">
+        <button type="submit" role="menuitem">삭제하기</button>
+    </form>
+    <?php
+    return ob_get_clean();
+}
+
 function willow_content_board()
 {
     return 'free';
@@ -1945,8 +1969,7 @@ function willow_render_post_card($post)
                 </button>
                 <div class="willow_more_menu" role="menu">
                     <?php if ($is_post_owner) { ?>
-                    <button type="button" role="menuitem">수정하기</button>
-                    <button type="button" role="menuitem">삭제하기</button>
+                    <?php echo willow_post_owner_menu($post); ?>
                     <?php } else { ?>
                     <button type="button" role="menuitem" class="willow_report_button" data-willow-report-open data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
                     <?php } ?>

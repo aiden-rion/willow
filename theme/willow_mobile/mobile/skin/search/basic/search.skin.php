@@ -90,6 +90,13 @@ $willow_author_results = $willow_has_query ? willow_get_authors($willow_keyword,
             <div class="willow_post_list">
                 <?php foreach ($willow_post_results as $post) { ?>
                 <article class="willow_search_post">
+                    <?php $owner_menu = willow_post_owner_menu($post); ?>
+                    <?php if ($owner_menu) { ?>
+                    <details class="willow_search_owner_menu">
+                        <summary aria-label="글 관리"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></summary>
+                        <div><?php echo $owner_menu; ?></div>
+                    </details>
+                    <?php } ?>
                     <a class="willow_search_post_link" href="<?php echo $post['href']; ?>">
                         <div class="willow_post_head">
                             <span class="willow_post_avatar"><img src="<?php echo $post['avatar']; ?>" alt=""></span>
@@ -97,7 +104,6 @@ $willow_author_results = $willow_has_query ? willow_get_authors($willow_keyword,
                                 <strong><?php echo $post['author']; ?></strong>
                                 <time><?php echo $post['date']; ?></time>
                             </span>
-                            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                         </div>
                         <p><?php echo $post['excerpt']; ?></p>
                         <div class="willow_post_meta">
