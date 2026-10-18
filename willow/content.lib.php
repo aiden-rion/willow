@@ -815,6 +815,8 @@ function willow_content_plain_text($content)
     }
 
     $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    // Browser form submissions use CRLF; normalize before splitting paragraphs.
+    $content = str_replace(array("\r\n", "\r"), "\n", $content);
     $content = str_replace(array('\\r\\n', '\\n', '\\r'), "\n", $content);
     $content = preg_replace('/<\s*br\s*\/?\s*>/i', "\n", $content);
     $content = preg_replace('/<\s*\/p\s*>\s*<\s*p[^>]*>/i', "\n\n", $content);
