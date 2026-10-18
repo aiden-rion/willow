@@ -117,8 +117,12 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                         </button>
                         <div class="willow_more_menu" role="menu">
                             <?php if ($is_post_owner) { ?>
-                            <button type="button" role="menuitem">수정하기</button>
-                            <button type="button" role="menuitem">삭제하기</button>
+                            <button type="button" role="menuitem" onclick="location.href='<?php echo G5_URL; ?>/willow/write.php?wp_id=<?php echo (int) $post['id']; ?>'">수정하기</button>
+                            <form action="<?php echo G5_URL; ?>/willow/post_delete.php" method="post" onsubmit="return confirm('이 글을 삭제하시겠습니까?');">
+                                <input type="hidden" name="wp_id" value="<?php echo (int) $post['id']; ?>">
+                                <input type="hidden" name="token" value="<?php if (!get_session('willow_post_token')) set_session('willow_post_token', bin2hex(random_bytes(32))); echo get_session('willow_post_token'); ?>">
+                                <button type="submit" role="menuitem">삭제하기</button>
+                            </form>
                             <?php } else { ?>
                             <button type="button" role="menuitem" class="willow_report_button" data-willow-report-open data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>">신고하기</button>
                             <?php } ?>

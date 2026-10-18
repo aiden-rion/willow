@@ -9,6 +9,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 willow_topic_install();
 
 $tables = willow_topic_tables();
+$edit_id = isset($_POST['wp_id']) ? (int) $_POST['wp_id'] : 0;
+if ($edit_id) {
+    $edit_post = sql_fetch("select * from `{$tables['post']}` where wp_id = '{$edit_id}'");
+    if (!$is_member || empty($edit_post['mb_id']) || $edit_post['mb_id'] !== $member['mb_id']) alert('본인의 글만 수정할 수 있습니다.');
+    if (!get_session('willow_post_token') || !hash_equals(get_session('willow_post_token'), (string) ($_POST['token'] ?? ''))) alert('잘못된 요청입니다.');
+    $_POST['wt_id'] = $edit_post['wt_id'];
+    $_POST['topic_mode'] = $edit_post['wp_topic_mode'] === 'free' ? 'free' : 'today';
+}
 $today_write_point = 100;
 $wt_id = isset($_POST['wt_id']) ? (int) $_POST['wt_id'] : 0;
 $wd_id = isset($_POST['wd_id']) ? (int) $_POST['wd_id'] : 0;
@@ -112,6 +120,18 @@ if (isset($_FILES['wp_images']['name']) && is_array($_FILES['wp_images']['name']
 }
 
 $wp_image = implode('|', $wp_images);
+
+if ($edit_id) {
+    sql_query("update `{$tables['post']}` set
+        wp_subject = '".sql_escape_string($wp_subject)."',
+        wp_content = '".sql_escape_string($wp_content)."',
+        wp_image = '".sql_escape_string($wp_image)."',
+        wp_access = '".sql_escape_string($wp_access)."',
+        wp_tags = '".sql_escape_string($wp_tags)."'
+        where wp_id = '{$edit_id}' and mb_id = '".sql_escape_string($mb_id)."'");
+    foreach ($keyword_list as $keyword) willow_register_keyword($keyword);
+    goto_url(G5_URL.'/willow/post.php?wp_id='.$edit_id);
+}
 
 sql_query(" insert into `{$tables['post']}`
     set wt_id = '{$wt_id}',

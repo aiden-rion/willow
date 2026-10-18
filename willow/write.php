@@ -5,6 +5,16 @@ include_once('./topic.lib.php');
 willow_topic_install();
 
 $tables = willow_topic_tables();
+$edit_id = isset($_GET['wp_id']) ? (int) $_GET['wp_id'] : 0;
+$edit_post = array();
+if ($edit_id) {
+    $edit_post = sql_fetch("select * from `{$tables['post']}` where wp_id = '{$edit_id}'");
+    if (!$is_member || empty($edit_post['mb_id']) || $edit_post['mb_id'] !== $member['mb_id']) {
+        alert('본인의 글만 수정할 수 있습니다.', G5_URL.'/willow/today.php');
+    }
+    $_GET['wt_id'] = $edit_post['wt_id'];
+}
+if (!get_session('willow_post_token')) set_session('willow_post_token', bin2hex(random_bytes(32)));
 $topic = willow_get_topic();
 $wt_id = isset($_GET['wt_id']) ? (int) $_GET['wt_id'] : (int) $topic['wt_id'];
 if ($wt_id && $wt_id !== (int) $topic['wt_id']) {
@@ -25,7 +35,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 $willow_topic_title = get_text($topic['wt_subject']);
 $willow_topic_description = !empty($topic['wt_description']) ? nl2br(get_text($topic['wt_description'])) : '';
 $willow_story_categories = willow_story_categories();
-$draft_id = isset($_GET['wd_id']) ? (int) $_GET['wd_id'] : 0;
+$draft_id = !$edit_id && isset($_GET['wd_id']) ? (int) $_GET['wd_id'] : 0;
 $draft = array();
 $draft_images = array();
 $draft_tags = array();
@@ -46,6 +56,13 @@ if ($draft_id && $is_member) {
     } else {
         $draft_id = 0;
     }
+}
+if ($edit_id) {
+    $draft_id = 0;
+    foreach (array('subject', 'content', 'topic_mode', 'category', 'tags', 'access') as $field) {
+        $draft['wd_'.$field] = $edit_post['wp_'.$field];
+    }
+    $draft_images = array_values(array_filter(explode('|', $edit_post['wp_image'])));
 }
 $draft_topic_mode = !empty($draft['wd_topic_mode']) && $draft['wd_topic_mode'] === 'free' ? 'free' : 'today';
 $draft_category = willow_story_normalize_category(!empty($draft['wd_category']) ? $draft['wd_category'] : willow_story_default_category());
@@ -72,6 +89,8 @@ if (!$can_subscriber_access) {
 
     <form class="willow_topic_write_form" action="<?php echo G5_URL; ?>/willow/write_update.php" method="post" enctype="multipart/form-data" autocomplete="off">
         <input type="hidden" name="MAX_FILE_SIZE" value="5242880">
+        <input type="hidden" name="wp_id" value="<?php echo $edit_id; ?>">
+        <input type="hidden" name="token" value="<?php echo get_session('willow_post_token'); ?>">
         <input type="hidden" name="wt_id" value="<?php echo (int) $topic['wt_id']; ?>">
         <input type="hidden" id="topic_mode" name="topic_mode" value="<?php echo get_text($draft_topic_mode); ?>">
         <input type="hidden" id="wd_id" name="wd_id" value="<?php echo (int) $draft_id; ?>">
@@ -286,6 +305,7 @@ if (!$can_subscriber_access) {
     }
 
     toggle.addEventListener('click', function() {
+        if (<?php echo $edit_id ? 'true' : 'false'; ?>) return;
         topicMode = topicMode === 'today' ? 'free' : 'today';
         syncTopic();
     });
@@ -451,6 +471,7 @@ if (!$can_subscriber_access) {
     });
 
     if (saveButton && form) {
+        if (<?php echo $edit_id ? 'true' : 'false'; ?>) saveButton.hidden = true;
         saveButton.addEventListener('click', function() {
             if (saveButton.disabled) return;
             syncTags();
