@@ -15,7 +15,8 @@ if ($is_member) {
 
 $login_url = G5_BBS_URL.'/login.php?url='.urlencode($return_url);
 $g5['title'] = 'WILLOW';
-$willow_splash_count = 8;
+$willow_splash_images = array(1, 2, 3, 4, 5, 6, 8);
+$willow_splash_count = count($willow_splash_images);
 
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_splash.css').'">', 10);
@@ -23,9 +24,9 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_splash.
 
 <main class="willow_splash" data-login-url="<?php echo $login_url; ?>">
     <div class="willow_splash_track">
-        <?php for ($i = 1; $i <= $willow_splash_count; $i++) { ?>
-        <?php $image = sprintf('splash_%03d.png', $i); ?>
-        <section class="willow_splash_slide" aria-label="WILLOW 소개 <?php echo $i; ?>">
+        <?php foreach ($willow_splash_images as $index => $image_id) { ?>
+        <?php $image = sprintf('splash_%03d.png', $image_id); ?>
+        <section class="willow_splash_slide" aria-label="WILLOW 소개 <?php echo $index + 1; ?>">
             <img src="<?php echo G5_IMG_URL; ?>/<?php echo $image; ?>" alt="" draggable="false">
         </section>
         <?php } ?>

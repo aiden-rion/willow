@@ -1,4 +1,4 @@
-const WILLOW_CACHE = "willow-app-shell-v3";
+const WILLOW_CACHE = "willow-app-shell-v4";
 const WILLOW_APP_SHELL = [
   "/",
   "/offline.php",
@@ -15,7 +15,6 @@ const WILLOW_APP_SHELL = [
   "/img/splash_004.png",
   "/img/splash_005.png",
   "/img/splash_006.png",
-  "/img/splash_007.png",
   "/img/splash_008.png"
 ];
 

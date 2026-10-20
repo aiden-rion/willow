@@ -59,12 +59,10 @@ body {
 .willow_splash_slide:nth-child(4) { background: rgb(228, 234, 220); }
 .willow_splash_slide:nth-child(3) { background: rgb(244, 244, 244); }
 .willow_splash_slide:nth-child(6),
-.willow_splash_slide:nth-child(8) { background: rgb(246, 245, 246); }
-.willow_splash_slide:nth-child(7) { background: rgb(228, 236, 223); }
+.willow_splash_slide:nth-child(7) { background: rgb(246, 245, 246); }
 .willow_splash_slide:nth-child(3) img,
 .willow_splash_slide:nth-child(6) img,
-.willow_splash_slide:nth-child(7) img,
-.willow_splash_slide:nth-child(8) img {
+.willow_splash_slide:nth-child(7) img {
   position: absolute;
   top: 50%;
   left: 50%;
