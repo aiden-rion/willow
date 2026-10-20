@@ -70,7 +70,7 @@ function willow_author_post_card($post)
             <?php } ?>
         </a>
         <div class="willow_author_post_meta">
-            <span><img src="<?php echo G5_IMG_URL; ?>/ico_heart<?php echo !empty($post['liked']) ? '_active' : ''; ?>.png" alt=""><?php echo $like_count > 0 ? number_format($like_count) : ''; ?></span>
+            <button type="button" data-author-like data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>" aria-label="좋아요" aria-pressed="<?php echo !empty($post['liked']) ? 'true' : 'false'; ?>"><img src="<?php echo G5_IMG_URL; ?>/ico_heart<?php echo !empty($post['liked']) ? '_active' : ''; ?>.png" alt=""><span data-like-count><?php echo $like_count > 0 ? number_format($like_count) : ''; ?></span></button>
             <a href="<?php echo $post['href']; ?>#willow_comments"><img src="<?php echo G5_IMG_URL; ?>/ico_rep.png" alt=""><?php echo $comment_count > 0 ? number_format($comment_count) : ''; ?></a>
             <b><?php echo $access_label; ?></b>
         </div>
@@ -135,7 +135,7 @@ $subscribe_href = G5_URL.'/willow/subscribe.php?author='.urlencode($author_id);
 $g5['title'] = '작가보기';
 
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.G5_CSS_VER.'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
 ?>
 
 <main class="willow_content_app willow_author_page" data-author-id="<?php echo get_text($author_id); ?>">
@@ -204,6 +204,30 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         }
 
         document.addEventListener('click', function(event) {
+            var like = event.target.closest('[data-author-like]');
+            if (like) {
+                event.preventDefault();
+                if (like.disabled) return;
+                like.disabled = true;
+                var payload = new FormData();
+                payload.append('target_type', like.dataset.targetType);
+                payload.append('target_id', like.dataset.targetId);
+                fetch('<?php echo G5_URL; ?>/willow/like.php', {
+                    method: 'POST', credentials: 'same-origin',
+                    headers: {'X-Requested-With': 'XMLHttpRequest'}, body: payload
+                }).then(function(response) { return response.json(); }).then(function(data) {
+                    if (!data.success) {
+                        alert(data.message || '좋아요 처리에 실패했습니다.');
+                        return;
+                    }
+                    like.setAttribute('aria-pressed', data.liked ? 'true' : 'false');
+                    like.querySelector('img').src = '<?php echo G5_IMG_URL; ?>/ico_heart' + (data.liked ? '_active' : '') + '.png';
+                    like.querySelector('[data-like-count]').textContent = parseInt(String(data.count).replace(/,/g, ''), 10) > 0 ? data.count : '';
+                }).catch(function() {
+                    alert('좋아요 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+                }).finally(function() { like.disabled = false; });
+                return;
+            }
             var accessTab = event.target.closest('[data-author-access-tab]');
             if (accessTab) {
                 event.preventDefault();

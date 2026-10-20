@@ -3876,6 +3876,7 @@ html.willow_pull_active body {
 }
 
 .willow_author_post_meta span,
+.willow_author_post_meta button,
 .willow_author_post_meta a {
   display: inline-flex;
   align-items: center;
