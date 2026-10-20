@@ -10,6 +10,12 @@ $g5['title'] = '오늘의 주제';
 $tables = willow_topic_tables();
 $selected_wt_id = isset($_GET['wt_id']) ? (int) $_GET['wt_id'] : 0;
 $mode = isset($_GET['mode']) && $_GET['mode'] === 'new' ? 'new' : '';
+$topic_count = sql_fetch(" select count(*) as cnt from `{$tables['topic']}` ");
+$total_count = (int) $topic_count['cnt'];
+$rows_per_page = 20;
+$total_page = max(1, (int) ceil($total_count / $rows_per_page));
+$page = min($total_page, max(1, (int) ($_GET['page'] ?? 1)));
+$offset = ($page - 1) * $rows_per_page;
 
 $topics = array();
 $topic_result = sql_query(" select t.*,
@@ -18,7 +24,8 @@ $topic_result = sql_query(" select t.*,
     from `{$tables['topic']}` t
     left join `{$tables['post']}` p on p.wt_id = t.wt_id
     group by t.wt_id
-    order by t.wt_publish_datetime desc, t.wt_date desc, t.wt_id desc ", false);
+    order by t.wt_publish_datetime desc, t.wt_date desc, t.wt_id desc
+    limit {$offset}, {$rows_per_page} ", false);
 
 if ($topic_result) {
     while ($row = sql_fetch_array($topic_result)) {
@@ -85,11 +92,14 @@ require_once './admin.head.php';
 </div>
 
 <div class="btn_fixed_top">
-    <a href="./willow_topic.php?mode=new" class="btn btn_01">새 주제 등록</a>
+    <?php if ($mode === 'new') { ?><a href="./willow_topic.php?page=<?php echo $page; ?>" class="btn btn_02">주제 목록</a><?php } ?>
+    <a href="./willow_topic.php?mode=new&amp;page=<?php echo $page; ?>" class="btn btn_01">새 주제 등록</a>
 </div>
 
+<?php if ($mode !== 'new') { ?>
 <section>
     <h2 class="h2_frm">날짜별 주제 목록</h2>
+    <div class="willow_admin_summary"><span>전체 <?php echo number_format($total_count); ?>개</span><span><?php echo $page; ?> / <?php echo $total_page; ?> 페이지</span></div>
     <div class="tbl_head01 tbl_wrap">
         <table>
             <caption>날짜별 오늘의 주제 목록</caption>
@@ -111,7 +121,7 @@ require_once './admin.head.php';
                 <?php foreach ($topics as $topic_row) { ?>
                 <?php
                 $is_selected = $selected_wt_id && (int) $topic_row['wt_id'] === $selected_wt_id;
-                $topic_link = './willow_topic.php?wt_id='.(int) $topic_row['wt_id'];
+                $topic_link = './willow_topic.php?page='.$page.'&amp;wt_id='.(int) $topic_row['wt_id'].'#topic_form';
                 ?>
                 <tr<?php echo $is_selected ? ' style="background:#fffbe8"' : ''; ?>>
                     <td class="td_num"><?php echo (int) $topic_row['wt_id']; ?></td>
@@ -142,8 +152,10 @@ require_once './admin.head.php';
         </table>
     </div>
 </section>
+<?php echo get_paging(10, $page, $total_page, './willow_topic.php?page='); ?>
+<?php } ?>
 
-<form name="fwillowtopic" method="post" action="./willow_topic_update.php">
+<form id="topic_form" name="fwillowtopic" method="post" action="./willow_topic_update.php" style="scroll-margin-top:100px">
     <input type="hidden" name="token" value="<?php echo get_admin_token(); ?>">
     <input type="hidden" name="wt_id" value="<?php echo (int) $selected_topic['wt_id']; ?>">
 
