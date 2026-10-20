@@ -39,7 +39,7 @@ $bo_v_sns_class = $config['cf_kakao_js_apikey'] ? 'show_kakao' : '';
             }
 
             var webUrl = location.protocol+"<?php echo '//'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']; ?>",
-                imageUrl = $("#bo_v_img").find("img").attr("src") || $(".view_image").find("img").attr("src") || '';
+                imageUrl = <?php echo json_encode(G5_IMG_URL.'/willow-share-20261020.jpg'); ?>;
 
             Kakao.Link.sendDefault({
                 objectType: 'feed',

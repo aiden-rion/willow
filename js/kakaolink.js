@@ -6,9 +6,7 @@ function kakaolink_send(text, url, image)
         }
     }
 
-    if( image === undefined ){
-        image = '';
-    }
+    image = g5_url + '/img/willow-share-20261020.jpg';
 
     // 카카오톡 링크 버튼을 생성합니다. 처음 한번만 호출하면 됩니다.
     Kakao.Link.sendDefault({

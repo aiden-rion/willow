@@ -35,6 +35,14 @@ header("Pragma: no-cache"); // HTTP/1.0
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<meta property="og:type" content="website">
+<meta property="og:title" content="<?php echo htmlspecialchars($g5_head_title, ENT_QUOTES, 'UTF-8'); ?>">
+<meta property="og:description" content="작은 기록이 서로의 힘이 되는 곳, 윌로우">
+<meta property="og:image" content="<?php echo G5_IMG_URL; ?>/willow-share-20261020.jpg">
+<meta property="og:image:width" content="1668">
+<meta property="og:image:height" content="835">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="<?php echo G5_IMG_URL; ?>/willow-share-20261020.jpg">
 <?php
 if (G5_IS_MOBILE) {
     echo '<meta name="viewport" id="meta_viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">'.PHP_EOL;
