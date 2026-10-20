@@ -24,6 +24,10 @@ if (!in_array($target_type, array('topic', 'board')) || $target_id < 1) {
     willow_like_json(array('success' => false, 'message' => '대상을 확인할 수 없습니다.'));
 }
 
+if (willow_post_blocked($target_type, $target_id)) {
+    willow_like_json(array('success' => false, 'message' => '게시중단된 글입니다.'));
+}
+
 $tables = willow_topic_tables();
 $count = 0;
 

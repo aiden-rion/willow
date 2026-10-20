@@ -125,7 +125,9 @@ if ($stx) {
     for ($i=0; $i<count($g5_search['tables']); $i++) {
         $tmp_write_table   = $g5['write_prefix'] . $g5_search['tables'][$i];
 
-        $sql = " select wr_id from {$tmp_write_table} where {$sql_search} ";
+        include_once(G5_PATH.'/willow/moderation.lib.php');
+        $visible = $g5_search['tables'][$i] === 'free' ? willow_visible_sql('board', 'wr_parent') : '1';
+        $sql = " select wr_id from {$tmp_write_table} where ({$sql_search}) and {$visible} ";
         $result = sql_query($sql, false);
         $row['cnt'] = @sql_num_rows($result);
 
@@ -170,7 +172,8 @@ if ($stx) {
 
         $tmp_write_table = $g5['write_prefix'] . $search_table[$idx];
 
-        $sql = " select * from {$tmp_write_table} where {$sql_search} order by wr_id desc limit {$from_record}, {$rows} ";
+        $visible = $search_table[$idx] === 'free' ? willow_visible_sql('board', 'wr_parent') : '1';
+        $sql = " select * from {$tmp_write_table} where ({$sql_search}) and {$visible} order by wr_id desc limit {$from_record}, {$rows} ";
         $result = sql_query($sql);
         for ($i=0; $row=sql_fetch_array($result); $i++) {
             // 검색어까지 링크되면 게시판 부하가 일어남

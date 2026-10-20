@@ -39,6 +39,7 @@ $is_search_bbs = false;
 if ($sca || $stx || $stx === '0') {     //검색이면
     $is_search_bbs = true;      //검색구분변수 true 지정
     $sql_search = get_sql_search($sca, $sfl, $stx, $sop);
+    if ($bo_table === 'free') $sql_search = '('.$sql_search.') and '.willow_visible_sql('board', 'wr_parent');
 
     // 가장 작은 번호를 얻어서 변수에 저장 (하단의 페이징에서 사용)
     $sql = " select MIN(wr_num) as min_wr_num from {$write_table} ";
@@ -63,6 +64,10 @@ if ($sca || $stx || $stx === '0') {     //검색이면
     $sql_search = "";
 
     $total_count = $board['bo_count_write'];
+    if ($bo_table === 'free') {
+        $visible_count = sql_fetch("SELECT COUNT(*) AS cnt FROM {$write_table} WHERE wr_is_comment = 0 AND ".willow_visible_sql('board', 'wr_id'));
+        $total_count = (int) $visible_count['cnt'];
+    }
 }
 
 if(G5_IS_MOBILE) {
@@ -97,6 +102,7 @@ if (!$is_search_bbs) {
         $row = sql_fetch(" select * from {$write_table} where wr_id = '{$arr_notice[$k]}' ");
 
         if (!isset($row['wr_id']) || !$row['wr_id']) continue;
+        if ($bo_table === 'free' && willow_post_blocked('board', $row['wr_id'])) continue;
 
         $notice_array[] = $row['wr_id'];
 
@@ -182,6 +188,7 @@ if ($is_search_bbs) {
     $sql = " select distinct wr_parent from {$write_table} where {$sql_search} {$sql_order} limit {$from_record}, $page_rows ";
 } else {
     $sql = " select * from {$write_table} where wr_is_comment = 0 ";
+    if ($bo_table === 'free') $sql .= ' and '.willow_visible_sql('board', 'wr_id');
     if(!empty($notice_array))
         $sql .= " and wr_id not in (".implode(', ', $notice_array).") ";
     $sql .= " {$sql_order} limit {$from_record}, $page_rows ";

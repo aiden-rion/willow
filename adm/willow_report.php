@@ -5,6 +5,7 @@ include_once G5_PATH.'/willow/content.lib.php';
 
 auth_check_menu($auth, $sub_menu, 'r');
 willow_report_install();
+if (!willow_moderation_install()) alert('게시중단 관리 테이블을 생성할 수 없습니다.');
 
 $g5['title'] = '신고관리';
 $table = willow_report_table();
@@ -20,6 +21,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     check_demo();
     auth_check_menu($auth, $sub_menu, 'w');
     check_admin_token();
+
+    if (isset($_POST['moderate'])) {
+        $parts = explode(':', (string) $_POST['moderate']);
+        $report_id = isset($parts[0]) ? (int) $parts[0] : 0;
+        $action = isset($parts[1]) ? $parts[1] : '';
+        if (!in_array($action, array('block', 'restore'), true)) alert('잘못된 요청입니다.');
+        $report = sql_fetch("SELECT * FROM `{$table}` WHERE wrp_id = {$report_id}");
+        if (!$report || !in_array($report['wrp_target_type'], array('board', 'topic'), true)) alert('신고 대상을 찾을 수 없습니다.');
+        $type = $report['wrp_target_type'];
+        $id = (int) $report['wrp_target_id'];
+        $blocked = $action === 'block' ? 1 : 0;
+        $admin = sql_escape_string($member['mb_id']);
+        $moderation_table = willow_moderation_table();
+        sql_query("INSERT INTO `{$moderation_table}` (target_type, target_id, blocked, admin_id, updated_at)
+            VALUES ('{$type}', {$id}, {$blocked}, '{$admin}', '".G5_TIME_YMDHIS."')
+            ON DUPLICATE KEY UPDATE blocked = VALUES(blocked), admin_id = VALUES(admin_id), updated_at = VALUES(updated_at)");
+        $log = sql_escape_string("\n[".G5_TIME_YMDHIS."] ".$member['mb_id'].': '.($blocked ? '게시중단' : '게시중단 해제'));
+        sql_query("UPDATE `{$table}` SET wrp_admin_memo = CONCAT(COALESCE(wrp_admin_memo, ''), '{$log}'), wrp_update_datetime = '".G5_TIME_YMDHIS."' WHERE wrp_target_type = '{$type}' AND wrp_target_id = {$id}");
+        goto_url('./willow_report.php');
+    }
 
     $ids = isset($_POST['wrp_id']) ? $_POST['wrp_id'] : array();
     $status_post = isset($_POST['wrp_status']) ? $_POST['wrp_status'] : array();
@@ -128,6 +149,9 @@ require_once './admin.head.php';
                     <?php if (!empty($target['href'])) { ?>
                     <a href="<?php echo $target['href']; ?>" target="_blank" rel="noopener noreferrer" class="btn btn_03">글보기</a>
                     <?php } ?>
+                    <?php $blocked = willow_post_blocked($report['wrp_target_type'], $report['wrp_target_id']); ?>
+                    <p><strong><?php echo $blocked ? '게시중단' : '게시중'; ?></strong></p>
+                    <button type="submit" name="moderate" value="<?php echo (int) $report['wrp_id']; ?>:<?php echo $blocked ? 'restore' : 'block'; ?>" class="btn btn_02" onclick="return confirm('<?php echo $blocked ? '이 글의 게시중단을 해제할까요?' : '이 글을 게시중단할까요? 목록과 상세페이지에서 숨겨집니다.'; ?>');"><?php echo $blocked ? '게시중단 해제' : '게시중단'; ?></button>
                 </td>
                 <td><?php echo get_text($report['wrp_author_name']); ?><br><span><?php echo get_text($report['wrp_author_mb_id']); ?></span></td>
                 <td><?php echo get_text($report['wrp_reporter_name']); ?><br><span><?php echo get_text($report['wrp_reporter_mb_id']); ?></span></td>

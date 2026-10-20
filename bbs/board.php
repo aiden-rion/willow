@@ -1,5 +1,9 @@
 <?php
 include_once('./_common.php');
+include_once(G5_PATH.'/willow/moderation.lib.php');
+if ($bo_table === 'free' && !empty($write['wr_id'])) {
+    willow_require_visible_post('board', $write['wr_is_comment'] ? $write['wr_parent'] : $write['wr_id']);
+}
 
 if (!$board['bo_table']) {
    alert('존재하지 않는 게시판입니다.', G5_URL);

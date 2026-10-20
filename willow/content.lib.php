@@ -2,6 +2,7 @@
 if (!defined('_GNUBOARD_')) exit;
 
 include_once(G5_PATH.'/willow/category.lib.php');
+include_once(G5_PATH.'/willow/moderation.lib.php');
 
 function willow_post_owner_menu($post)
 {
@@ -1167,7 +1168,7 @@ function willow_get_board_posts($limit = 10, $keyword = '')
 {
     $table = willow_content_table();
     $limit = max(1, (int) $limit);
-    $where = " where wr_is_comment = 0 ";
+    $where = " where wr_is_comment = 0 and ".willow_visible_sql('board', 'wr_id');
 
     if ($keyword !== '') {
         $keyword = sql_escape_string($keyword);
@@ -1247,7 +1248,7 @@ function willow_get_topic_search_posts($limit = 10, $keyword = '')
     $result = sql_query(" select p.*, t.wt_subject
         from `{$tables['post']}` p
         left join `{$tables['topic']}` t on t.wt_id = p.wt_id
-        where (".implode(' or ', $where).")
+        where (".implode(' or ', $where).") and ".willow_visible_sql('topic', 'p.wp_id')."
         order by p.wp_datetime desc, p.wp_id desc
         limit {$limit} ", false);
     if ($result) {
@@ -1289,7 +1290,7 @@ function willow_get_popular_board_posts($limit = 10)
     $posts = array();
     $result = sql_query(" select *
         from {$table}
-        where wr_is_comment = 0
+        where wr_is_comment = 0 and ".willow_visible_sql('board', 'wr_id')."
         order by wr_hit desc, wr_datetime desc, wr_id desc
         limit {$limit} ", false);
 
@@ -1366,6 +1367,7 @@ function willow_get_mixed_feed_posts($offset = 0, $limit = 6, $seed = '', $exclu
         $result = sql_query(" select p.*, t.wt_subject
             from `{$tables['post']}` p
             left join `{$tables['topic']}` t on t.wt_id = p.wt_id
+            where ".willow_visible_sql('topic', 'p.wp_id')."
             order by p.wp_datetime desc, p.wp_like desc, p.wp_comment desc, p.wp_id desc
             limit {$fetch_limit} ", false);
         if ($result) {
@@ -1467,7 +1469,7 @@ function willow_get_search_suggestions($seed_words = array(), $limit = 40)
     }
 
     $table = willow_content_table();
-    $result = sql_query(" select wr_subject, wr_1, wr_2, wr_name from {$table} where wr_is_comment = 0 order by wr_datetime desc, wr_id desc limit 30 ", false);
+    $result = sql_query(" select wr_subject, wr_1, wr_2, wr_name from {$table} where wr_is_comment = 0 and ".willow_visible_sql('board', 'wr_id')." order by wr_datetime desc, wr_id desc limit 30 ", false);
     if ($result) {
         while ($row = sql_fetch_array($result)) {
             willow_add_search_suggestion($suggestions, $seen, $row['wr_name'].' 작가', $row['wr_name'], 'author');
@@ -1493,12 +1495,12 @@ function willow_get_recommended_posts($limit = 3)
     $recent_from = date('Y-m-d 00:00:00', strtotime('-90 days', G5_SERVER_TIME));
     $queries = array(
         " select * from {$table}
-            where wr_is_comment = 0
+            where wr_is_comment = 0 and ".willow_visible_sql('board', 'wr_id')."
                 and wr_datetime >= '".sql_escape_string($recent_from)."'
             order by wr_hit desc, wr_datetime desc, wr_id desc
             limit ".($limit * 8),
         " select * from {$table}
-            where wr_is_comment = 0
+            where wr_is_comment = 0 and ".willow_visible_sql('board', 'wr_id')."
             order by wr_hit desc, wr_datetime desc, wr_id desc
             limit ".($limit * 8),
     );
@@ -1845,6 +1847,7 @@ function willow_get_personalized_feed($offset = 0, $limit = 6, $feed_seed = '', 
         $result = sql_query(" select p.*, t.wt_subject
             from `{$tables['post']}` p
             left join `{$tables['topic']}` t on t.wt_id = p.wt_id
+            where ".willow_visible_sql('topic', 'p.wp_id')."
             order by p.wp_datetime desc, p.wp_id desc
             limit {$fetch_limit} ", false);
         if ($result) {
@@ -2053,7 +2056,7 @@ function willow_get_recommended_authors($limit = 0, $days = 0)
 
         $mb_id_sql = sql_escape_string($mb_id);
         $board_base = " from {$board_table}
-            where wr_is_comment = 0
+            where wr_is_comment = 0 and ".willow_visible_sql('board', 'wr_id')."
                 and mb_id = '{$mb_id_sql}'
                 and wr_datetime >= '{$recent_from_sql}' ";
 
@@ -2154,7 +2157,7 @@ function willow_get_author_board_posts($mb_id, $author_name = '', $access_group 
     $table = willow_content_table();
     $limit = max(1, (int) $limit);
     $exclude_wr_id = (int) $exclude_wr_id;
-    $where = " where wr_is_comment = 0 ";
+    $where = " where wr_is_comment = 0 and ".willow_visible_sql('board', 'wr_id');
 
     if ($mb_id !== '') {
         $where .= " and mb_id = '".sql_escape_string($mb_id)."' ";
@@ -2196,7 +2199,7 @@ function willow_get_author_topic_posts($mb_id, $author_name = '', $exclude_wp_id
 
     $limit = max(1, (int) $limit);
     $exclude_wp_id = (int) $exclude_wp_id;
-    $where = " where 1 ";
+    $where = " where ".willow_visible_sql('topic', 'wp_id');
 
     if ($mb_id !== '') {
         $where .= " and mb_id = '".sql_escape_string($mb_id)."' ";

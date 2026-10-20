@@ -229,6 +229,8 @@ function willow_notification_add(&$items, $type, $title, $body, $href, $datetime
 
 function willow_notification_post_meta($target_type, $target_id)
 {
+    include_once(G5_PATH.'/willow/moderation.lib.php');
+    if (willow_post_blocked($target_type, $target_id)) return array();
     $target_id = (int) $target_id;
     if (!$target_id) {
         return array();

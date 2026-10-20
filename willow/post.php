@@ -4,6 +4,8 @@ include_once('./_data.php');
 include_once('./topic.lib.php');
 include_once('./content.lib.php');
 include_once('./notification.lib.php');
+willow_require_visible_post('board', isset($_GET['wr_id']) ? (int) $_GET['wr_id'] : 0);
+willow_require_visible_post('topic', isset($_GET['wp_id']) ? (int) $_GET['wp_id'] : 0);
 
 $type = isset($_GET['type']) && $_GET['type'] === 'general' ? 'general' : 'paid';
 $is_general = $type === 'general';

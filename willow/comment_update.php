@@ -29,6 +29,10 @@ if ($content === '') {
     willow_comment_json(array('success' => false, 'message' => '댓글 내용을 입력해주세요.'));
 }
 
+if (willow_post_blocked($target_type, $target_id)) {
+    willow_comment_json(array('success' => false, 'message' => '게시중단된 글입니다.'));
+}
+
 $tables = willow_topic_tables();
 $count = 0;
 

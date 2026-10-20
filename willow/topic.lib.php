@@ -2,6 +2,7 @@
 if (!defined('_GNUBOARD_')) exit;
 
 include_once(G5_PATH.'/willow/category.lib.php');
+include_once(G5_PATH.'/willow/moderation.lib.php');
 
 function willow_topic_tables()
 {
@@ -400,7 +401,7 @@ function willow_topic_recent_participants($wt_id, $limit = 3)
     $limit = max(1, (int) $limit);
     $participants = array();
     $seen = array();
-    $result = sql_query(" select mb_id, wp_author from `{$tables['post']}` where wt_id = '{$wt_id}' and (wp_topic_mode = '' or wp_topic_mode = 'today') order by wp_id desc limit 30 ");
+    $result = sql_query(" select mb_id, wp_author from `{$tables['post']}` where ".willow_visible_sql('topic', 'wp_id')." and wt_id = '{$wt_id}' and (wp_topic_mode = '' or wp_topic_mode = 'today') order by wp_id desc limit 30 ");
 
     while ($row = sql_fetch_array($result)) {
         $key = $row['mb_id'] ? 'm:'.$row['mb_id'] : 'a:'.$row['wp_author'];
@@ -465,7 +466,7 @@ function willow_get_topic_posts($wt_id, $limit = 20)
     $wt_id = (int) $wt_id;
     $limit = max(1, (int) $limit);
     $posts = array();
-    $result = sql_query(" select * from `{$tables['post']}` where wt_id = '{$wt_id}' and (wp_topic_mode = '' or wp_topic_mode = 'today') order by wp_id desc limit {$limit} ");
+    $result = sql_query(" select * from `{$tables['post']}` where ".willow_visible_sql('topic', 'wp_id')." and wt_id = '{$wt_id}' and (wp_topic_mode = '' or wp_topic_mode = 'today') order by wp_id desc limit {$limit} ");
 
     while ($row = sql_fetch_array($result)) {
         $posts[] = $row;
