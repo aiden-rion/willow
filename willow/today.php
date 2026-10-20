@@ -23,7 +23,7 @@ $write_href = $has_visible_topic ? willow_topic_write_url($willow_topic) : '#';
 
 $g5['title'] = '오늘의 주제';
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.G5_CSS_VER.'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
 ?>
 
 <div class="willow_pull_refresh" data-pull-refresh aria-hidden="true">
@@ -168,6 +168,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         }
 
         var picker = document.querySelector('[data-topic-picker]');
+        if (picker) document.body.appendChild(picker);
         var pickerOpen = document.querySelector('[data-topic-picker-open]');
         var monthButtons = document.querySelectorAll('[data-topic-month]');
         var topicItems = document.querySelectorAll('[data-topic-item]');

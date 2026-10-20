@@ -248,9 +248,10 @@ body.willow_has_bottom_nav .willow_today_app {
 }
 
 .willow_topic_picker {
+  box-sizing: border-box;
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: 1000;
   visibility: hidden;
   pointer-events: none;
 }
@@ -273,6 +274,7 @@ body.willow_has_bottom_nav .willow_today_app {
 }
 
 .willow_topic_picker_panel {
+  box-sizing: border-box;
   position: absolute;
   right: 0;
   bottom: 0;
@@ -280,6 +282,9 @@ body.willow_has_bottom_nav .willow_today_app {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
   max-height: min(78vh, 640px);
+  height: min(78vh, 640px);
+  height: min(78dvh, 640px);
+  overflow: hidden;
   padding: 0 20px calc(18px + env(safe-area-inset-bottom));
   border-radius: 22px 22px 0 0;
   background: #ffffff;
@@ -373,11 +378,13 @@ body.willow_has_bottom_nav .willow_today_app {
   align-content: start;
   gap: 8px;
   overflow-y: auto;
-  min-height: 220px;
+  min-height: 0;
+  overscroll-behavior: contain;
   padding: 4px 0 6px;
 }
 
 .willow_topic_picker_list a {
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: 86px minmax(0, 1fr);
   align-items: center;
@@ -387,6 +394,18 @@ body.willow_has_bottom_nav .willow_today_app {
   border-radius: 10px;
   background: #ffffff;
   color: #111111;
+}
+
+.willow_topic_picker_list a[hidden] {
+  display: none;
+}
+
+@media (min-width: 1180px) {
+  .willow_topic_picker {
+    left: calc(50% + 40px);
+    right: auto;
+    width: 390px;
+  }
 }
 
 .willow_topic_picker_list a.is_selected {
