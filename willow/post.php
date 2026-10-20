@@ -242,7 +242,7 @@ if (!$article_author_is_certified) {
 }
 
 include_once(G5_PATH.'/head.sub.php');
-add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.G5_CSS_VER.'">', 10);
+add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
 ?>
 
 <main class="willow_content_app willow_article_page">

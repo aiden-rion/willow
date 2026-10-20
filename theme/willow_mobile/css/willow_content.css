@@ -1580,6 +1580,7 @@ html.willow_pull_active body {
 
 .willow_article_tags {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   min-height: 23px;
   margin-bottom: 28px;
@@ -1587,8 +1588,12 @@ html.willow_pull_active body {
 
 .willow_article_tags span {
   display: inline-flex;
+  flex: 0 0 auto;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   align-items: center;
-  height: 23px;
+  min-height: 23px;
+  line-height: 21px;
   padding: 0 7px;
   border: 1px solid #1476ff;
   color: #1476ff;
