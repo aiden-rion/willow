@@ -10,7 +10,7 @@ function willow_share_button($type, $id)
 {
     if ((int) $id < 1) return '';
     $url = G5_URL.'/willow/post.php?'.($type === 'topic' ? 'wp_id=' : 'wr_id=').(int) $id;
-    return '<button type="button" class="willow_share_button" data-willow-share="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'" title="공유하기 (링크 복사)" aria-label="공유하기 (링크 복사)"><img class="willow_share_icon" src="'.G5_IMG_URL.'/ico_share_upload.png" alt="" aria-hidden="true"></button>';
+    return '<button type="button" class="willow_share_button" data-willow-share="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'" title="공유하기 (링크 복사)" aria-label="공유하기 (링크 복사)"><svg class="willow_share_icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true" focusable="false"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.247 1.499C4.183-.187.6 2.643 1.53 6.014L3.182 12 1.53 17.986c-.93 3.37 2.653 6.201 5.717 4.515l13.578-7.468c2.39-1.315 2.39-4.75 0-6.066L7.246 1.5zM3.458 5.482c-.46-1.666 1.311-3.064 2.825-2.231L19.86 10.72c.142.077.263.172.365.28H4.98L3.458 5.482zM4.981 13l-1.523 5.518c-.46 1.665 1.311 3.064 2.825 2.231l13.577-7.468c.142-.078.263-.173.365-.281H4.98z"></path></svg></button>';
 }
 
 function willow_profile_link_open($post)

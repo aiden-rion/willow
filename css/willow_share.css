@@ -14,15 +14,13 @@ button.willow_share_button {
   cursor: pointer;
 }
 button.willow_share_button:hover { background: #f4f4f4; color: #222; }
-button.willow_share_button img.willow_share_icon {
+button.willow_share_button svg.willow_share_icon {
   display: block;
-  flex: 0 0 24px;
-  width: 24px;
-  height: 28px;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
   margin: 0;
   border-radius: 0;
-  object-fit: contain;
-  mix-blend-mode: multiply;
 }
 button.willow_share_button:focus-visible { outline: 2px solid #2878ff; outline-offset: 2px; }
 .willow_article_like { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px; }
