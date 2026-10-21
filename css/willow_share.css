@@ -1,0 +1,34 @@
+button.willow_share_button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #666;
+  font-size: 18px;
+  cursor: pointer;
+}
+button.willow_share_button:hover { background: #f4f4f4; color: #222; }
+button.willow_share_button:focus-visible { outline: 2px solid #2878ff; outline-offset: 2px; }
+.willow_article_like { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 16px; }
+.willow_article_actions { display: flex; align-items: center; justify-content: center; gap: 16px; }
+.willow_article_actions .willow_like_button { min-height: 36px; }
+.willow_share_status {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  max-width: calc(100% - 32px);
+  padding: 12px 20px;
+  background: #222;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}

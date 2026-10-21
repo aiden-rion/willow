@@ -4,13 +4,13 @@ if (!defined('_GNUBOARD_')) exit;
 include_once(G5_PATH.'/willow/category.lib.php');
 include_once(G5_PATH.'/willow/moderation.lib.php');
 add_javascript('<script src="'.G5_JS_URL.'/willow_share.js?v='.filemtime(G5_PATH.'/js/willow_share.js').'"></script>', 10);
-add_stylesheet('<style>button.willow_share_button{display:inline-flex;align-items:center;justify-content:center;flex:0 0 40px;width:40px;height:40px;padding:0;border:0;background:transparent;color:#222;font-size:20px;cursor:pointer}button.willow_share_button:focus-visible{outline:2px solid #2878ff;outline-offset:2px}.willow_share_status{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:10000;max-width:calc(100% - 32px);padding:12px 20px;background:#222;color:#fff;border-radius:6px;font-size:14px;text-align:center}</style>', 20);
+add_stylesheet('<link rel="stylesheet" href="'.G5_URL.'/css/willow_share.css?v='.filemtime(G5_PATH.'/css/willow_share.css').'">', 30);
 
 function willow_share_button($type, $id)
 {
     if ((int) $id < 1) return '';
     $url = G5_URL.'/willow/post.php?'.($type === 'topic' ? 'wp_id=' : 'wr_id=').(int) $id;
-    return '<button type="button" class="willow_share_button" data-willow-share="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'" title="공유하기 (링크 복사)" aria-label="공유하기 (링크 복사)"><i class="fa fa-share-alt" aria-hidden="true"></i></button>';
+    return '<button type="button" class="willow_share_button" data-willow-share="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'" title="공유하기 (링크 복사)" aria-label="공유하기 (링크 복사)"><i class="fa fa-external-link" aria-hidden="true"></i></button>';
 }
 
 function willow_profile_link_open($post)
@@ -2014,8 +2014,8 @@ function willow_render_post_card($post)
             <a class="willow_comment_link" href="<?php echo $post['href']; ?>#willow_comments">
                 <img class="willow_meta_icon" src="<?php echo G5_IMG_URL; ?>/ico_rep.png" alt=""><span data-comment-count><?php echo (int) str_replace(',', '', $post['comments']) > 0 ? $post['comments'] : ''; ?></span>
             </a>
+            <?php echo willow_share_button($post['target_type'], $post['id']); ?>
             <div class="willow_post_badges">
-                <?php echo willow_share_button($post['target_type'], $post['id']); ?>
                 <?php if (!empty($post['access']) && willow_is_paid_access($post['access'])) { ?>
                 <span class="willow_post_badge is_paid">유료</span>
                 <?php } ?>
