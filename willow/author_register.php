@@ -8,7 +8,7 @@ if (!$is_member) {
 
 willow_author_request_install();
 
-$is_author = ((int) $member['mb_level'] >= 3) || (!empty($member['mb_2']) && $member['mb_2'] === 'author');
+$is_author = willow_author_is_escapee($member);
 $latest_request = willow_author_latest_request($member['mb_id']);
 $step = isset($_GET['step']) && $_GET['step'] === 'form' ? 'form' : 'intro';
 $category_rows = willow_get_categories(true);

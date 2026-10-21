@@ -9,7 +9,7 @@ if (!$is_member) {
 check_token();
 willow_author_request_install();
 
-$is_author = ((int) $member['mb_level'] >= 3) || (!empty($member['mb_2']) && $member['mb_2'] === 'author');
+$is_author = willow_author_is_escapee($member);
 if ($is_author) {
     alert('이미 작가회원으로 등록되어 있습니다.', G5_URL.'/willow/author_register.php');
 }

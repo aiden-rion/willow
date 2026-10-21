@@ -11,8 +11,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_mobile.
 
 $is_logged_in = !empty($member['mb_id']);
 $is_author = $is_logged_in && willow_author_is_escapee($member);
-$is_registered_author = $is_logged_in && ($is_author || $member['mb_2'] === 'author' || (int) $member['mb_level'] >= 3 || in_array($member['mb_7'], array('nk_migrant', 'general_author'), true));
-$show_author_register = $is_logged_in && !$is_registered_author;
+$show_author_register = $is_logged_in && !$is_author;
 $member_name = $is_logged_in ? ($member['mb_nick'] ? $member['mb_nick'] : $member['mb_name']) : '방문자';
 $member_level = $is_author ? '작가회원' : '일반회원';
 $member_suffix = $is_author ? ' 작가님,' : ' 회원님,';
