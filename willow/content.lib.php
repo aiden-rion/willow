@@ -10,7 +10,7 @@ function willow_share_button($type, $id)
 {
     if ((int) $id < 1) return '';
     $url = G5_URL.'/willow/post.php?'.($type === 'topic' ? 'wp_id=' : 'wr_id=').(int) $id;
-    return '<button type="button" class="willow_share_button" data-willow-share="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'" title="공유하기 (링크 복사)" aria-label="공유하기 (링크 복사)"><i class="fa fa-external-link" aria-hidden="true"></i></button>';
+    return '<button type="button" class="willow_share_button" data-willow-share="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'" title="공유하기 (링크 복사)" aria-label="공유하기 (링크 복사)"><img class="willow_share_icon" src="'.G5_IMG_URL.'/ico_share_upload.png" alt="" aria-hidden="true"></button>';
 }
 
 function willow_profile_link_open($post)
