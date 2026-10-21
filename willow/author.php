@@ -47,9 +47,9 @@ function willow_author_post_card($post)
     ?>
     <article class="willow_author_post_card">
         <div class="willow_author_post_head">
-            <img src="<?php echo $post['avatar']; ?>" alt="">
+            <?php echo willow_profile_link_open($post); ?><img src="<?php echo $post['avatar']; ?>" alt="프로필"><?php echo willow_profile_link_close($post); ?>
             <div>
-                <strong><?php echo $post['author']; ?></strong>
+                <strong><?php echo willow_profile_link_open($post); ?><?php echo $post['author']; ?><?php echo willow_profile_link_close($post); ?></strong>
                 <span><?php echo get_text($post['date']); ?> · <?php echo $access_label; ?></span>
             </div>
             <div class="willow_more">

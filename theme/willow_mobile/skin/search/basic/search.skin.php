@@ -97,14 +97,14 @@ $willow_author_results = $willow_has_query ? willow_get_authors($willow_keyword,
                         <div><?php echo $owner_menu; ?></div>
                     </details>
                     <?php } ?>
-                    <a class="willow_search_post_link" href="<?php echo $post['href']; ?>">
                         <div class="willow_post_head">
-                            <span class="willow_post_avatar"><img src="<?php echo $post['avatar']; ?>" alt=""></span>
+                            <?php echo willow_profile_link_open($post); ?><img src="<?php echo $post['avatar']; ?>" alt="프로필"><?php echo willow_profile_link_close($post); ?>
                             <span>
-                                <strong><?php echo $post['author']; ?></strong>
+                                <strong><?php echo willow_profile_link_open($post); ?><?php echo $post['author']; ?><?php echo willow_profile_link_close($post); ?></strong>
                                 <time><?php echo $post['date']; ?></time>
                             </span>
                         </div>
+                    <a class="willow_search_post_link" href="<?php echo $post['href']; ?>">
                         <p><?php echo $post['excerpt']; ?></p>
                         <div class="willow_post_meta">
                             <span><img class="willow_meta_icon" src="<?php echo G5_IMG_URL; ?>/ico_heart.png" alt=""> <?php echo (int) str_replace(',', '', $post['likes']) > 0 ? $post['likes'] : ''; ?></span>

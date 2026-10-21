@@ -13,6 +13,19 @@ function willow_share_button($type, $id)
     return '<button type="button" class="willow_share_button" data-willow-share="'.htmlspecialchars($url, ENT_QUOTES, 'UTF-8').'" title="공유하기 (링크 복사)" aria-label="공유하기 (링크 복사)"><i class="fa fa-share-alt" aria-hidden="true"></i></button>';
 }
 
+function willow_profile_link_open($post)
+{
+    add_stylesheet('<style>.willow_search_post>.willow_post_head{padding:15px 55px 0 15px}.willow_search_post>.willow_post_head>.willow_profile_link{flex:0 0 44px}.willow_search_post>.willow_post_head>.willow_profile_link img{display:block;width:44px;height:44px;border-radius:50%;object-fit:cover}.willow_search_post>.willow_search_post_link{padding-top:0}</style>', 26);
+    add_stylesheet('<style>.willow_post_head .willow_profile_link,.willow_feed_head .willow_profile_link,.willow_author_post_head .willow_profile_link{display:inline-block;margin:0;color:inherit;font:inherit;line-height:inherit;text-decoration:none}.willow_author_post_head>.willow_profile_link img{width:44px;height:44px;border-radius:50%;object-fit:cover}a.willow_profile_link:focus-visible{outline:2px solid #2878ff;outline-offset:3px}</style>', 25);
+    if (empty($post['verified']) || empty($post['mb_id'])) return '<span class="willow_profile_link">';
+    return '<a class="willow_profile_link" href="'.htmlspecialchars(G5_URL.'/willow/author.php?author='.rawurlencode($post['mb_id']), ENT_QUOTES, 'UTF-8').'">';
+}
+
+function willow_profile_link_close($post)
+{
+    return !empty($post['verified']) && !empty($post['mb_id']) ? '</a>' : '</span>';
+}
+
 function willow_post_owner_menu($post)
 {
     global $member;
@@ -1970,9 +1983,9 @@ function willow_render_post_card($post)
     ?>
     <article class="willow_post_card" data-feed-item="<?php echo $post['target_type']; ?>:<?php echo (int) $post['id']; ?>">
         <div class="willow_post_head">
-            <img src="<?php echo $post['avatar']; ?>" alt="">
+            <?php echo willow_profile_link_open($post); ?><img src="<?php echo $post['avatar']; ?>" alt="프로필"><?php echo willow_profile_link_close($post); ?>
             <div>
-                <strong><?php echo $post['author']; ?><?php if (!empty($post['verified'])) { ?><img class="willow_author_cert_mark" src="<?php echo G5_IMG_URL; ?>/img_cert_mark.png" alt="탈북이주민 인증"><?php } ?></strong>
+                <strong><?php echo willow_profile_link_open($post); ?><?php echo $post['author']; ?><?php echo willow_profile_link_close($post); ?><?php if (!empty($post['verified'])) { ?><img class="willow_author_cert_mark" src="<?php echo G5_IMG_URL; ?>/img_cert_mark.png" alt="탈북이주민 인증"><?php } ?></strong>
                 <span><?php echo $post['date']; ?></span>
             </div>
             <div class="willow_more">

@@ -106,9 +106,9 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             <?php $post_tags = !empty($post['tags']) && is_array($post['tags']) ? array_slice($post['tags'], 0, 2) : array(); ?>
             <article class="willow_feed_card">
                 <div class="willow_feed_head">
-                    <img src="<?php echo $post['avatar']; ?>" alt="">
+                    <?php echo willow_profile_link_open($post); ?><img src="<?php echo $post['avatar']; ?>" alt="프로필"><?php echo willow_profile_link_close($post); ?>
                     <div>
-                        <strong><?php echo $post['author']; ?><?php if (!empty($post['verified'])) { ?><img class="willow_author_cert_mark" src="<?php echo G5_IMG_URL; ?>/img_cert_mark.png" alt="탈북이주민 인증"><?php } ?></strong>
+                        <strong><?php echo willow_profile_link_open($post); ?><?php echo $post['author']; ?><?php echo willow_profile_link_close($post); ?><?php if (!empty($post['verified'])) { ?><img class="willow_author_cert_mark" src="<?php echo G5_IMG_URL; ?>/img_cert_mark.png" alt="탈북이주민 인증"><?php } ?></strong>
                         <span><?php echo $post['date']; ?></span>
                     </div>
                     <div class="willow_more">

@@ -338,13 +338,13 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         </section>
 
         <section>
-            <div class="willow_author_box">
+            <<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?> class="willow_author_box" <?php if ($article_author_href && $article_author_is_certified) { ?>href="<?php echo htmlspecialchars($article_author_href, ENT_QUOTES, 'UTF-8'); ?>"<?php } ?>>
                 <img src="<?php echo $article_author_avatar; ?>" alt="">
                 <div>
                     <strong><?php echo $article_author_label; ?><?php echo $article_author_name_html; ?></strong>
                     <span>작성 글 : <?php echo number_format($article_author_post_count); ?>개<?php if ($article_author_is_certified) { ?>, 구독자 : <?php echo number_format($article_author_subscriber_count); ?>명<?php } ?></span>
                 </div>
-            </div>
+            </<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?>>
             <?php if ($article_author_is_certified) { ?>
             <?php if ($article_author_subscribed) { ?>
             <span class="willow_subscribe_button is_subscribed" aria-disabled="true">구독중</span>
