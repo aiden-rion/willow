@@ -17,13 +17,13 @@ function willow_profile_link_open($post)
 {
     add_stylesheet('<style>.willow_search_post>.willow_post_head{padding:15px 55px 0 15px}.willow_search_post>.willow_post_head>.willow_profile_link{flex:0 0 44px}.willow_search_post>.willow_post_head>.willow_profile_link img{display:block;width:44px;height:44px;border-radius:50%;object-fit:cover}.willow_search_post>.willow_search_post_link{padding-top:0}</style>', 26);
     add_stylesheet('<style>.willow_post_head .willow_profile_link,.willow_feed_head .willow_profile_link,.willow_author_post_head .willow_profile_link{display:inline-block;margin:0;color:inherit;font:inherit;line-height:inherit;text-decoration:none}.willow_author_post_head>.willow_profile_link img{width:44px;height:44px;border-radius:50%;object-fit:cover}a.willow_profile_link:focus-visible{outline:2px solid #2878ff;outline-offset:3px}</style>', 25);
-    if (empty($post['verified']) || empty($post['mb_id'])) return '<span class="willow_profile_link">';
+    if (empty($post['mb_id'])) return '<span class="willow_profile_link">';
     return '<a class="willow_profile_link" href="'.htmlspecialchars(G5_URL.'/willow/author.php?author='.rawurlencode($post['mb_id']), ENT_QUOTES, 'UTF-8').'">';
 }
 
 function willow_profile_link_close($post)
 {
-    return !empty($post['verified']) && !empty($post['mb_id']) ? '</a>' : '</span>';
+    return !empty($post['mb_id']) ? '</a>' : '</span>';
 }
 
 function willow_post_owner_menu($post)

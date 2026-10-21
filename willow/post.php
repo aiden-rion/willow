@@ -272,13 +272,13 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
         <?php if (!empty($topic_post) && (!empty($topic_post['wp_topic_mode']) && $topic_post['wp_topic_mode'] === 'today')) { ?><p class="willow_article_kicker">오늘의 주제<?php if (!empty($topic['wt_subject'])) { ?> · <?php echo get_text($topic['wt_subject']); ?><?php } ?></p><?php } ?>
 
-        <<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?> class="willow_article_byline" <?php if ($article_author_href && $article_author_is_certified) { ?>href="<?php echo $article_author_href; ?>"<?php } ?>>
+        <<?php echo $article_author_id !== '' && $article_author_href ? 'a' : 'div'; ?> class="willow_article_byline" <?php if ($article_author_id !== '' && $article_author_href) { ?>href="<?php echo $article_author_href; ?>"<?php } ?>>
             <div>
                 <strong><?php echo $article_author_label; ?><?php echo $article_author_name_html; ?></strong>
                 <span><?php echo get_text($article_date); ?> | 조회 <?php echo number_format($article_view_count); ?></span>
             </div>
             <img src="<?php echo $article_author_avatar; ?>" alt="">
-        </<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?>>
+        </<?php echo $article_author_id !== '' && $article_author_href ? 'a' : 'div'; ?>>
 
         <?php if ($willow_target_id) { ?>
         <div class="willow_article_like">
@@ -338,13 +338,13 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         </section>
 
         <section>
-            <<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?> class="willow_author_box" <?php if ($article_author_href && $article_author_is_certified) { ?>href="<?php echo htmlspecialchars($article_author_href, ENT_QUOTES, 'UTF-8'); ?>"<?php } ?>>
+            <<?php echo $article_author_id !== '' && $article_author_href ? 'a' : 'div'; ?> class="willow_author_box" <?php if ($article_author_id !== '' && $article_author_href) { ?>href="<?php echo htmlspecialchars($article_author_href, ENT_QUOTES, 'UTF-8'); ?>"<?php } ?>>
                 <img src="<?php echo $article_author_avatar; ?>" alt="">
                 <div>
                     <strong><?php echo $article_author_label; ?><?php echo $article_author_name_html; ?></strong>
                     <span>작성 글 : <?php echo number_format($article_author_post_count); ?>개<?php if ($article_author_is_certified) { ?>, 구독자 : <?php echo number_format($article_author_subscriber_count); ?>명<?php } ?></span>
                 </div>
-            </<?php echo $article_author_href && $article_author_is_certified ? 'a' : 'div'; ?>>
+            </<?php echo $article_author_id !== '' && $article_author_href ? 'a' : 'div'; ?>>
             <?php if ($article_author_is_certified) { ?>
             <?php if ($article_author_subscribed) { ?>
             <span class="willow_subscribe_button is_subscribed" aria-disabled="true">구독중</span>

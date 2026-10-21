@@ -14,7 +14,7 @@ function willow_author_page_row($author_id, $author_name = '')
     if ($author_id !== '') {
         $row = get_member($author_id);
         if (!empty($row['mb_id'])) {
-            if (willow_author_is_escapee($row)) {
+            if (empty($row['mb_leave_date']) && empty($row['mb_intercept_date'])) {
                 return $row;
             }
 
@@ -90,6 +90,7 @@ if (empty($author['mb_id'])) {
 
 $author_name = $author['mb_nick'] ? $author['mb_nick'] : $author['mb_name'];
 $author_id = $author['mb_id'];
+$is_certified_author = willow_author_is_escapee($author);
 $author_card = willow_author_card($author);
 $author_tags = willow_member_tags($author);
 $subscriber_count = willow_author_subscriber_count($author_id);
@@ -133,7 +134,7 @@ $posts = willow_get_author_posts($author_id, $author_name, 0, $page_limit + 1, $
 $has_more = count($posts) > $page_limit;
 $posts = array_slice($posts, 0, $page_limit);
 $subscribe_href = G5_URL.'/willow/subscribe.php?author='.urlencode($author_id);
-$g5['title'] = '작가보기';
+$g5['title'] = $is_certified_author ? '작가보기' : '프로필';
 
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
@@ -142,34 +143,34 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 <main class="willow_content_app willow_author_page" data-author-id="<?php echo get_text($author_id); ?>">
     <header class="willow_author_page_header">
         <button type="button" data-author-back data-fallback-url="<?php echo G5_URL; ?>" aria-label="뒤로가기"><img src="<?php echo G5_IMG_URL; ?>/ico_back.png" alt=""></button>
-        <h1>작가보기</h1>
+        <h1><?php echo $g5['title']; ?></h1>
     </header>
 
     <section class="willow_author_profile">
         <div class="willow_author_profile_top">
             <div>
-                <h2><?php echo !empty($author_card['role_name_html']) ? $author_card['role_name_html'] : $author_card['name'].' 작가'; ?></h2>
+                <h2><?php echo $is_certified_author ? $author_card['role_name_html'] : $author_card['name']; ?></h2>
                 <p class="willow_author_profile_meta"><?php if ($author_tags) { ?> · <?php echo get_text(implode(' · ', array_slice($author_tags, 0, 2))); ?><?php } ?></p>
             </div>
             <img src="<?php echo $author_card['avatar']; ?>" alt="<?php echo $author_card['name']; ?> 프로필">
         </div>
-        <p class="willow_author_profile_intro"><?php echo nl2br($author_card['profile']); ?></p>
+        <p class="willow_author_profile_intro"><?php echo nl2br($is_certified_author ? $author_card['profile'] : get_text($author['mb_profile'])); ?></p>
         <div class="willow_author_subscribers">
-            <?php if ($subscriber_avatars) { ?>
+            <?php if ($is_certified_author && $subscriber_avatars) { ?>
             <span>
                 <?php foreach ($subscriber_avatars as $avatar) { ?>
                 <img src="<?php echo $avatar; ?>" alt="">
                 <?php } ?>
             </span>
             <?php } ?>
-            <strong><?php echo number_format($subscriber_count); ?>명 구독중</strong>
+            <?php if ($is_certified_author) { ?><strong><?php echo number_format($subscriber_count); ?>명 구독중</strong><?php } ?>
             <em>등록글 <?php echo number_format($post_count); ?>개</em>
         </div>
         <?php if ($is_self) { ?>
         <a class="willow_author_subscribe is_subscribed" href="<?php echo G5_URL; ?>/willow/my_posts.php">내 글 보기</a>
-        <?php } else if ($is_subscribed) { ?>
+        <?php } else if ($is_certified_author && $is_subscribed) { ?>
         <a class="willow_author_subscribe is_subscribed" href="<?php echo G5_URL; ?>/willow/subscribe.php?mode=my&amp;author=<?php echo urlencode($author_id); ?>">구독중</a>
-        <?php } else { ?>
+        <?php } else if ($is_certified_author) { ?>
         <a class="willow_author_subscribe" href="<?php echo $subscribe_href; ?>">구독하기</a>
         <?php } ?>
     </section>
