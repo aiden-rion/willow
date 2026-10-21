@@ -137,6 +137,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                     <a class="willow_comment_link" href="<?php echo $post['href']; ?>#willow_comments">
                         <img class="willow_meta_icon" src="<?php echo G5_IMG_URL; ?>/ico_rep.png" alt=""><span data-comment-count><?php echo (int) str_replace(',', '', $post['comments']) > 0 ? $post['comments'] : ''; ?></span>
                     </a>
+                    <?php echo willow_share_button($post['target_type'], $post['id']); ?>
                     <?php if (!empty($post['actions'])) { ?>
                     <div class="willow_feed_actions">
                         <a href="<?php echo $write_href; ?>">글쓰기</a>

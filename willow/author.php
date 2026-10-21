@@ -73,6 +73,7 @@ function willow_author_post_card($post)
             <button type="button" data-author-like data-target-type="<?php echo $post['target_type']; ?>" data-target-id="<?php echo (int) $post['id']; ?>" aria-label="좋아요" aria-pressed="<?php echo !empty($post['liked']) ? 'true' : 'false'; ?>"><img src="<?php echo G5_IMG_URL; ?>/ico_heart<?php echo !empty($post['liked']) ? '_active' : ''; ?>.png" alt=""><span data-like-count><?php echo $like_count > 0 ? number_format($like_count) : ''; ?></span></button>
             <a href="<?php echo $post['href']; ?>#willow_comments"><img src="<?php echo G5_IMG_URL; ?>/ico_rep.png" alt=""><?php echo $comment_count > 0 ? number_format($comment_count) : ''; ?></a>
             <b><?php echo $access_label; ?></b>
+            <?php echo willow_share_button($post['target_type'], $post['id']); ?>
         </div>
     </article>
     <?php

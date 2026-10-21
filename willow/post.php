@@ -282,6 +282,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
 
         <?php if ($willow_target_id) { ?>
         <div class="willow_article_like">
+            <?php echo willow_share_button($willow_target_type, $willow_target_id); ?>
             <button type="button" class="willow_like_button <?php echo $article_liked ? 'is_liked' : ''; ?>" data-target-type="<?php echo $willow_target_type; ?>" data-target-id="<?php echo (int) $willow_target_id; ?>" aria-pressed="<?php echo $article_liked ? 'true' : 'false'; ?>">
                 <img class="willow_meta_icon" src="<?php echo G5_IMG_URL; ?>/ico_heart<?php echo $article_liked ? '_active' : ''; ?>.png" alt="" data-icon-heart data-icon-default="<?php echo G5_IMG_URL; ?>/ico_heart.png" data-icon-active="<?php echo G5_IMG_URL; ?>/ico_heart_active.png"><span data-like-count><?php echo (int) str_replace(',', '', $article_like) > 0 ? $article_like : ''; ?></span>
             </button>
