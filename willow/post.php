@@ -4,6 +4,10 @@ include_once('./_data.php');
 include_once('./topic.lib.php');
 include_once('./content.lib.php');
 include_once('./notification.lib.php');
+if (empty($_GET['wr_id']) && empty($_GET['wp_id'])) {
+    http_response_code(404);
+    exit('글을 찾을 수 없습니다.');
+}
 willow_require_visible_post('board', isset($_GET['wr_id']) ? (int) $_GET['wr_id'] : 0);
 willow_require_visible_post('topic', isset($_GET['wp_id']) ? (int) $_GET['wp_id'] : 0);
 
@@ -123,6 +127,7 @@ if ($wr_id) {
     willow_record_post_view('board', $wr_id);
     $board_post = willow_get_board_post($wr_id);
     if (empty($board_post['id'])) {
+        http_response_code(404);
         alert('글을 찾을 수 없습니다.', G5_URL);
     }
     $is_general = empty($board_post['access']) || !willow_is_paid_access($board_post['access']);
@@ -154,6 +159,7 @@ if ($wp_id) {
     $tables = willow_topic_tables();
     $topic_post = sql_fetch(" select * from `{$tables['post']}` where wp_id = '{$wp_id}' ");
     if (empty($topic_post['wp_id'])) {
+        http_response_code(404);
         alert('글을 찾을 수 없습니다.', G5_URL.'/willow/today.php');
     }
     willow_record_post_view('topic', $wp_id);
@@ -238,10 +244,6 @@ if ($article_author_id !== '') {
 $article_author_name_html = !empty($article_author_member['mb_id']) ? willow_author_name_html($article_author_member) : get_text($article_author);
 $article_author_is_certified = !empty($article_author_member['mb_id']) && willow_author_is_escapee($article_author_member);
 $article_author_label = $article_author_is_certified ? '작가 ' : '';
-if (!$article_author_is_certified) {
-    $article_requires_subscription = false;
-    $article_locked = false;
-}
 
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
@@ -292,6 +294,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <?php } ?>
 
         <div class="willow_paid_preview <?php echo $article_locked ? 'is_locked' : ''; ?>">
+            <?php if (!$article_locked) { ?>
             <div class="willow_article_body">
                 <?php if (!empty($article_body)) { ?>
                 <?php foreach ($article_body as $paragraph) { ?>
@@ -321,12 +324,13 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
             </div>
             <?php } ?>
 
+            <?php } ?>
             <?php if ($article_locked) { ?>
             <div class="willow_paid_fade" aria-hidden="true"></div>
             <?php } ?>
         </div>
 
-        <?php if ($article_locked && $article_author_is_certified) { ?>
+        <?php if ($article_locked) { ?>
         <section class="willow_paid_gate" aria-label="구독 안내">
             <h2>구독자 전용 글 입니다.</h2>
             <p>구독 후 이용이 가능합니다.</p>

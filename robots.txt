@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /adm/
+Disallow: /install/
+Disallow: /data/
+Disallow: /vendor/
+Disallow: /plugin/
+
+Sitemap: https://willlow.org/sitemap.php

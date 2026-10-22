@@ -15,6 +15,19 @@ else {
 
 $g5['title'] = strip_tags($g5['title']);
 $g5_head_title = strip_tags($g5_head_title);
+include_once G5_PATH.'/willow/seo.lib.php';
+$willow_seo_context = array(
+    'post_id' => $willow_target_id ?? 0,
+    'post_type' => $willow_target_type ?? '',
+    'paid' => $article_requires_subscription ?? true,
+    'excerpt' => isset($article_body) ? implode(' ', $article_body) : '',
+    'author_id' => $author_id ?? '',
+    'author_name' => $author_name ?? '',
+    'certified' => $is_certified_author ?? false,
+    'profile' => $author_card['profile'] ?? '',
+);
+$willow_seo = willow_seo_metadata($_SERVER['SCRIPT_NAME'] ?? '', $_GET, $g5_head_title, $willow_seo_context);
+$g5_head_title = $willow_seo['title'];
 
 // 현재 접속자
 // 게시판 제목에 ' 포함되면 오류 발생
@@ -35,9 +48,15 @@ header("Pragma: no-cache"); // HTTP/1.0
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta property="og:type" content="website">
+<meta name="description" content="<?php echo htmlspecialchars($willow_seo['description'], ENT_QUOTES, 'UTF-8'); ?>">
+<meta name="robots" content="<?php echo $willow_seo['index'] ? 'index,follow,max-image-preview:large' : 'noindex,follow'; ?>">
+<link rel="canonical" href="<?php echo htmlspecialchars($willow_seo['canonical'], ENT_QUOTES, 'UTF-8'); ?>">
+<meta property="og:url" content="<?php echo htmlspecialchars($willow_seo['canonical'], ENT_QUOTES, 'UTF-8'); ?>">
+<meta property="og:site_name" content="윌로우 WILLOW">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:type" content="<?php echo $willow_seo['type']; ?>">
 <meta property="og:title" content="<?php echo htmlspecialchars($g5_head_title, ENT_QUOTES, 'UTF-8'); ?>">
-<meta property="og:description" content="작은 기록이 서로의 힘이 되는 곳, 윌로우">
+<meta property="og:description" content="<?php echo htmlspecialchars($willow_seo['description'], ENT_QUOTES, 'UTF-8'); ?>">
 <meta property="og:image" content="<?php echo G5_IMG_URL; ?>/willow-share-20261020.jpg">
 <meta property="og:image:width" content="1668">
 <meta property="og:image:height" content="835">
@@ -56,7 +75,10 @@ if (G5_IS_MOBILE) {
 if($config['cf_add_meta'])
     echo $config['cf_add_meta'].PHP_EOL;
 ?>
-<title><?php echo $g5_head_title; ?></title>
+<title><?php echo htmlspecialchars($g5_head_title, ENT_QUOTES, 'UTF-8'); ?></title>
+<?php if ($willow_seo['canonical'] === 'https://willlow.org/') { ?>
+<script type="application/ld+json"><?php echo json_encode(array('@context' => 'https://schema.org', '@type' => 'WebSite', 'name' => '윌로우', 'alternateName' => 'WILLOW', 'url' => 'https://willlow.org/'), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG); ?></script>
+<?php } ?>
 <?php if (!defined('G5_IS_ADMIN')) { ?>
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light">
