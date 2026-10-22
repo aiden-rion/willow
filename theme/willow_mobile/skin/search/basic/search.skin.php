@@ -142,7 +142,9 @@ $willow_author_results = $willow_has_query ? willow_get_authors($willow_keyword,
         </section>
 
         <section class="willow_search_banner">
+            <a href="<?php echo G5_URL; ?>/willow/author_register.php" aria-label="작가 신청하기" style="display:block">
             <img src="<?php echo G5_IMG_URL; ?>/banner001.png" alt="윌로우 에서 작가로 활동하세요! 함께하실 작가분들을 언제나 모집합니다.">
+            </a>
         </section>
     </section>
     <?php echo $write_pages; ?>
