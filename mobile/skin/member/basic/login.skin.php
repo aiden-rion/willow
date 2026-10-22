@@ -170,6 +170,7 @@ if ($auth_step === 'profile' && $phone_value) {
         <?php
         $urlencode = urlencode($return_url);
         include_once(get_social_skin_path().'/social_login.skin.php');
+        add_stylesheet('<link rel="stylesheet" href="'.G5_URL.'/css/willow_social_login.css?v='.filemtime(G5_PATH.'/css/willow_social_login.css').'">', 20);
         ?>
     </main>
     <?php } ?>
