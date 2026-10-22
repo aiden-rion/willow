@@ -90,10 +90,7 @@ class Hybrid_Providers_Kakao extends Hybrid_Provider_Model_OAuth2
     */
     function getUserProfile()
     {
-        //$params = array('property_keys'=>'kaccount_email');	// v1 parameter
-        $params = array('property_keys'=>array('kakao_account.email'));		// v2 parameter
-
-        $this->api->decode_json = false;
+        $params = array('property_keys' => json_encode(array('kakao_account.email', 'kakao_account.profile')));
         $this->api->curl_header = array( 'Authorization: Bearer ' . $this->api->access_token );
 
         $data = $this->api->api("user/me", "POST", $params);
@@ -103,8 +100,8 @@ class Hybrid_Providers_Kakao extends Hybrid_Provider_Model_OAuth2
         }
         # store the user profile.
         $this->user->profile->identifier  = @ $data->id;
-        $this->user->profile->displayName = @ $data->properties->nickname;
-        $this->user->profile->photoURL    = @ $data->properties->thumbnail_image;
+        $this->user->profile->displayName = $data->kakao_account->profile->nickname ?? $data->properties->nickname ?? '';
+        $this->user->profile->photoURL    = $data->kakao_account->profile->thumbnail_image_url ?? $data->properties->thumbnail_image ?? '';
         //$email = @ $data->properties->kaccount_email;	// v1 version
         
         $email = @ $data->kakao_account->email;   // v2 version
