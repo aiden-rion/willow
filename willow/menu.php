@@ -99,6 +99,10 @@ $member_avatar = $is_logged_in ? willow_member_avatar($member) : $menu_img_url.'
     </section>
 
     <footer class="willow_menu_company">
+        <nav aria-label="약관 및 정책" style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px">
+            <a href="<?php echo G5_BBS_URL; ?>/content.php?co_id=provision">이용약관</a>
+            <a href="<?php echo G5_BBS_URL; ?>/content.php?co_id=privacy"><b>개인정보처리방침</b></a>
+        </nav>
         <strong>사단법인 통일의징검다리 우리온</strong>
         <span>대표자 : 박대현 <i aria-hidden="true">|</i> 전화번호 : 02-2649-0206</span>
         <span>법인등록번호 : 678-82-00212 <i aria-hidden="true">|</i> 이메일 : info@woorion.org</span>

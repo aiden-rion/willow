@@ -8,6 +8,8 @@ if (defined('G5_IS_ADMIN')) {
 $willow_script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
 $willow_public_board = isset($bo_table) && $bo_table === 'notice';
 $willow_public_page = $willow_script === '/bbs/faq.php' || $willow_public_board;
+$willow_public_page = $willow_public_page || ($willow_script === '/bbs/content.php'
+    && in_array($_GET['co_id'] ?? '', array('provision', 'privacy'), true));
 $willow_allowed_paths = array(
     '/index.php',
     '/sitemap.php',
