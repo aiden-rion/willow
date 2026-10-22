@@ -45,6 +45,14 @@ set_session("ss_token", $token);
 
 $g5['title'] = '소셜 회원 가입 - '.social_get_provider_service_name($provider_name);
 
+if ($config['cf_theme'] === 'willow_mobile' && strtolower($provider_name) === 'kakao') {
+    set_session('ss_willow_social_join', array('token' => bin2hex(random_bytes(32)), 'id' => $user_id, 'time' => time()));
+    include_once(G5_PATH.'/head.sub.php');
+    include_once(G5_PATH.'/willow/social_join.skin.php');
+    include_once(G5_PATH.'/tail.sub.php');
+    exit;
+}
+
 include_once(G5_BBS_PATH.'/_head.php');
 
 $register_action_url = https_url(G5_PLUGIN_DIR.'/'.G5_SOCIAL_LOGIN_DIR, true).'/register_member_update.php';

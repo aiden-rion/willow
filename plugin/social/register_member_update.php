@@ -24,6 +24,23 @@ if( ! $user_profile ){
 // 소셜 가입된 내역이 있는지 확인 상수 G5_SOCIAL_DELETE_DAY 관련
 $is_exists_social_account = social_before_join_check(G5_URL);
 
+$willow_social_join = $config['cf_theme'] === 'willow_mobile' && strtolower($provider_name) === 'kakao';
+if ($willow_social_join) {
+    $join = get_session('ss_willow_social_join');
+    $submitted_token = $_POST['willow_join_token'] ?? '';
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !is_array($join) || !is_string($submitted_token)
+        || empty($join['token']) || time() - $join['time'] > 1800 || !hash_equals($join['token'], $submitted_token)) {
+        alert('가입 인증이 만료되었습니다. 카카오 로그인을 다시 진행해주세요.', G5_BBS_URL.'/login.php');
+    }
+    if (($_POST['agree'] ?? '') !== '1' || ($_POST['agree2'] ?? '') !== '1') {
+        alert('이용약관과 개인정보 수집·이용에 동의해주세요.');
+    }
+    $_POST['mb_id'] = $join['id'];
+    $_POST['mb_name'] = $_POST['mb_nick'] ?? '';
+    $_POST['mb_password'] = bin2hex(random_bytes(32));
+    $_POST['mb_hp'] = '';
+}
+
 $sm_id = $user_profile->sid;
 $mb_id = isset($_POST['mb_id']) ? trim($_POST['mb_id']) : '';
 $mb_password    = isset($_POST['mb_password']) ? trim($_POST['mb_password']) : '';
@@ -106,6 +123,9 @@ $mb_thirdparty_agree = isset($_POST['mb_thirdparty_agree']) ? trim($_POST['mb_th
 
 $agree_items = [];
 $sql_agree = "";
+if ($willow_social_join) {
+    $agree_items[] = '이용약관 및 개인정보 수집·이용 동의';
+}
 // 마케팅 목적의 개인정보 수집 및 이용
 if ($mb_marketing_agree == 1) {
     $sql_agree .=  " , mb_marketing_date = '".G5_TIME_YMDHIS."' ";
@@ -266,7 +286,9 @@ if($result) {
     if( $mb_email_certify ){    //메일인증 사용 안하면
 
         //바로 로그인 처리
+        if ($willow_social_join) session_regenerate_id(false);
         set_session('ss_mb_id', $mb['mb_id']);
+        if ($willow_social_join) generate_mb_key($mb);
         if(function_exists('update_auth_session_token')) update_auth_session_token(G5_TIME_YMDHIS);
 
     } else {    // 메일인증을 사용한다면
@@ -334,6 +356,10 @@ if($result) {
     // 사용자 코드 실행
     @include_once ($member_skin_path.'/register_form_update.tail.skin.php');
 
+    if ($willow_social_join) {
+        set_session('ss_willow_social_join', '');
+        goto_url(G5_URL);
+    }
     goto_url(G5_HTTP_BBS_URL.'/register_result.php');
 
 } else {
