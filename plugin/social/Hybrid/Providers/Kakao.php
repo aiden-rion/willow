@@ -24,6 +24,8 @@ class Hybrid_Providers_Kakao extends Hybrid_Provider_Model_OAuth2
     function initialize()
     {
         parent::initialize();
+        $this->api->curl_ssl_verifypeer = true;
+        $this->api->curl_ssl_verifyhost = 2;
 
         // Provider API end-points
         $this->api->api_base_url  = "https://kapi.kakao.com/v2/";
@@ -36,11 +38,27 @@ class Hybrid_Providers_Kakao extends Hybrid_Provider_Model_OAuth2
 		}
     }
 
+    function loginBegin()
+    {
+        $state = bin2hex(random_bytes(32));
+        $this->token('oauth_state', $state);
+        $this->token('oauth_state_time', time());
+        Hybrid_Auth::redirect($this->api->authorizeUrl(array('scope' => $this->scope, 'state' => $state)));
+    }
+
     /**
     * finish login step
     */
     function loginFinish()
     {
+        $expected = $this->token('oauth_state');
+        $issued = (int) $this->token('oauth_state_time');
+        $this->token('oauth_state', '');
+        $this->token('oauth_state_time', 0);
+        $state = isset($_GET['state']) && is_string($_GET['state']) ? $_GET['state'] : '';
+        if (!$expected || !$issued || time() - $issued > 600 || !hash_equals($expected, $state)) {
+            throw new Exception('Invalid or expired Kakao login state.', 5);
+        }
         $error = (array_key_exists('error', $_REQUEST)) ? $_REQUEST['error'] : "";
         // check for errors
         if ( $error ){
@@ -145,6 +163,7 @@ class Hybrid_Providers_Kakao extends Hybrid_Provider_Model_OAuth2
         curl_setopt($ch, CURLOPT_USERAGENT     , $this->api->curl_useragent);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->api->curl_connect_time_out);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->api->curl_ssl_verifypeer);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
         curl_setopt($ch, CURLOPT_HTTPHEADER    , $this->api->curl_header);
 
         if ( $this->api->curl_proxy ) {

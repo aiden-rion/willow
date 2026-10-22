@@ -160,6 +160,10 @@ if ($auth_step === 'profile' && $phone_value) {
         <strong class="willow_auth_brand"><img src="<?php echo G5_IMG_URL; ?>/logo.png" alt="WILLOW"></strong>
         <h2>간편인증을 통해<br>이용이 가능합니다.</h2>
         <p>휴대폰 인증을 통한 간편로그인을 사용합니다</p>
+        <?php
+        $urlencode = urlencode($return_url);
+        include_once(get_social_skin_path().'/social_login.skin.php');
+        ?>
 
         <form class="willow_auth_form" action="<?php echo $base_login_url; ?>" method="get">
             <input type="hidden" name="auth_step" value="verify">
