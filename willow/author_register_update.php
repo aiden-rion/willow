@@ -20,6 +20,11 @@ if (!empty($latest['war_status']) && $latest['war_status'] === 'pending') {
 }
 
 $intro = isset($_POST['intro']) ? trim(strip_tags($_POST['intro'])) : '';
+$business_number = is_string($_POST['business_number'] ?? null) ? trim($_POST['business_number']) : '';
+if (!preg_match('/^[0-9]{3}-?[0-9]{2}-?[0-9]{5}$/D', $business_number)) {
+    alert('사업자등록번호 10자리를 입력해주세요.');
+}
+$business_number = str_replace('-', '', $business_number);
 $is_escapee = isset($_POST['is_escapee']) ? trim($_POST['is_escapee']) : '';
 $raw_keywords = isset($_POST['keywords']) && is_string($_POST['keywords']) ? $_POST['keywords'] : '';
 $categories = willow_input_keywords($raw_keywords);
@@ -107,6 +112,11 @@ function willow_author_request_upload($field, $upload_dir, $required, $image_onl
 }
 
 $profile_image = willow_author_request_upload('profile_image', $upload_dir, false, true);
+$business_dir = willow_author_business_upload_dir();
+if (!is_dir($business_dir)) @mkdir($business_dir, 0700, true);
+if (!is_writable($business_dir)) alert('사업자등록증 저장 경로를 확인해주세요. 관리자에게 문의해주세요.');
+$business_file = willow_author_request_upload('business_file', $business_dir, true);
+@chmod($business_dir.'/'.$business_file, 0600);
 $cert_file = willow_author_request_upload('cert_file', $upload_dir, $is_escapee === 'yes', false);
 $category_text = implode(',', array_map(function($item) {
     return trim(strip_tags($item));
@@ -118,6 +128,8 @@ $now = G5_TIME_YMDHIS;
 sql_query(" insert into `{$table}`
     set mb_id = '".sql_escape_string($member['mb_id'])."',
         war_status = 'pending',
+        war_business_number = '".sql_escape_string($business_number)."',
+        war_business_file = '".sql_escape_string($business_file)."',
         war_intro = '".sql_escape_string($intro)."',
         war_is_escapee = '".sql_escape_string($is_escapee)."',
         war_cert_file = '".sql_escape_string($cert_file)."',

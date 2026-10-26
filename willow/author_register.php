@@ -183,6 +183,18 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         </section>
 
         <section>
+            <h2>사업자정보</h2>
+            <label class="willow_author_field"><span>사업자등록번호</span>
+                <input type="text" name="business_number" inputmode="numeric" maxlength="12" pattern="[0-9]{3}-?[0-9]{2}-?[0-9]{5}" placeholder="000-00-00000" required>
+            </label>
+            <label class="willow_author_field willow_author_file_field"><span>사업자등록증</span>
+                <input type="file" name="business_file" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" required>
+                <em data-file-label>파일을 첨부해주세요</em>
+            </label>
+            <p class="willow_author_apply_note">* 이미지 또는 PDF, 최대 5MB</p>
+        </section>
+
+        <section>
             <h2>정산정보등록</h2>
             <p class="willow_author_apply_note">* 작가 수익 정산을 위해 활용됩니다.</p>
             <label class="willow_author_field"><span>예금주</span>

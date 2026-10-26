@@ -440,7 +440,16 @@ function willow_author_request_install()
         key war_datetime (war_datetime)
     ) ", false);
 
+    foreach (array('war_business_number' => 'varchar(10)', 'war_business_file' => 'varchar(255)') as $column => $type) {
+        $exists = sql_fetch("SHOW COLUMNS FROM `{$table}` LIKE '{$column}'", false);
+        if (!$exists) sql_query("ALTER TABLE `{$table}` ADD `{$column}` {$type} NOT NULL DEFAULT ''");
+    }
     $installed = true;
+}
+
+function willow_author_business_upload_dir()
+{
+    return dirname(G5_PATH).'/willow_private/author_business';
 }
 
 function willow_author_request_upload_dir()

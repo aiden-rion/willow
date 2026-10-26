@@ -97,6 +97,10 @@ require_once './admin.head.php';
                 <td><?php echo get_text($request['war_categories']); ?></td>
                 <td>
                     <div><?php echo get_text($request['war_bank_name']); ?> / <?php echo get_text($request['war_account_holder']); ?></div>
+                    <div>사업자등록번호: <?php echo !empty($request['war_business_number']) ? get_text(preg_replace('/^(\d{3})(\d{2})(\d{5})$/', '$1-$2-$3', $request['war_business_number'])) : '미등록'; ?></div>
+                    <?php if (!empty($request['war_business_file'])) { ?>
+                    <a href="./willow_author_business_download.php?war_id=<?php echo (int) $request['war_id']; ?>" class="btn btn_03">사업자등록증 다운로드</a>
+                    <?php } ?>
                     <div><?php echo get_text($request['war_account_number']); ?></div>
                     <strong><?php echo number_format((int) $request['war_subscribe_price']); ?>원</strong>
                 </td>
