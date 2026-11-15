@@ -14,6 +14,10 @@ function willow_subscription_bill_one($subscription)
         return array('success' => false, 'message' => '구독 정보가 올바르지 않습니다.');
     }
 
+    if (!empty($subscription['ws_cancelled_datetime']) || ($subscription['ws_status'] ?? '') !== 'active') {
+        return array('success' => false, 'message' => '해지되었거나 해지 예정인 구독입니다.');
+    }
+
     $subscriber = get_member($subscription['subscriber_mb_id']);
     $author = get_member($subscription['author_mb_id']);
     if (empty($subscriber['mb_id']) || empty($author['mb_id'])) {
@@ -81,7 +85,7 @@ function willow_subscription_process_due_billings($limit = 20)
     $items = array();
     $result = sql_query(" select *
         from `{$table}`
-        where ws_status = 'active'
+        where ws_status = 'active' and ws_cancelled_datetime is null
             and ws_next_billing_date <> '0000-00-00'
             and ws_next_billing_date <= '".G5_TIME_YMD."'
         order by ws_next_billing_date asc, ws_id asc

@@ -7,6 +7,8 @@ $willow_notifications = isset($willow_notifications) && is_array($willow_notific
 $willow_notification_icons = array(
     'comment' => array('label' => '댓글', 'icon' => 'ico_menu_comment.png'),
     'like' => array('label' => '좋아요', 'icon' => 'ico_heart.png'),
+    'subscription_cancelled' => array('label' => '구독 취소', 'icon' => 'ico_menu_bell.png'),
+    'membership_post' => array('label' => '멤버십', 'icon' => 'ico_menu_document.png'),
     'subscriber' => array('label' => '구독', 'icon' => 'ico_menu_bell.png'),
     'subscribed_post' => array('label' => '새글', 'icon' => 'ico_menu_document.png'),
     'topic' => array('label' => '주제', 'icon' => 'ico_menu_alert.png'),

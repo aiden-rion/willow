@@ -78,6 +78,7 @@ sql_query(" insert into `{$table}`
         ('{$author_sql}', '{$subscriber_sql}', 'active', '".(int) $card['ci_id']."', '".sql_escape_string(substr($paid_datetime, 0, 10))."', '".sql_escape_string($next_billing_date)."', '".G5_TIME_YMDHIS."')
     on duplicate key update
         ws_status = 'active',
+        ws_cancelled_datetime = null,
         ws_card_ci_id = values(ws_card_ci_id),
         ws_last_billing_date = values(ws_last_billing_date),
         ws_next_billing_date = values(ws_next_billing_date),
@@ -87,7 +88,8 @@ $subscription = sql_fetch(" select * from `{$table}`
     where author_mb_id = '{$author_sql}'
         and subscriber_mb_id = '{$subscriber_sql}'
     limit 1 ", false);
-if (!empty($subscription['ws_id'])) {
+if (!empty($subscription['ws_id']) && $subscription['ws_status'] === 'active') {
+    willow_notification_record_subscription($subscription, 'subscriber');
     willow_revenue_record_subscription_payment($subscription, $amount, $paid_datetime, array(
         'pg_service' => 'tosspayments',
         'order_id' => $order_id,

@@ -76,6 +76,33 @@ function willow_notification_install()
     }
     sql_query(" alter table `{$table}` add key next_billing (ws_status, ws_next_billing_date) ", false);
 
+    if (empty($columns['ws_cancelled_datetime'])) {
+        sql_query(" alter table `{$table}` add ws_cancelled_datetime datetime null default null ", false);
+    }
+    // End access only when the already-paid subscription period expires.
+    sql_query(" update `{$table}` set ws_status = 'cancelled'
+        where ws_status = 'active' and ws_cancelled_datetime is not null
+            and ws_next_billing_date <= '".G5_TIME_YMD."' ", false);
+
+    $event_table = willow_notification_event_table();
+    sql_query(" create table if not exists `{$event_table}` (
+        event_key varchar(64) not null,
+        recipient_mb_id varchar(20) not null,
+        actor_mb_id varchar(20) not null,
+        event_type varchar(30) not null,
+        event_datetime datetime not null,
+        primary key (event_key),
+        key recipient_datetime (recipient_mb_id, event_datetime)
+    ) ", false);
+    // Preserve subscription starts independently of subsequent cancellation/reactivation.
+    sql_query(" insert ignore into `{$event_table}`
+        select sha2(concat('subscriber:', ws_id, ':', ws_datetime), 256),
+            author_mb_id, subscriber_mb_id, 'subscriber', ws_datetime from `{$table}` ", false);
+    sql_query(" insert ignore into `{$event_table}`
+        select sha2(concat('subscription_cancelled:', ws_id, ':', ws_cancelled_datetime), 256),
+            author_mb_id, subscriber_mb_id, 'subscription_cancelled', ws_cancelled_datetime
+        from `{$table}` where ws_cancelled_datetime is not null ", false);
+
     $setting_table = willow_notification_setting_table();
     sql_query(" create table if not exists `{$setting_table}` (
         mb_id varchar(20) not null default '',
@@ -87,6 +114,42 @@ function willow_notification_install()
     ) ", false);
 
     $installed = true;
+}
+
+function willow_notification_event_table()
+{
+    return willow_subscription_table().'_event';
+}
+
+function willow_notification_record_subscription($subscription, $type)
+{
+    if (empty($subscription['ws_id']) || !in_array($type, array('subscriber', 'subscription_cancelled'), true)) return;
+    $datetime = $type === 'subscriber' ? $subscription['ws_datetime'] : ($subscription['ws_cancelled_datetime'] ?? '');
+    if (!$datetime) return;
+    $table = willow_notification_event_table();
+    $key = hash('sha256', $type.':'.$subscription['ws_id'].':'.$datetime);
+    $recipient = sql_escape_string($subscription['author_mb_id']);
+    $actor = sql_escape_string($subscription['subscriber_mb_id']);
+    $datetime = sql_escape_string($datetime);
+    sql_query(" insert ignore into `{$table}` values ('{$key}', '{$recipient}', '{$actor}', '{$type}', '{$datetime}') ", false);
+}
+
+function willow_cancel_subscription($subscriber_id, $author_id)
+{
+    willow_notification_install();
+    $table = willow_subscription_table();
+    $subscriber = sql_escape_string($subscriber_id);
+    $author = sql_escape_string($author_id);
+    if ($subscriber === '' || $author === '') return false;
+    $result = sql_query(" update `{$table}` set ws_cancelled_datetime = '".G5_TIME_YMDHIS."'
+        where subscriber_mb_id = '{$subscriber}' and author_mb_id = '{$author}'
+            and ws_status = 'active' and ws_cancelled_datetime is null ", false);
+    if (!$result) return false;
+    $row = sql_fetch(" select * from `{$table}` where subscriber_mb_id = '{$subscriber}'
+        and author_mb_id = '{$author}' and ws_status = 'active' ", false);
+    if (empty($row['ws_cancelled_datetime'])) return false;
+    willow_notification_record_subscription($row, 'subscription_cancelled');
+    return true;
 }
 
 function willow_notification_setting_table()
@@ -112,6 +175,14 @@ function willow_notification_setting_definitions()
         'subscriber' => array(
             'title' => '신규 구독자',
             'description' => '작가 계정에 새 구독자가 생기면 알려드려요.',
+        ),
+        'subscription_cancelled' => array(
+            'title' => '구독 취소',
+            'description' => '내 작가 구독을 취소한 회원이 있으면 알려드려요.',
+        ),
+        'membership_post' => array(
+            'title' => '멤버십 콘텐츠 업로드',
+            'description' => '구독 중인 작가가 멤버십 콘텐츠를 등록하면 알려드려요.',
         ),
         'like' => array(
             'title' => '좋아요',
@@ -238,7 +309,7 @@ function willow_notification_post_meta($target_type, $target_id)
 
     if ($target_type === 'board') {
         $table = willow_content_table();
-        $post = sql_fetch(" select wr_id, mb_id, wr_name, wr_subject, wr_content, wr_datetime, wr_5 from `{$table}` where wr_id = '{$target_id}' and wr_is_comment = 0 ", false);
+        $post = sql_fetch(" select wr_id, mb_id, wr_name, wr_subject, wr_content, wr_datetime, wr_5, wr_3 from `{$table}` where wr_id = '{$target_id}' and wr_is_comment = 0 ", false);
         if (empty($post['wr_id'])) {
             return array();
         }
@@ -251,6 +322,7 @@ function willow_notification_post_meta($target_type, $target_id)
         $image = isset($images[0]) ? $images[0] : '';
 
         return array(
+            'access' => willow_normalize_post_access($post['wr_3']),
             'author_mb_id' => $post['mb_id'],
             'author' => $post['wr_name'],
             'title' => $post['wr_subject'],
@@ -264,7 +336,7 @@ function willow_notification_post_meta($target_type, $target_id)
 
     if ($target_type === 'topic') {
         $tables = willow_topic_tables();
-        $post = sql_fetch(" select wp_id, mb_id, wp_author, wp_subject, wp_content, wp_image, wp_datetime from `{$tables['post']}` where wp_id = '{$target_id}' ", false);
+        $post = sql_fetch(" select wp_id, mb_id, wp_author, wp_subject, wp_content, wp_image, wp_datetime, wp_access from `{$tables['post']}` where wp_id = '{$target_id}' ", false);
         if (empty($post['wp_id'])) {
             return array();
         }
@@ -272,6 +344,7 @@ function willow_notification_post_meta($target_type, $target_id)
         $images = array_map('willow_media_url', willow_split_images($post['wp_image']));
 
         return array(
+            'access' => willow_normalize_post_access($post['wp_access']),
             'author_mb_id' => $post['mb_id'],
             'author' => $post['wp_author'],
             'title' => $post['wp_subject'],
@@ -355,16 +428,19 @@ function willow_get_notifications($mb_id, $limit = 50)
         }
     }
 
-    $result = sql_query(" select s.*, m.mb_nick, m.mb_name
-        from `{$subscription_table}` s
-        left join {$g5['member_table']} m on m.mb_id = s.subscriber_mb_id
-        where s.author_mb_id = '{$mb_id}' and s.ws_status = 'active'
-        order by s.ws_datetime desc
-        limit 20 ", false);
+    $event_table = willow_notification_event_table();
+    $result = sql_query(" select e.*, m.mb_nick, m.mb_name
+        from `{$event_table}` e
+        left join {$g5['member_table']} m on m.mb_id = e.actor_mb_id
+        where e.recipient_mb_id = '{$mb_id}' and e.actor_mb_id <> '{$mb_id}'
+        order by e.event_datetime desc limit 40 ", false);
     if ($result) {
         while ($row = sql_fetch_array($result)) {
-            $actor = $row['mb_nick'] ? $row['mb_nick'] : ($row['mb_name'] ? $row['mb_name'] : '새 구독자');
-            willow_notification_add($items, 'subscriber', '새 구독자가 생겼어요', $actor.'님이 작가님을 구독했습니다.', G5_URL.'/willow/subscribe.php', $row['ws_datetime'], $actor);
+            $actor = $row['mb_nick'] ? $row['mb_nick'] : ($row['mb_name'] ? $row['mb_name'] : '구독자');
+            $cancelled = $row['event_type'] === 'subscription_cancelled';
+            willow_notification_add($items, $row['event_type'], $cancelled ? '구독 취소가 접수됐어요' : '새 구독자가 생겼어요',
+                $actor.($cancelled ? '님이 작가님 구독을 취소했습니다.' : '님이 작가님을 구독했습니다.'),
+                G5_URL.'/willow/author.php?author='.rawurlencode($mb_id), $row['event_datetime'], $actor);
         }
     }
 
@@ -394,7 +470,10 @@ function willow_get_notifications($mb_id, $limit = 50)
                 while ($post_row = sql_fetch_array($post_result)) {
                     $post = willow_notification_post_meta($post_row['target_type'], (int) $post_row['target_id']);
                     if ($post) {
-                        willow_notification_add($items, 'subscribed_post', $author.' 작가의 새 글이 올라왔어요', $post['title'], $post['href'], $post_row['event_datetime'], $author);
+                        $membership = willow_is_paid_access($post['access']);
+                        willow_notification_add($items, $membership ? 'membership_post' : 'subscribed_post',
+                            $author.($membership ? ' 작가의 멤버십 콘텐츠가 올라왔어요' : ' 작가의 새 글이 올라왔어요'),
+                            $post['title'], $post['href'], $post_row['event_datetime'], $author);
                     }
                 }
             }
@@ -414,6 +493,7 @@ function willow_get_notifications($mb_id, $limit = 50)
             limit 10 ", false);
         if ($result) {
             while ($row = sql_fetch_array($result)) {
+                if (!willow_notification_post_meta('topic', (int) $row['wp_id'])) continue;
                 willow_notification_add($items, 'topic_post', '오늘의 주제에 새 글이 올라왔어요', ($row['wp_author'] ? $row['wp_author'] : '윌로우 회원').' · '.$row['wp_subject'], G5_URL.'/willow/post.php?wp_id='.(int) $row['wp_id'], $row['wp_datetime'], $row['wp_author']);
             }
         }
@@ -439,6 +519,8 @@ function willow_notification_policies()
         '구독 중인 작가가 신규 글을 등록한 경우',
         '내가 작성한 글에 새로운 댓글이 등록된 경우',
         '작가 계정에 신규 구독자가 발생한 경우',
+        '내 작가 구독이 취소된 경우',
+        '구독 중인 작가가 멤버십 콘텐츠를 등록한 경우',
         '내가 작성한 글에 좋아요가 발생한 경우',
         '오늘의 주제가 새로 열렸거나 오늘의 주제에 새 참여글이 등록된 경우',
     );

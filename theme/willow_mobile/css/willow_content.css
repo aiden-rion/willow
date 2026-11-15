@@ -3109,6 +3109,17 @@ html.willow_pull_active body {
   margin-left: auto;
 }
 
+.willow_subscribe_my_actions form {
+  margin: 0 0 0 auto;
+}
+
+.willow_subscribe_my_actions button.willow_subscribe_cancel {
+  border: 0;
+  color: #1a1a1a;
+  font-family: inherit;
+  cursor: pointer;
+}
+
 .willow_subscribe_filter {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

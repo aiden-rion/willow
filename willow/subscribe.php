@@ -10,6 +10,9 @@ if ($is_guest) {
     goto_url(G5_BBS_URL.'/login.php?url='.urlencode(G5_URL.'/willow/subscribe.php'.(!empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '')));
 }
 
+if (!get_session('willow_cancel_token')) set_session('willow_cancel_token', bin2hex(random_bytes(32)));
+$willow_cancel_token = get_session('willow_cancel_token');
+
 function willow_subscribe_price($value)
 {
     $price = (int) preg_replace('/[^0-9]/', '', (string) $value);
@@ -124,6 +127,7 @@ function willow_subscribe_my_items()
             $author = willow_subscribe_author_row($row['author_mb_id']);
             if ($author) {
                 $author['subscribed_at'] = $row['ws_datetime'];
+                $author['cancelled_at'] = $row['ws_cancelled_datetime'];
                 $items[] = $author;
             }
         }
@@ -358,7 +362,15 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
                 <div class="willow_subscribe_my_actions">
                     <a href="<?php echo G5_URL; ?>/willow/subscribe.php?mode=my&amp;author=<?php echo urlencode($item['id']); ?>">결제내역</a>
                     <a href="<?php echo G5_URL; ?>/willow/author.php?author=<?php echo urlencode($item['id']); ?>">작가 페이지</a>
-                    <span class="willow_subscribe_cancel">구독취소</span>
+                    <?php if (!empty($item['cancelled_at'])) { ?>
+                    <span class="willow_subscribe_cancel">해지 예정</span>
+                    <?php } else { ?>
+                    <form method="post" action="<?php echo G5_URL; ?>/willow/subscribe_cancel.php" onsubmit="return confirm('구독을 취소하시겠습니까? 결제된 기간까지 이용할 수 있습니다.');">
+                        <input type="hidden" name="author" value="<?php echo htmlspecialchars($item['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="hidden" name="token" value="<?php echo $willow_cancel_token; ?>">
+                        <button type="submit" class="willow_subscribe_cancel">구독취소</button>
+                    </form>
+                    <?php } ?>
                 </div>
             </article>
             <?php } ?>
