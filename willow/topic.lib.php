@@ -66,6 +66,7 @@ function willow_topic_install()
         wp_topic_mode varchar(20) not null default 'today',
         wp_category varchar(40) not null default '',
         wp_tags varchar(255) not null default '',
+        wp_hit int unsigned not null default 0,
         wp_like int unsigned not null default 0,
         wp_comment int unsigned not null default 0,
         wp_datetime datetime not null,
@@ -73,6 +74,11 @@ function willow_topic_install()
         key wt_id (wt_id),
         key wp_datetime (wp_datetime)
     ) ", false);
+
+    $post_hit_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_hit' ", false);
+    if (empty($post_hit_column['Field'])) {
+        sql_query(" alter table `{$tables['post']}` add `wp_hit` int unsigned not null default 0 ", false);
+    }
 
     $post_image_column = sql_fetch(" show columns from `{$tables['post']}` like 'wp_image' ", false);
     if (!empty($post_image_column['Type']) && stripos($post_image_column['Type'], 'text') === false) {

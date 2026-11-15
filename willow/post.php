@@ -162,6 +162,13 @@ if ($wp_id) {
         http_response_code(404);
         alert('글을 찾을 수 없습니다.', G5_URL.'/willow/today.php');
     }
+    $topic_hit_session_key = 'willow_topic_hit_'.$wp_id;
+    if (empty($_SESSION[$topic_hit_session_key])) {
+        if (sql_query(" update `{$tables['post']}` set wp_hit = wp_hit + 1 where wp_id = '{$wp_id}' ", false)) {
+            $_SESSION[$topic_hit_session_key] = G5_SERVER_TIME;
+            $topic_post['wp_hit'] = (int) $topic_post['wp_hit'] + 1;
+        }
+    }
     willow_record_post_view('topic', $wp_id);
     $topic = sql_fetch(" select * from `{$tables['topic']}` where wt_id = '".(int) $topic_post['wt_id']."' ");
     $topic_access = willow_normalize_post_access(isset($topic_post['wp_access']) ? $topic_post['wp_access'] : '');
@@ -174,7 +181,7 @@ if ($wp_id) {
     $article_date = !empty($topic_post['wp_datetime']) ? get_text(substr($topic_post['wp_datetime'], 0, 10)) : '2026-01-01';
     $article_like = number_format(willow_like_count('topic', (int) $topic_post['wp_id']));
     $article_comment = number_format(willow_comment_count('topic', (int) $topic_post['wp_id']));
-    $article_view_count = 0;
+    $article_view_count = (int) $topic_post['wp_hit'];
     $article_liked = willow_has_liked('topic', (int) $topic_post['wp_id']);
     $willow_target_type = 'topic';
     $willow_target_id = (int) $topic_post['wp_id'];
@@ -244,6 +251,7 @@ if ($article_author_id !== '') {
 $article_author_name_html = !empty($article_author_member['mb_id']) ? willow_author_name_html($article_author_member) : get_text($article_author);
 $article_author_is_certified = !empty($article_author_member['mb_id']) && willow_author_is_escapee($article_author_member);
 $article_author_label = $article_author_is_certified ? '작가 ' : '';
+$article_can_view_count = !empty($member['mb_id']) && $article_author_id !== '' && $member['mb_id'] === $article_author_id;
 
 include_once(G5_PATH.'/head.sub.php');
 add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content.css?ver='.filemtime(G5_THEME_PATH.'/css/willow_content.css').'">', 10);
@@ -277,7 +285,7 @@ add_stylesheet('<link rel="stylesheet" href="'.G5_THEME_CSS_URL.'/willow_content
         <<?php echo $article_author_id !== '' && $article_author_href ? 'a' : 'div'; ?> class="willow_article_byline" <?php if ($article_author_id !== '' && $article_author_href) { ?>href="<?php echo $article_author_href; ?>"<?php } ?>>
             <div>
                 <strong><?php echo $article_author_label; ?><?php echo $article_author_name_html; ?></strong>
-                <span><?php echo get_text($article_date); ?> | 조회 <?php echo number_format($article_view_count); ?></span>
+                <span><?php echo get_text($article_date); ?><?php if ($article_can_view_count) { ?> | 조회 <?php echo number_format($article_view_count); ?><?php } ?></span>
             </div>
             <img src="<?php echo $article_author_avatar; ?>" alt="">
         </<?php echo $article_author_id !== '' && $article_author_href ? 'a' : 'div'; ?>>
