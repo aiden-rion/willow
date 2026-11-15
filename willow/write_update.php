@@ -1,6 +1,7 @@
 <?php
 include_once('./_common.php');
 include_once('./topic.lib.php');
+include_once('./topic_point.lib.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     goto_url(G5_URL.'/willow/today.php');
@@ -147,7 +148,8 @@ sql_query(" insert into `{$tables['post']}`
 $wp_id = sql_insert_id();
 if ($wp_id) foreach ($keyword_list as $keyword) willow_register_keyword($keyword);
 
-if ($topic_mode === 'today') {
+if ($wp_id && $topic_mode === 'today') {
+    willow_award_daily_topic_point($member, $topic_mode, $wp_id);
     sql_query(" update `{$tables['topic']}` set wt_participants = wt_participants + 1 where wt_id = '{$wt_id}' ");
 }
 
