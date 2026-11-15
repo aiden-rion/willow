@@ -19,6 +19,8 @@ include_once G5_PATH.'/willow/seo.lib.php';
 $willow_seo_context = array(
     'post_id' => $willow_target_id ?? 0,
     'post_type' => $willow_target_type ?? '',
+    'images' => isset($article_images) ? array_map('willow_media_url', $article_images) : array(),
+    'avatar' => isset($article_author_avatar) ? willow_media_url($article_author_avatar) : '',
     'paid' => $article_requires_subscription ?? true,
     'excerpt' => isset($article_body) ? implode(' ', $article_body) : '',
     'author_id' => $author_id ?? '',
@@ -57,11 +59,13 @@ header("Pragma: no-cache"); // HTTP/1.0
 <meta property="og:type" content="<?php echo $willow_seo['type']; ?>">
 <meta property="og:title" content="<?php echo htmlspecialchars($g5_head_title, ENT_QUOTES, 'UTF-8'); ?>">
 <meta property="og:description" content="<?php echo htmlspecialchars($willow_seo['description'], ENT_QUOTES, 'UTF-8'); ?>">
-<meta property="og:image" content="<?php echo G5_IMG_URL; ?>/willow-share-20261020.jpg">
-<meta property="og:image:width" content="1668">
-<meta property="og:image:height" content="835">
+<meta property="og:image" content="<?php echo htmlspecialchars($willow_seo['image'], ENT_QUOTES, 'UTF-8'); ?>">
+<?php if ($willow_seo['image_width'] && $willow_seo['image_height']) { ?>
+<meta property="og:image:width" content="<?php echo (int) $willow_seo['image_width']; ?>">
+<meta property="og:image:height" content="<?php echo (int) $willow_seo['image_height']; ?>">
+<?php } ?>
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="<?php echo G5_IMG_URL; ?>/willow-share-20261020.jpg">
+<meta name="twitter:image" content="<?php echo htmlspecialchars($willow_seo['image'], ENT_QUOTES, 'UTF-8'); ?>">
 <?php
 if (G5_IS_MOBILE) {
     echo '<meta name="viewport" id="meta_viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">'.PHP_EOL;

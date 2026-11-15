@@ -8,6 +8,9 @@ function willow_seo_metadata($script, $query, $title, $context = array())
     $canonical = $base.$script;
     $index = false;
     $type = 'website';
+    $image = G5_IMG_URL.'/willow-share-20261020.jpg';
+    $image_width = 1668;
+    $image_height = 835;
     if ($script === '/index.php' || $script === '/') {
         $title = '윌로우 WILLOW | 작은 기록이 서로의 힘이 되는 곳';
         $canonical = $base.'/';
@@ -16,6 +19,20 @@ function willow_seo_metadata($script, $query, $title, $context = array())
         $canonical .= '?'.($context['post_type'] === 'topic' ? 'wp_id=' : 'wr_id=').(int) $context['post_id'];
         $index = empty($context['paid']);
         $type = 'article';
+        foreach (array_merge($context['images'] ?? array(), array($context['avatar'] ?? '')) as $candidate) {
+            $candidate = trim((string) $candidate);
+            if ($candidate === '') continue;
+            if (strpos($candidate, '//') === 0) {
+                $candidate = 'https:'.$candidate;
+            } elseif (!preg_match('#^https?://#i', $candidate)) {
+                if (preg_match('#^[a-z][a-z0-9+.-]*:#i', $candidate)) continue;
+                $candidate = rtrim(G5_URL, '/').'/'.ltrim($candidate, '/');
+            }
+            $image = $candidate;
+            $image_width = null;
+            $image_height = null;
+            break;
+        }
         $description = $index ? ($context['excerpt'] ?? '') : '구독자 전용 글입니다. 작가 구독 후 읽을 수 있습니다.';
     } elseif ($script === '/willow/author.php' && !empty($context['author_id'])) {
         $canonical .= '?author='.rawurlencode($context['author_id']);
@@ -35,5 +52,5 @@ function willow_seo_metadata($script, $query, $title, $context = array())
     $description = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($description), ENT_QUOTES, 'UTF-8')));
     $description = mb_substr($description, 0, 150, 'UTF-8');
     if ($description === '') $description = '윌로우에서 글과 작가의 이야기를 만나보세요.';
-    return array('title' => strip_tags($title), 'description' => $description, 'canonical' => $canonical, 'index' => $index, 'type' => $type);
+    return array('title' => strip_tags($title), 'description' => $description, 'canonical' => $canonical, 'index' => $index, 'type' => $type, 'image' => $image, 'image_width' => $image_width, 'image_height' => $image_height);
 }
