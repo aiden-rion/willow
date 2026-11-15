@@ -57,6 +57,7 @@ if (empty($member_row['mb_id'])) {
                     mb_profile = '',
                     mb_1 = 'willow_phone_auth' ";
     sql_query($sql);
+    insert_point($mb_id, $config['cf_register_point'], '회원가입 축하', '@member', $mb_id, '회원가입');
 } else {
     $sql = " update {$g5['member_table']}
                 set mb_nick = '".sql_escape_string($mb_nick)."',
