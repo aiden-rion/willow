@@ -30,7 +30,7 @@ function willow_subscription_bill_one($subscription)
         $card_where .= " and ci_id = '".(int) $subscription['ws_card_ci_id']."' ";
     }
     $card = sql_fetch(" select * from `{$card_table}` where {$card_where} order by ci_id desc limit 1 ", false);
-    if (empty($card['ci_id'])) {
+    if (empty($card['ci_id']) && empty($subscription['ws_card_ci_id'])) {
         $card = willow_payment_default_card($subscriber['mb_id']);
     }
     if (empty($card['ci_id']) || empty($card['card_billkey'])) {
